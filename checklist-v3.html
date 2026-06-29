@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Checklist de Envio para Medição — FABRILIS</title>
+<style>
+  :root{
+    --ink:#161616; --text:#2C2C2C; --muted:#6A6A6A;
+    --red:#D93025; --green:#2E9E4F; --amber:#B8860B;
+    --paper:#FCFCFA; --card:#FFFFFF; --border:#DBD8D2; --dark:#121212;
+    --line:#E6E3DD;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--text);
+    font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:880px;margin:0 auto;padding:28px 20px 60px;}
+  .kick{font-size:11px;letter-spacing:3px;font-weight:700;color:#7E7E7E;}
+  .hrow{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  h1{font-size:26px;font-weight:800;color:var(--ink);margin:8px 0 0;letter-spacing:.3px;line-height:1.1;}
+  .rule{height:1.6px;background:var(--ink);margin:14px 0 0;}
+  .lead{font-size:13.5px;color:var(--muted);margin:16px 0 0;line-height:1.5;max-width:680px;}
+  .bar{position:sticky;top:0;z-index:20;background:var(--paper);
+    border-bottom:1px solid var(--line);margin:18px -20px 0;padding:12px 20px;}
+  .barflex{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .track{flex:1;min-width:160px;height:8px;background:#EDEAE3;border-radius:6px;overflow:hidden;}
+  .fill{height:100%;width:0;background:var(--green);transition:width .25s ease;}
+  .count{font-size:12.5px;font-weight:700;color:var(--ink);white-space:nowrap;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:18px 18px 8px;margin:18px 0 0;}
+  .sec-h{display:flex;align-items:center;gap:10px;margin:0 0 4px;}
+  .sec-n{font-size:12px;font-weight:800;color:#fff;background:var(--ink);
+    border-radius:6px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;}
+  .sec-t{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:.2px;}
+  .sec-d{font-size:12px;color:var(--muted);margin:2px 0 10px;line-height:1.45;}
+  .badge{font-size:10px;font-weight:700;letter-spacing:.6px;border-radius:5px;padding:3px 7px;margin-left:auto;}
+  .badge.guide{background:#FBEEEC;color:var(--red);}
+  .item{border-top:1px solid var(--line);padding:12px 0;}
+  .item:first-of-type{border-top:none;}
+  .item-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .item-name{font-size:13.5px;font-weight:600;color:var(--ink);flex:1;min-width:160px;}
+  .state{font-size:9px;font-weight:800;letter-spacing:.6px;border-radius:20px;padding:3px 9px;text-transform:uppercase;}
+  .state.pend{background:#FBEEEC;color:var(--red);}
+  .state.ok{background:#EAF6EE;color:var(--green);}
+  .seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .seg button{appearance:none;border:none;background:#fff;color:var(--muted);
+    font-size:11.5px;font-weight:700;padding:7px 11px;cursor:pointer;letter-spacing:.2px;}
+  .seg button + button{border-left:1px solid var(--border);}
+  .seg button.on-y{background:var(--green);color:#fff;}
+  .seg button.on-n{background:var(--ink);color:#fff;}
+  .seg-na{appearance:none;border:1px solid var(--border);background:#fff;color:var(--muted);
+    font-size:11.5px;font-weight:700;padding:9px 12px;border-radius:8px;cursor:pointer;white-space:nowrap;}
+  .seg-na.on-n{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .hint-sm{font-size:11px;color:var(--muted);margin-top:4px;}
+  .fields{display:none;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 2px;}
+  .fields.show{display:grid;}
+  .fields.two{grid-template-columns:repeat(2,1fr);}
+  .fields.one{grid-template-columns:1fr;}
+  .f label{display:block;font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--muted);margin:0 0 3px;text-transform:uppercase;}
+  .f input, .f textarea, .idgrid input, .idgrid select{
+    width:100%;font-size:13px;font-family:inherit;color:var(--ink);
+    border:1px solid var(--border);border-radius:7px;padding:8px 9px;background:#fff;}
+  .f input.req-empty{border-color:var(--red);background:#FFF8F7;}
+  textarea{resize:vertical;min-height:38px;}
+  .idgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .idgrid .full{grid-column:1/-1;}
+  .idgrid .span2{grid-column:span 2;}
+  .idgrid label{display:block;font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--muted);margin:0 0 3px;text-transform:uppercase;}
+  .heritage{display:none;margin:10px 0 2px;font-size:12px;color:var(--amber);
+    background:#FBF6E9;border:1px solid #EAD9A6;border-radius:8px;padding:9px 11px;}
+  .heritage.show{display:block;}
+  .secq{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:6px 0 10px;}
+  .secq span{font-size:13px;color:var(--ink);font-weight:600;}
+  .dyn-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:start;margin:8px 0;}
+  .dyn-row .rm{border:none;background:none;color:var(--red);font-size:18px;cursor:pointer;line-height:1;padding:6px;}
+  .fixture-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:start;margin:8px 0;}
+  .fixture-row .rm{border:none;background:none;color:var(--red);font-size:18px;cursor:pointer;line-height:1;padding:6px;}
+  .addbtn{appearance:none;border:1px dashed var(--border);background:#fff;color:var(--ink);
+    font-size:12px;font-weight:700;border-radius:8px;padding:9px 12px;cursor:pointer;margin:4px 0 6px;}
+  .dyn-wrap{display:none;}
+  .dyn-wrap.show{display:block;}
+  .termo{background:#fff;border:1px solid var(--border);border-left:4px solid var(--red);
+    border-radius:10px;padding:14px 16px;margin:18px 0 0;}
+  .termo h3{margin:0 0 6px;font-size:12px;letter-spacing:.6px;color:var(--red);font-weight:800;}
+  .termo p{margin:0;font-size:12.5px;color:var(--text);line-height:1.5;}
+  .termo code{background:#F3F0EA;border-radius:4px;padding:1px 5px;font-size:11.5px;}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:22px 0 0;}
+  .btn{appearance:none;border:none;border-radius:9px;font-size:13.5px;font-weight:800;
+    letter-spacing:.3px;padding:13px 20px;cursor:pointer;}
+  .btn.primary{background:var(--ink);color:#fff;}
+  .btn.primary:disabled{background:#C9C5BD;cursor:not-allowed;}
+  .btn.ghost{background:#fff;border:1px solid var(--border);color:var(--ink);}
+  .hint{font-size:12px;color:var(--red);font-weight:600;}
+  .hint.ok{color:var(--green);}
+  .foot{display:flex;justify-content:space-between;margin:30px 0 0;padding-top:14px;
+    border-top:1px solid var(--line);font-size:11px;letter-spacing:1px;color:#8A8A8A;}
+  #summary{display:none;}
+  #summary.show{display:block;margin:24px 0 0;}
+  .sumhead{font-size:11px;letter-spacing:3px;color:#7E7E7E;font-weight:700;}
+  .sum-sec{margin:16px 0 0;}
+  .sum-sec h4{font-size:13px;font-weight:800;color:var(--ink);margin:0 0 6px;
+    border-bottom:1px solid var(--ink);padding-bottom:4px;}
+  .sum-line{font-size:12.5px;color:var(--text);padding:3px 0;border-bottom:1px dotted var(--line);}
+  .sum-line b{color:var(--ink);}
+  .sum-na{color:var(--muted);}
+  .sum-pend{color:var(--red);font-weight:700;}
+  .sign{display:flex;gap:40px;margin:34px 0 0;}
+  .sign div{flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:11px;color:var(--muted);letter-spacing:.5px;}
+  @media (max-width:620px){
+    .idgrid,.fields,.fields.two{grid-template-columns:1fr 1fr;}
+    .fields.one{grid-template-columns:1fr;}
+    .idgrid .span2{grid-column:1/-1;}
+    .fixture-row{grid-template-columns:1fr;}
+    .dyn-row{grid-template-columns:1fr;}
+    h1{font-size:22px;}
+  }
+  @media print{
+    @page{margin:14mm;}
+    body{background:#fff;}
+    .bar,.actions,.no-print,form#form{display:none !important;}
+    #summary.show{display:block;}
+    .wrap{padding:0;max-width:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="kick">FABRILIS · MARCENARIA AUTORAL</div>
+  <div class="hrow">
+    <h1>CHECKLIST DE ENVIO PARA MEDIÇÃO</h1>
+    <div class="kick">SOLICITAÇÃO DE MEDIÇÃO · INTERNO</div>
+  </div>
+  <div class="rule"></div>
+  <p class="lead">Todo projeto enviado ao setor técnico deve ter os itens abaixo definidos. Cada item precisa ser
+  resolvido — informado ou marcado como “não se aplica”. O resumo só é liberado quando não houver nenhum item em aberto.</p>
+
+  <!-- PROGRESS BAR -->
+  <div class="bar no-print">
+    <div class="barflex">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <div class="count" id="count">0 de 0 itens resolvidos</div>
+    </div>
+  </div>
+
+  <form id="form">
+    <!-- IDENTIFICATION -->
+    <div class="card">
+      <div class="sec-h"><span class="sec-t">Identificação</span></div>
+      <div class="idgrid" id="idgrid">
+        <div><label>Cliente</label><input data-id="cliente" required></div>
+        <div><label>Projeto / Pedido</label><input data-id="projeto" required></div>
+        <div><label>Consultor(a)</label><input data-id="consultor" required></div>
+        <div class="span2"><label>Endereço da obra</label><input data-id="endereco" required></div>
+        <div><label>Tipo de medição</label>
+          <select data-id="tipo_medicao" required>
+            <option value="">Selecionar</option>
+            <option>Orientação</option>
+            <option>Final</option>
+          </select></div>
+        <div><label>Quantidade de ambientes a serem medidos</label><input data-id="qtd_ambientes" type="number" min="1" step="1" required></div>
+        <div><label>Responsável pela obra</label><input data-id="responsavel_obra" required></div>
+        <div><label>Telefone do responsável</label><input data-id="telefone_responsavel" type="tel" required></div>
+        <div><label>Loja</label>
+          <select data-id="loja" required>
+            <option value="">Selecionar</option>
+            <option>Gabriel (São Paulo)</option>
+            <option>Campinas</option>
+          </select></div>
+        <div><label>Tipo de obra</label>
+          <select data-id="tipo" id="tipo" required>
+            <option value="">Selecionar</option>
+            <option>Obra nova</option>
+            <option>Reforma</option>
+            <option>Herança / acervo</option>
+          </select></div>
+        <div><label>Data do preenchimento do checklist</label><input data-id="data_checklist" type="date" required></div>
+        <div><label>Data da solicitação da medição</label><input data-id="data_solicitacao_medicao" type="date" required></div>
+        <div class="full">
+          <label>Link do SharePoint com as fotos da obra</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input data-id="link_fotos" id="link_fotos" placeholder="Cole o link do SharePoint com as fotos" style="flex:1;min-width:200px;">
+            <button type="button" class="seg-na" id="fotosNA">Não se aplica</button>
+          </div>
+          <div class="hint-sm" id="fotosHint">Se ainda não houver fotos, marque “não se aplica”.</div>
+        </div>
+      </div>
+      <div class="heritage" id="heritage">⚠ Obra de herança/acervo: atenção redobrada — confirme cada medida e registre divergências, pois é onde o ruído de informação mais ocorre.</div>
+    </div>
+
+    <!-- SECTION 1 -->
+    <div class="card" id="card-1">
+      <div class="sec-h"><span class="sec-n">1</span><span class="sec-t">Obra Civil Finalizada</span>
+        <span class="badge guide">GUIA DE AVALIAÇÃO DAS FOTOS</span></div>
+      <div class="sec-d">Base para a avaliação prévia da obra (Jamile). Marque cada item como concluído ou pendente. Itens pendentes embasam o Termo de Responsabilidade.</div>
+      <div id="sec1"></div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="card" id="card-2">
+      <div class="sec-h"><span class="sec-n">2</span><span class="sec-t">Eletrodomésticos</span></div>
+      <div class="sec-d">Informar marca, modelo e dimensões de cada item, ou marcar “não se aplica”. Use “+ Adicionar eletrodoméstico” para itens que não estejam na lista.</div>
+      <div id="sec2"></div>
+      <div id="eletrosExtra"></div>
+      <button type="button" class="addbtn" id="addEletro">+ Adicionar eletrodoméstico</button>
+    </div>
+
+    <!-- SECTION 3 — METAIS (porteira por área molhada) -->
+    <div class="card" id="card-3">
+      <div class="sec-h"><span class="sec-n">3</span><span class="sec-t">Metais e Acabamentos</span></div>
+      <div class="sec-d">O modelo dos metais só importa quando há instalação em área molhada (cuba, pedra ou bancada). Responda abaixo.</div>
+      <div class="secq">
+        <span>Há cuba, pedra ou bancada (instalação em área molhada) no projeto?</span>
+        <div class="seg" data-secq="m">
+          <button type="button" data-v="sim">Sim</button>
+          <button type="button" data-v="nao">Não</button>
+        </div>
+      </div>
+      <div class="dyn-wrap" id="wrapm">
+        <div id="metaisRows"></div>
+      </div>
+    </div>
+
+    <!-- SECTION 4 — CUBAS -->
+    <div class="card" id="card-4">
+      <div class="sec-h"><span class="sec-n">4</span><span class="sec-t">Cubas e Louças</span></div>
+      <div class="sec-d">Informar modelo/material e dimensões de cada peça, ou marcar “não se aplica”.</div>
+      <div id="sec4"></div>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="card" id="card-5">
+      <div class="sec-h"><span class="sec-n">5</span><span class="sec-t">Mobiliário de Terceiros</span></div>
+      <div class="sec-d">Cama, escrivaninha, criados-mudos, móveis de acervo — qualquer móvel que impacte o projeto (abertura de porta de roupeiro, circulação).</div>
+      <div class="secq">
+        <span>Há mobiliário de terceiros que impacta o projeto?</span>
+        <div class="seg" data-secq="5">
+          <button type="button" data-v="sim">Sim</button>
+          <button type="button" data-v="nao">Não</button>
+        </div>
+      </div>
+      <div class="dyn-wrap" id="wrap5">
+        <div id="rows5"></div>
+        <button type="button" class="addbtn" data-add="5">+ Adicionar item</button>
+      </div>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="card" id="card-6">
+      <div class="sec-h"><span class="sec-n">6</span><span class="sec-t">Demais Itens que Interferem no Projeto</span></div>
+      <div class="sec-d">TV em nicho, objetos de coleção/decoração e outros itens que ocupem ou condicionem o ambiente.</div>
+      <div class="secq">
+        <span>Há outros itens que interferem no projeto?</span>
+        <div class="seg" data-secq="6">
+          <button type="button" data-v="sim">Sim</button>
+          <button type="button" data-v="nao">Não</button>
+        </div>
+      </div>
+      <div class="dyn-wrap" id="wrap6">
+        <div id="rows6"></div>
+        <button type="button" class="addbtn" data-add="6">+ Adicionar item</button>
+      </div>
+    </div>
+
+    <!-- TERMO -->
+    <div class="termo">
+      <h3>TERMO DE RESPONSABILIDADE PELAS MEDIDAS INFORMADAS</h3>
+      <p>Tudo que for definido no projeto executivo e ainda não estiver executado deve ter o termo assinado pelo cliente e anexado à pasta dele.
+      Arquivo no SharePoint: <code>Público &gt; 01 - DOCUMENTOS COMERCIAIS &gt; TERMO DE RESPONSABILIDADE PELAS MEDIDAS INFORMADAS</code>.</p>
+    </div>
+
+    <div class="actions no-print">
+      <button type="button" class="btn primary" id="finish" disabled>Gerar solicitação de medição</button>
+      <span class="hint" id="hint">Resolva todos os itens para liberar o resumo.</span>
+    </div>
+  </form>
+
+  <!-- SUMMARY -->
+  <div id="summary"></div>
+
+  <div class="foot">
+    <span>Uso interno | Fabrilis</span>
+    <span>Marcenaria Autoral</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---------- DATA ----------
+  const sec1items = [
+    "Revestimentos instalados em todos os ambientes (pisos, paredes, azulejos)",
+    "Forro / gesso concluído, com altura final definida",
+    "Cortineiro executado, com medidas confirmadas",
+    "Aberturas de portas finalizadas (vãos, batentes e vistas)",
+    "Rodapés definidos",
+    "Pontos hidráulicos posicionados (água quente e fria, esgoto)",
+    "Pontos elétricos posicionados (tomadas, interruptores, saídas para eletros)",
+    "Ambiente livre de entulho e estrutura antiga"
+  ];
+  const sec2items = ["Geladeira","Freezer","Cooktop / Fogão","Forno","Micro-ondas",
+    "Coifa / Depurador","Lava-louças","Máquina de lavar","Secadora","Adega","Cervejeira",
+    "Icemaker","Purificador de água","Triturador de resíduos","Gaveta aquecida","Gaveta refrigerada",
+    "Cafeteira embutida","Frigobar"];
+  const metaisItems = [
+    "Material das bancadas / pedras",
+    "Altura das saias das bancadas (por ambiente)",
+    "Misturadores, metais e acessórios hidráulicos"
+  ];
+  const cubaItems = ["Cuba(s) da cozinha","Cuba(s) dos banheiros","Cuba(s) da área de serviço",
+    "Tanque (área de serviço)","Vaso(s) sanitário(s) / louças"];
+  const cubaBases = ["Cuba cozinha","Cuba banheiro","Cuba área de serviço","Tanque área de serviço","Louça sanitária"];
+
+  const F2 = [{l:"Marca",k:"marca",r:true},{l:"Modelo",k:"modelo",r:true},{l:"Dimensões (L×A×P)",k:"dim",r:true}];
+  const F3 = [{l:"Marca / fornecedor",k:"marca",r:false},{l:"Modelo / material",k:"modelo",r:true},{l:"Dimensões",k:"dim",r:true}];
+  const F4 = [{l:"Marca / fornecedor",k:"marca",r:false},{l:"Modelo / especificação",k:"espec",r:true},{l:"Dimensões / altura",k:"dim",r:false}];
+
+  const state = {}; // id -> {status, fields:{}}
+  let secq = {m:null, 5:null, 6:null};
+  const dynRows = {5:[], 6:[]};
+  let dynEletros = [];
+  let photosNA = false;
+
+  function fieldClass(fields){ return fields.length===3?"":fields.length===2?"two":"one"; }
+
+  // ---------- RENDER DEFINIDO/NA ROWS (eletros) ----------
+  function renderDefRows(containerId, items, fields, prefix){
+    const c = document.getElementById(containerId);
+    items.forEach((name,i)=>{
+      const id = prefix+"_"+i;
+      state[id] = {status:null, fields:{}};
+      let fh='<div class="fields '+fieldClass(fields)+'" id="f_'+id+'">';
+      fields.forEach(f=>{ fh += '<div class="f"><label>'+f.l+(f.r?' *':'')+
+        '</label><input data-fk="'+f.k+'" data-fid="'+id+'"></div>'; });
+      fh += '</div>';
+      const row = document.createElement("div");
+      row.className = "item";
+      row.innerHTML =
+        '<div class="item-top"><span class="item-name">'+name+'</span>'+
+        '<span class="state" id="st_'+id+'"></span>'+
+        '<div class="seg" data-id="'+id+'">'+
+          '<button type="button" data-s="def">Definido</button>'+
+          '<button type="button" data-s="na">Não se aplica</button>'+
+        '</div></div>'+ fh;
+      c.appendChild(row);
+    });
+  }
+
+  // ---------- DYNAMIC ELETROS ----------
+  function addEletro(){
+    const id="de_"+Date.now();
+    dynEletros.push(id); state[id]={status:"def", fields:{}, dynEletro:true};
+    const c=document.getElementById("eletrosExtra");
+    const row=document.createElement("div"); row.className="fixture-row"; row.id="row_"+id;
+    row.innerHTML=
+      '<div class="f"><label>Eletrodoméstico *</label><input data-fk="nome" data-fid="'+id+'" placeholder="Ex.: Cervejeira dupla"></div>'+
+      '<div class="f"><label>Marca *</label><input data-fk="marca" data-fid="'+id+'"></div>'+
+      '<div class="f"><label>Modelo *</label><input data-fk="modelo" data-fid="'+id+'"></div>'+
+      '<div class="f"><label>Dimensões (L×A×P) *</label><input data-fk="dim" data-fid="'+id+'"></div>'+
+      '<button type="button" class="rm" title="Remover" data-rm-el="'+id+'">×</button>';
+    c.appendChild(row); update();
+  }
+
+  // ---------- METAIS (gated) ----------
+  function createMetais(){
+    const c=document.getElementById("metaisRows");
+    if(c.children.length) return;
+    metaisItems.forEach((name,i)=>{
+      const id="m_"+i; state[id]={status:null, fields:{}};
+      let fh='<div class="fields '+fieldClass(F4)+'" id="f_'+id+'">';
+      F4.forEach(f=>{ fh += '<div class="f"><label>'+f.l+(f.r?' *':'')+
+        '</label><input data-fk="'+f.k+'" data-fid="'+id+'"></div>'; });
+      fh += '</div>';
+      const row=document.createElement("div"); row.className="item";
+      row.innerHTML=
+        '<div class="item-top"><span class="item-name">'+name+'</span>'+
+        '<span class="state" id="st_'+id+'"></span>'+
+        '<div class="seg" data-id="'+id+'">'+
+          '<button type="button" data-s="def">Definido</button>'+
+          '<button type="button" data-s="na">Não se aplica</button>'+
+        '</div></div>'+fh;
+      c.appendChild(row);
+    });
+  }
+  function removeMetais(){
+    document.getElementById("metaisRows").innerHTML="";
+    Object.keys(state).forEach(id=>{ if(id.startsWith("m_")) delete state[id]; });
+  }
+
+  // ---------- CUBAS ----------
+  function renderCubas(){
+    const c=document.getElementById("sec4");
+    cubaItems.forEach((name,i)=>{
+      const id="c_"+i; state[id]={status:null, fields:{}, entries:[], base:cubaBases[i]};
+      const fh='<div class="fields one" id="f_'+id+'">'+
+        '<div id="list_'+id+'"></div>'+
+        '<button type="button" class="addbtn" data-add-cuba="'+id+'">+ Adicionar peça</button>'+
+        '</div>';
+      const row=document.createElement("div"); row.className="item";
+      row.innerHTML=
+        '<div class="item-top"><span class="item-name">'+name+'</span>'+
+        '<span class="state" id="st_'+id+'"></span>'+
+        '<div class="seg" data-id="'+id+'">'+
+          '<button type="button" data-s="def">Definido</button>'+
+          '<button type="button" data-s="na">Não se aplica</button>'+
+        '</div></div>'+fh;
+      c.appendChild(row);
+    });
+  }
+  function addCubaEntry(id){
+    const s=state[id]; if(!s) return;
+    const entryId=id+"_"+Date.now()+"_"+Math.floor(Math.random()*1000);
+    const n=s.entries.length+1;
+    const entry={id:entryId, fields:{nome:(s.base||"Peça")+" "+n}};
+    s.entries.push(entry); renderCubaEntry(id,entry); update();
+  }
+  function renderCubaEntry(parentId, entry){
+    const list=document.getElementById("list_"+parentId); if(!list) return;
+    const row=document.createElement("div"); row.className="fixture-row"; row.id="entry_"+entry.id;
+    row.innerHTML=
+      '<div class="f"><label>Identificação *</label><input data-c-id="'+parentId+'" data-c-entry="'+entry.id+'" data-fk="nome" value="'+escAttr(entry.fields.nome||'')+'"></div>'+
+      '<div class="f"><label>Marca / fornecedor</label><input data-c-id="'+parentId+'" data-c-entry="'+entry.id+'" data-fk="marca"></div>'+
+      '<div class="f"><label>Modelo / material *</label><input data-c-id="'+parentId+'" data-c-entry="'+entry.id+'" data-fk="modelo"></div>'+
+      '<div class="f"><label>Dimensões *</label><input data-c-id="'+parentId+'" data-c-entry="'+entry.id+'" data-fk="dim"></div>'+
+      '<button type="button" class="rm" title="Remover" data-rm-cuba="'+parentId+'|'+entry.id+'">×</button>';
+    list.appendChild(row);
+  }
+
+  // ---------- SECTION 1 ----------
+  function renderSec1(){
+    const c = document.getElementById("sec1");
+    sec1items.forEach((name,i)=>{
+      const id="s1_"+i; state[id]={status:null, fields:{}};
+      const row=document.createElement("div"); row.className="item";
+      row.innerHTML=
+        '<div class="item-top"><span class="item-name">'+name+'</span>'+
+        '<span class="state" id="st_'+id+'"></span>'+
+        '<div class="seg" data-id="'+id+'">'+
+          '<button type="button" data-s="ok">Concluído</button>'+
+          '<button type="button" data-s="pend">Pendente</button>'+
+        '</div></div>'+
+        '<div class="fields one" id="f_'+id+'"><div class="f"><label>Observação da pendência *</label>'+
+        '<input data-fk="obs" data-fid="'+id+'" placeholder="O que falta executar"></div></div>';
+      c.appendChild(row);
+    });
+  }
+
+  // ---------- DYNAMIC ROWS (sec 5,6) ----------
+  function addDyn(sec){
+    const id="d"+sec+"_"+Date.now();
+    dynRows[sec].push(id); state[id]={status:"def", fields:{}, dyn:true};
+    const c=document.getElementById("rows"+sec);
+    const row=document.createElement("div"); row.className="dyn-row"; row.id="row_"+id;
+    const ph = sec==="5" ? "Móvel (ex.: cama queen, criado-mudo)" : "Item (ex.: TV em nicho 65\")";
+    row.innerHTML=
+      '<div class="f"><label>Descrição *</label><input data-fk="desc" data-fid="'+id+'" placeholder="'+ph+'"></div>'+
+      '<div class="f"><label>Dimensões / observação *</label><input data-fk="dim" data-fid="'+id+'"></div>'+
+      '<button type="button" class="rm" title="Remover" data-rm="'+id+'">×</button>';
+    c.appendChild(row); update();
+  }
+
+  // ---------- VALIDATION ----------
+  function rowResolved(id){
+    const s=state[id]; if(!s) return false;
+    if(s.dyn){ return !!(s.fields.desc && s.fields.dim); }
+    if(s.dynEletro){ return !!(s.fields.nome && s.fields.marca && s.fields.modelo && s.fields.dim); }
+    if(id.startsWith("s1_")){
+      if(s.status==="ok") return true;
+      if(s.status==="pend") return !!s.fields.obs; return false;
+    }
+    if(id.startsWith("c_")){
+      if(s.status==="na") return true;
+      if(s.status==="def") return s.entries && s.entries.length>0 &&
+        s.entries.every(e=>e.fields.nome && e.fields.modelo && e.fields.dim);
+      return false;
+    }
+    if(s.status==="na") return true;
+    if(id.startsWith("s2_")){
+      if(s.status==="def") return F2.every(f=>!f.r||(s.fields[f.k]&&s.fields[f.k].trim()));
+      return false;
+    }
+    if(id.startsWith("m_")){
+      if(s.status==="def") return F4.every(f=>!f.r||(s.fields[f.k]&&s.fields[f.k].trim()));
+      return false;
+    }
+    return false;
+  }
+  function idComplete(){
+    const els=[...document.querySelectorAll('#idgrid [data-id]')];
+    for(const el of els){
+      if(el.dataset.id==='link_fotos') continue;
+      if(!el.value.trim()) return false;
+    }
+    const lf=document.querySelector('#idgrid [data-id="link_fotos"]');
+    if(!photosNA && !(lf && lf.value.trim())) return false;
+    return true;
+  }
+  function fixedIds(){ return Object.keys(state).filter(id=>!state[id].dyn && !id.startsWith("m_")); }
+
+  function update(){
+    const ids = fixedIds();
+    let resolved = ids.filter(rowResolved).length;
+    let total = ids.length;
+    // gates 5,6
+    let gTotal=0, gOk=0;
+    [5,6].forEach(s=>{ gTotal++; if(secq[s]==="nao") gOk++; else if(secq[s]==="sim"){
+      const rows=dynRows[s].filter(id=>document.getElementById("row_"+id));
+      if(rows.length>0 && rows.every(rowResolved)) gOk++; }});
+    // gate metais
+    gTotal++;
+    if(secq.m==="nao") gOk++;
+    else if(secq.m==="sim"){
+      const mids=Object.keys(state).filter(id=>id.startsWith("m_"));
+      if(mids.length>0 && mids.every(rowResolved)) gOk++;
+    }
+    total+=gTotal; resolved+=gOk;
+    if(idComplete()){ resolved++; } total++;
+
+    const pct = total? Math.round(resolved/total*100):0;
+    document.getElementById("fill").style.width=pct+"%";
+    document.getElementById("count").textContent = resolved+" de "+total+" itens resolvidos";
+    const ok = resolved===total;
+    const btn=document.getElementById("finish"); btn.disabled=!ok;
+    const hint=document.getElementById("hint");
+    if(ok){ hint.textContent="Tudo resolvido — gere a solicitação."; hint.classList.add("ok"); }
+    else { hint.textContent="Resolva todos os itens para liberar o resumo."; hint.classList.remove("ok"); }
+  }
+
+  // ---------- STATE BADGES ----------
+  function paintState(id){
+    const st=document.getElementById("st_"+id); if(!st) return;
+    const s=state[id];
+    if(id.startsWith("s1_")){
+      st.className="state "+(s.status==="ok"?"ok":s.status==="pend"?"pend":"");
+      st.textContent = s.status==="ok"?"CONCLUÍDO":s.status==="pend"?"PENDENTE":"";
+    } else {
+      st.className="state "+(s.status==="def"?"ok":s.status==="na"?"":"");
+      st.textContent = s.status==="def"?"DEFINIDO":s.status==="na"?"N/A":"";
+    }
+  }
+
+  // ---------- EVENTS ----------
+  document.addEventListener("click",function(e){
+    // photos N/A toggle
+    if(e.target.id==="fotosNA"){
+      photosNA=!photosNA;
+      const inp=document.getElementById("link_fotos");
+      e.target.classList.toggle("on-n",photosNA);
+      inp.disabled=photosNA; if(photosNA) inp.value="";
+      document.getElementById("fotosHint").textContent=photosNA?"Sem fotos — marcado como não se aplica.":"Se ainda não houver fotos, marque “não se aplica”.";
+      update(); return;
+    }
+    // item state (def/na/ok/pend)
+    const seg=e.target.closest(".seg[data-id]");
+    if(seg && e.target.dataset.s){
+      const id=seg.dataset.id, v=e.target.dataset.s;
+      state[id].status=v;
+      [...seg.querySelectorAll("button")].forEach(b=>{b.classList.remove("on-y","on-n");});
+      if(v==="def"||v==="ok"){ e.target.classList.add("on-y"); }
+      else { e.target.classList.add("on-n"); }
+      const f=document.getElementById("f_"+id);
+      if(f){ const show = (v==="def"||v==="pend"); f.classList.toggle("show",show); }
+      if(id.startsWith("c_") && v==="def" && state[id].entries.length===0) addCubaEntry(id);
+      paintState(id); update(); return;
+    }
+    // section yes/no gates
+    const sq=e.target.closest(".seg[data-secq]");
+    if(sq && e.target.dataset.v){
+      const sec=sq.dataset.secq, v=e.target.dataset.v; secq[sec]=v;
+      [...sq.querySelectorAll("button")].forEach(b=>b.classList.remove("on-y","on-n"));
+      e.target.classList.add(v==="sim"?"on-y":"on-n");
+      document.getElementById("wrap"+sec).classList.toggle("show",v==="sim");
+      if(sec==="m"){ if(v==="sim") createMetais(); else removeMetais(); }
+      else { if(v==="sim" && dynRows[sec].length===0) addDyn(sec); }
+      update(); return;
+    }
+    if(e.target.id==="addEletro"){ addEletro(); return; }
+    if(e.target.dataset.add){ addDyn(e.target.dataset.add); return; }
+    if(e.target.dataset.addCuba){ addCubaEntry(e.target.dataset.addCuba); return; }
+    if(e.target.dataset.rmCuba){
+      const parts=e.target.dataset.rmCuba.split("|");
+      const s=state[parts[0]]; if(s) s.entries=s.entries.filter(en=>en.id!==parts[1]);
+      const r=document.getElementById("entry_"+parts[1]); if(r) r.remove();
+      update(); return;
+    }
+    if(e.target.dataset.rmEl){
+      const id=e.target.dataset.rmEl; const r=document.getElementById("row_"+id);
+      if(r) r.remove(); delete state[id]; dynEletros=dynEletros.filter(x=>x!==id); update(); return;
+    }
+    if(e.target.dataset.rm){
+      const id=e.target.dataset.rm; const r=document.getElementById("row_"+id);
+      if(r) r.remove(); delete state[id];
+      [5,6].forEach(s=>dynRows[s]=dynRows[s].filter(x=>x!==id)); update(); return;
+    }
+  });
+
+  document.addEventListener("input",function(e){
+    if(e.target.dataset.cId && e.target.dataset.cEntry && e.target.dataset.fk){
+      const s=state[e.target.dataset.cId];
+      const entry=s && s.entries.find(x=>x.id===e.target.dataset.cEntry);
+      if(entry){ entry.fields[e.target.dataset.fk]=e.target.value; update(); }
+      return;
+    }
+    const fid=e.target.dataset.fid, fk=e.target.dataset.fk;
+    if(fid && fk){ state[fid].fields[fk]=e.target.value; paintState(fid); update(); }
+    if(e.target.dataset.id!==undefined && e.target.closest("#idgrid")) update();
+  });
+  document.addEventListener("change",function(e){
+    if(e.target.id==="tipo"){
+      document.getElementById("heritage").classList.toggle("show", e.target.value==="Herança / acervo");
+    }
+    if(e.target.closest("#idgrid")) update();
+  });
+
+  // ---------- BUILD ----------
+  renderSec1();
+  renderDefRows("sec2", sec2items, F2, "s2");
+  renderCubas();
+  update();
+
+  // ---------- SUMMARY ----------
+  document.getElementById("finish").addEventListener("click",function(){
+    const g=id=>{const el=document.querySelector('#idgrid [data-id="'+id+'"]');return el?el.value:"";};
+    let h='<div class="sumhead">FABRILIS · MARCENARIA AUTORAL</div>';
+    h+='<h1 style="font-size:22px;margin:6px 0 0;">Solicitação de Medição</h1>';
+    h+='<div class="rule"></div>';
+    h+='<div class="sum-sec"><h4>Identificação</h4>'+
+       '<div class="sum-line"><b>Cliente:</b> '+esc(g("cliente"))+' &nbsp;·&nbsp; <b>Projeto:</b> '+esc(g("projeto"))+'</div>'+
+       '<div class="sum-line"><b>Consultor(a):</b> '+esc(g("consultor"))+' &nbsp;·&nbsp; <b>Loja:</b> '+esc(g("loja"))+'</div>'+
+       '<div class="sum-line"><b>Endereço da obra:</b> '+esc(g("endereco"))+'</div>'+
+       '<div class="sum-line"><b>Responsável pela obra:</b> '+esc(g("responsavel_obra"))+' &nbsp;·&nbsp; <b>Telefone:</b> '+esc(g("telefone_responsavel"))+'</div>'+
+       '<div class="sum-line"><b>Tipo de medição:</b> '+esc(g("tipo_medicao"))+' &nbsp;·&nbsp; <b>Tipo de obra:</b> '+esc(g("tipo"))+'</div>'+
+       '<div class="sum-line"><b>Quantidade de ambientes:</b> '+esc(g("qtd_ambientes"))+'</div>'+
+       '<div class="sum-line"><b>Fotos (SharePoint):</b> '+(photosNA?'<span class="sum-na">Não se aplica</span>':esc(g("link_fotos")||'—'))+'</div>'+
+       '<div class="sum-line"><b>Data do preenchimento:</b> '+esc(g("data_checklist"))+' &nbsp;·&nbsp; <b>Data da solicitação da medição:</b> '+esc(g("data_solicitacao_medicao"))+'</div></div>';
+
+    // sec1
+    h+='<div class="sum-sec"><h4>1 · Obra Civil Finalizada</h4>';
+    sec1items.forEach((n,i)=>{const s=state["s1_"+i];
+      if(s.status==="ok") h+='<div class="sum-line">✔ '+n+'</div>';
+      else h+='<div class="sum-line sum-pend">✖ '+n+' — pendente: '+esc(s.fields.obs||'')+'</div>';});
+    h+='</div>';
+
+    h+=sumEletros();
+    h+=sumMetais();
+    h+=sumCubas();
+    h+=sumDyn("5 · Mobiliário de Terceiros",5);
+    h+=sumDyn("6 · Demais Itens que Interferem",6);
+
+    h+='<div class="sum-sec"><h4>Termo de Responsabilidade</h4><div class="sum-line">Itens definidos e não executados exigem o Termo de Responsabilidade pelas Medidas Informadas, assinado pelo cliente e anexado à pasta (SharePoint &gt; Público &gt; 01 - DOCUMENTOS COMERCIAIS).</div></div>';
+    h+='<div class="sign"><div>Consultor(a) responsável</div><div>Data do envio</div></div>';
+    h+='<div class="foot" style="margin-top:30px;"><span>Uso interno | Fabrilis</span><span>Marcenaria Autoral</span></div>';
+
+    const sum=document.getElementById("summary"); sum.innerHTML=h; sum.classList.add("show");
+    const bar=document.createElement("div"); bar.className="actions no-print";
+    bar.innerHTML='<button type="button" class="btn primary" id="prt">Imprimir / Salvar PDF</button>'+
+                  '<button type="button" class="btn ghost" id="edit">Voltar e editar</button>';
+    sum.appendChild(bar);
+    document.getElementById("form").style.display="none";
+    sum.scrollIntoView({behavior:"smooth"});
+    document.getElementById("prt").onclick=()=>window.print();
+    document.getElementById("edit").onclick=()=>{
+      sum.classList.remove("show"); sum.innerHTML="";
+      document.getElementById("form").style.display="";
+      window.scrollTo({top:0,behavior:"smooth"});
+    };
+  });
+
+  function sumEletros(){
+    let def="", na="";
+    sec2items.forEach((n,i)=>{const s=state["s2_"+i];
+      if(s.status==="def"){
+        let parts=F2.map(f=>s.fields[f.k]?'<b>'+f.l.replace(' *','')+':</b> '+esc(s.fields[f.k]):null).filter(Boolean).join(' · ');
+        def+='<div class="sum-line">'+n+(parts?' — '+parts:'')+'</div>';
+      } else if(s.status==="na") na+=n+", ";
+    });
+    dynEletros.forEach(id=>{const s=state[id]; if(!s)return;
+      const parts=[s.fields.marca?'<b>Marca:</b> '+esc(s.fields.marca):null,
+        s.fields.modelo?'<b>Modelo:</b> '+esc(s.fields.modelo):null,
+        s.fields.dim?'<b>Dimensões:</b> '+esc(s.fields.dim):null].filter(Boolean).join(' · ');
+      def+='<div class="sum-line"><b>'+esc(s.fields.nome||'Eletro adicional')+'</b>'+(parts?' — '+parts:'')+'</div>';});
+    let h='<div class="sum-sec"><h4>2 · Eletrodomésticos</h4>'+(def||'<div class="sum-line sum-na">Nenhum item definido.</div>');
+    if(na) h+='<div class="sum-line sum-na"><b>Não se aplica:</b> '+esc(na.replace(/, $/,''))+'</div>';
+    return h+'</div>';
+  }
+  function sumMetais(){
+    let h='<div class="sum-sec"><h4>3 · Metais e Acabamentos</h4>';
+    if(secq.m==="nao"){ return h+'<div class="sum-line sum-na">Sem instalação em área molhada (cuba/pedra) — não se aplica.</div></div>'; }
+    let def="", na="";
+    metaisItems.forEach((n,i)=>{const s=state["m_"+i]; if(!s)return;
+      if(s.status==="def"){
+        let parts=F4.map(f=>s.fields[f.k]?'<b>'+f.l.replace(' *','')+':</b> '+esc(s.fields[f.k]):null).filter(Boolean).join(' · ');
+        def+='<div class="sum-line">'+n+(parts?' — '+parts:'')+'</div>';
+      } else if(s.status==="na") na+=n+", ";
+    });
+    h+=(def||'<div class="sum-line sum-na">Nenhum item definido.</div>');
+    if(na) h+='<div class="sum-line sum-na"><b>Não se aplica:</b> '+esc(na.replace(/, $/,''))+'</div>';
+    return h+'</div>';
+  }
+  function sumCubas(){
+    let def="", na="";
+    cubaItems.forEach((n,i)=>{const s=state["c_"+i];
+      if(s.status==="def"){
+        s.entries.forEach(entry=>{
+          const parts=[entry.fields.marca?'<b>Marca / fornecedor:</b> '+esc(entry.fields.marca):null,
+            entry.fields.modelo?'<b>Modelo / material:</b> '+esc(entry.fields.modelo):null,
+            entry.fields.dim?'<b>Dimensões:</b> '+esc(entry.fields.dim):null].filter(Boolean).join(' · ');
+          def+='<div class="sum-line"><b>'+esc(entry.fields.nome||n)+'</b>'+(parts?' — '+parts:'')+'</div>';
+        });
+      } else if(s.status==="na") na+=n+", ";
+    });
+    let h='<div class="sum-sec"><h4>4 · Cubas e Louças</h4>'+(def||'<div class="sum-line sum-na">Nenhum item definido.</div>');
+    if(na) h+='<div class="sum-line sum-na"><b>Não se aplica:</b> '+esc(na.replace(/, $/,''))+'</div>';
+    return h+'</div>';
+  }
+  function sumDyn(title, sec){
+    let h='<div class="sum-sec"><h4>'+title+'</h4>';
+    if(secq[sec]==="nao"){ h+='<div class="sum-line sum-na">Não há itens que impactam o projeto.</div>'; }
+    else{ dynRows[sec].forEach(id=>{const s=state[id]; if(s) h+='<div class="sum-line"><b>'+esc(s.fields.desc||'')+'</b> — '+esc(s.fields.dim||'')+'</div>';});}
+    return h+'</div>';
+  }
+  function esc(t){return (t||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+  function escAttr(t){return esc(t).replace(/"/g,'&quot;');}
+})();
+</script>
+</body>
+</html>
