@@ -1,0 +1,1333 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Checklist de Medição v2 — FABRILIS</title>
+<style>
+:root{
+  --ink:#161616;--text:#2C2C2C;--muted:#6A6A6A;
+  --red:#C0392B;--green:#1E7E34;--amber:#8B6914;
+  --paper:#FCFCFA;--card:#FFFFFF;--border:#DBD8D2;
+  --line:#E6E3DD;--critical-bg:#FDF3F2;--critical-border:#C0392B;
+  --warn-bg:#FBF6E9;--warn-border:#D4AC0D;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--text);
+  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:900px;margin:0 auto;padding:28px 20px 72px;}
+
+/* HEADER */
+.kick{font-size:11px;letter-spacing:3px;font-weight:700;color:#7E7E7E;}
+.hrow{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;}
+h1{font-size:26px;font-weight:800;color:var(--ink);margin:8px 0 0;letter-spacing:.3px;line-height:1.1;}
+.rule{height:1.6px;background:var(--ink);margin:14px 0 0;}
+.lead{font-size:13px;color:var(--muted);margin:14px 0 0;line-height:1.55;max-width:700px;}
+
+/* DRAFT BAR */
+.draftbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:16px 0 0;padding:10px 14px;
+  background:#F5F4F0;border:1px solid var(--line);border-radius:10px;}
+.draftbar span{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.5px;margin-right:4px;}
+.dbtn{appearance:none;border:1px solid var(--border);background:#fff;color:var(--ink);
+  font-size:11px;font-weight:700;border-radius:7px;padding:6px 12px;cursor:pointer;letter-spacing:.2px;}
+.dbtn:hover{background:#F5F4F0;}
+.dbtn.danger{color:var(--red);border-color:#E8B4B0;}
+#autosave-hint{font-size:11px;color:var(--green);font-weight:600;margin-left:auto;}
+
+/* PROGRESS BAR */
+.bar{position:sticky;top:0;z-index:20;background:var(--paper);
+  border-bottom:1px solid var(--line);margin:0 -20px;padding:10px 20px;}
+.barflex{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.track{flex:1;min-width:140px;height:8px;background:#EDEAE3;border-radius:6px;overflow:hidden;position:relative;}
+.fill-ok{height:100%;width:0;background:var(--green);transition:width .25s ease;border-radius:6px;}
+.count{font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap;}
+.crit-badge{font-size:10px;font-weight:800;letter-spacing:.4px;border-radius:5px;
+  padding:3px 8px;background:#FBEEEC;color:var(--red);display:none;}
+.crit-badge.show{display:inline-block;}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:18px 18px 10px;margin:20px 0 0;}
+.card.critical-card{border-color:var(--critical-border);border-left:4px solid var(--critical-border);}
+.sec-h{display:flex;align-items:center;gap:10px;margin:0 0 4px;flex-wrap:wrap;}
+.sec-n{font-size:12px;font-weight:800;color:#fff;background:var(--ink);
+  border-radius:6px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sec-t{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:.2px;}
+.sec-d{font-size:12px;color:var(--muted);margin:2px 0 12px;line-height:1.5;}
+.badge{font-size:10px;font-weight:700;letter-spacing:.5px;border-radius:5px;padding:3px 7px;margin-left:auto;}
+.badge.guide{background:#FBEEEC;color:var(--red);}
+.badge.info{background:#EBF5FB;color:#1A5276;}
+
+/* CHECKLIST ITEMS */
+.item{border-top:1px solid var(--line);padding:12px 0;}
+.item:first-of-type{border-top:none;}
+.item-top{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;}
+.item-name{font-size:13.5px;font-weight:600;color:var(--ink);flex:1;min-width:160px;padding-top:2px;}
+.state{font-size:9px;font-weight:800;letter-spacing:.6px;border-radius:20px;padding:3px 9px;
+  text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+.state.pend{background:#FBEEEC;color:var(--red);}
+.state.ok{background:#EAF6EE;color:var(--green);}
+.state.na{background:#F0F0F0;color:var(--muted);}
+
+/* SEGMENTED */
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;flex-shrink:0;}
+.seg button{appearance:none;border:none;background:#fff;color:var(--muted);
+  font-size:11px;font-weight:700;padding:7px 10px;cursor:pointer;letter-spacing:.2px;white-space:nowrap;}
+.seg button+button{border-left:1px solid var(--border);}
+.seg button.on-y{background:var(--green);color:#fff;}
+.seg button.on-n{background:var(--ink);color:#fff;}
+.seg button.on-warn{background:var(--red);color:#fff;}
+
+/* FIELDS */
+.fields{display:none;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 4px;}
+.fields.show{display:grid;}
+.fields.two{grid-template-columns:repeat(2,1fr);}
+.fields.one{grid-template-columns:1fr;}
+.f label{display:block;font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--muted);
+  margin:0 0 3px;text-transform:uppercase;}
+.f input,.f textarea,.f select,
+.idgrid input,.idgrid select{
+  width:100%;font-size:13px;font-family:inherit;color:var(--ink);
+  border:1px solid var(--border);border-radius:7px;padding:8px 9px;background:#fff;}
+.f input.req-empty,.f textarea.req-empty,.f select.req-empty,
+.idgrid input.req-empty,.idgrid select.req-empty{border-color:var(--red);background:#FFF8F7;}
+textarea{resize:vertical;min-height:52px;}
+
+/* IDENTIFICATION */
+.idgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.idgrid .full{grid-column:1/-1;}
+.idgrid .span2{grid-column:span 2;}
+.idgrid label{display:block;font-size:10px;font-weight:700;letter-spacing:.4px;
+  color:var(--muted);margin:0 0 3px;text-transform:uppercase;}
+
+/* ENVIRONMENTS */
+.env-list{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 4px;}
+.env-row{display:flex;align-items:center;gap:6px;}
+.env-row input{flex:1;font-size:13px;font-family:inherit;color:var(--ink);
+  border:1px solid var(--border);border-radius:7px;padding:8px 9px;background:#fff;}
+.env-row select{flex:1;font-size:13px;font-family:inherit;color:var(--ink);
+  border:1px solid var(--border);border-radius:7px;padding:8px 9px;background:#fff;}
+.env-row .rm{border:none;background:none;color:var(--red);font-size:18px;cursor:pointer;padding:4px 6px;flex-shrink:0;}
+.env-add{appearance:none;border:1px dashed var(--border);background:#fff;color:var(--ink);
+  font-size:12px;font-weight:700;border-radius:8px;padding:8px 12px;cursor:pointer;margin:4px 0 6px;width:100%;}
+
+/* HERITAGE */
+.heritage{display:none;margin:10px 0 4px;font-size:12px;color:var(--amber);
+  background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:8px;padding:9px 12px;}
+.heritage.show{display:block;}
+
+/* CRITICAL WARNING */
+.crit-warn{display:none;background:var(--critical-bg);border:1px solid var(--critical-border);
+  border-radius:8px;padding:10px 14px;margin:8px 0 4px;font-size:12px;color:var(--red);}
+.crit-warn.show{display:block;}
+.crit-warn strong{display:block;font-size:11px;letter-spacing:.5px;margin-bottom:4px;text-transform:uppercase;}
+
+/* CIENCIA CHECKBOX */
+.ciencia-row{display:flex;align-items:flex-start;gap:8px;margin:8px 0 4px;
+  background:var(--critical-bg);border:1px solid #E8B4B0;border-radius:8px;padding:10px 12px;}
+.ciencia-row input[type="checkbox"]{margin:2px 0 0;flex-shrink:0;width:16px;height:16px;cursor:pointer;}
+.ciencia-row label{font-size:12px;color:var(--ink);line-height:1.45;cursor:pointer;}
+
+/* SECTION YES/NO */
+.secq{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:4px 0 10px;}
+.secq span{font-size:13px;color:var(--ink);font-weight:600;}
+
+/* DYNAMIC ROWS */
+.dyn-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:start;margin:8px 0;}
+.dyn-row .rm{border:none;background:none;color:var(--red);font-size:18px;cursor:pointer;line-height:1;padding:6px;}
+.fixture-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:start;margin:8px 0;}
+.fixture-row .rm{border:none;background:none;color:var(--red);font-size:18px;cursor:pointer;line-height:1;padding:6px;}
+.addbtn{appearance:none;border:1px dashed var(--border);background:#fff;color:var(--ink);
+  font-size:12px;font-weight:700;border-radius:8px;padding:9px 12px;cursor:pointer;margin:4px 0 6px;}
+.dyn-wrap{display:none;}
+.dyn-wrap.show{display:block;}
+.linked-title{font-size:10px;font-weight:800;letter-spacing:.7px;color:var(--muted);
+  text-transform:uppercase;margin:10px 0 4px;}
+
+/* PHOTO CHECKLIST */
+.photo-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px solid var(--line);}
+.photo-item:first-of-type{border-top:none;}
+.photo-check{display:flex;align-items:center;gap:8px;flex:1;}
+.photo-check input[type="checkbox"]{width:18px;height:18px;cursor:pointer;flex-shrink:0;margin:0;}
+.photo-check label{font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;line-height:1.35;}
+.photo-obs{margin-top:6px;}
+
+/* AVALIACAO SECTION */
+.aval-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:10px 0;}
+.aval-status{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;}
+.aval-btn{appearance:none;border:1.5px solid var(--border);background:#fff;color:var(--muted);
+  font-size:12px;font-weight:700;border-radius:8px;padding:8px 14px;cursor:pointer;transition:all .15s;}
+.aval-btn.apt{border-color:var(--green);background:#EAF6EE;color:var(--green);}
+.aval-btn.ressalva{border-color:var(--amber);background:var(--warn-bg);color:var(--amber);}
+.aval-btn.inapt{border-color:var(--red);background:var(--critical-bg);color:var(--red);}
+.aval-detail{display:none;margin:10px 0 0;}
+.aval-detail.show{display:block;}
+
+/* TERMO */
+.termo{background:#fff;border:1px solid var(--border);border-left:4px solid var(--red);
+  border-radius:10px;padding:14px 16px;margin:20px 0 0;}
+.termo h3{margin:0 0 6px;font-size:11px;letter-spacing:.7px;color:var(--red);font-weight:800;text-transform:uppercase;}
+.termo p{margin:0;font-size:12.5px;color:var(--text);line-height:1.55;}
+.termo code{background:#F3F0EA;border-radius:4px;padding:1px 5px;font-size:11.5px;}
+
+/* VALIDATION HINT */
+.val-block{display:none;background:var(--critical-bg);border:1px solid #E8B4B0;
+  border-radius:10px;padding:12px 16px;margin:14px 0 0;}
+.val-block.show{display:block;}
+.val-block h4{margin:0 0 6px;font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--red);text-transform:uppercase;}
+.val-block ul{margin:0;padding:0 0 0 16px;font-size:12px;color:var(--text);line-height:1.7;}
+
+/* ACTIONS */
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:20px 0 0;}
+.btn{appearance:none;border:none;border-radius:9px;font-size:13.5px;font-weight:800;
+  letter-spacing:.3px;padding:13px 20px;cursor:pointer;}
+.btn.primary{background:var(--ink);color:#fff;}
+.btn.primary:disabled{background:#C9C5BD;cursor:not-allowed;}
+.btn.ghost{background:#fff;border:1.5px solid var(--border);color:var(--ink);}
+.hint{font-size:12px;color:var(--red);font-weight:600;}
+.hint.ok{color:var(--green);}
+
+/* FOOTER */
+.foot{display:flex;justify-content:space-between;margin:32px 0 0;padding-top:14px;
+  border-top:1px solid var(--line);font-size:11px;letter-spacing:1px;color:#8A8A8A;}
+
+/* SUMMARY */
+#summary{display:none;}
+#summary.show{display:block;margin:24px 0 0;}
+.sumhead{font-size:11px;letter-spacing:3px;color:#7E7E7E;font-weight:700;}
+.sum-sec{margin:18px 0 0;}
+.sum-sec h4{font-size:13px;font-weight:800;color:var(--ink);margin:0 0 6px;
+  border-bottom:1.5px solid var(--ink);padding-bottom:4px;}
+.sum-sec.critical h4{color:var(--red);border-color:var(--red);}
+.sum-line{font-size:12.5px;color:var(--text);padding:4px 0;border-bottom:1px dotted var(--line);}
+.sum-line b{color:var(--ink);}
+.sum-na{color:var(--muted);}
+.sum-pend{color:var(--red);font-weight:700;}
+.sum-ok{color:var(--green);}
+.sum-crit-block{background:var(--critical-bg);border:1.5px solid var(--critical-border);
+  border-radius:10px;padding:14px 16px;margin:0 0 4px;}
+.sum-crit-block h4{font-size:12px;font-weight:800;letter-spacing:.5px;color:var(--red);
+  text-transform:uppercase;margin:0 0 8px;border:none;padding:0;}
+.sign{display:flex;gap:40px;margin:36px 0 0;flex-wrap:wrap;}
+.sign div{flex:1;min-width:180px;border-top:1px solid var(--ink);padding-top:8px;
+  font-size:11px;color:var(--muted);letter-spacing:.5px;}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .idgrid,.fields,.aval-grid{grid-template-columns:1fr;}
+  .idgrid .span2,.idgrid .full{grid-column:1/-1;}
+  .fields.two{grid-template-columns:1fr;}
+  .fixture-row{grid-template-columns:1fr;}
+  .dyn-row{grid-template-columns:1fr;}
+  .env-list{grid-template-columns:1fr;}
+  h1{font-size:21px;}
+  .sign{flex-direction:column;gap:24px;}
+  .seg button{padding:7px 8px;font-size:10px;}
+}
+@media(max-width:480px){
+  .wrap{padding:20px 14px 60px;}
+  .card{padding:14px 14px 8px;}
+  .btn{font-size:13px;padding:12px 16px;}
+}
+@media print{
+  @page{margin:14mm;}
+  body{background:#fff;}
+  .bar,.actions,.no-print,form#form,.draftbar{display:none!important;}
+  #summary.show{display:block;}
+  .wrap{padding:0;max-width:none;}
+  .sum-crit-block{border:1.5px solid var(--red)!important;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="kick">FABRILIS · MARCENARIA AUTORAL</div>
+  <div class="hrow">
+    <h1>CHECKLIST DE ENVIO PARA MEDIÇÃO</h1>
+    <div class="kick">SOLICITAÇÃO DE MEDIÇÃO · INTERNO</div>
+  </div>
+  <div class="rule"></div>
+  <p class="lead">Preencha todos os campos antes de gerar a solicitação. O preenchimento do checklist <strong>não implica aprovação automática</strong> da medição — a avaliação prévia da obra é feita pela Jamile. Existindo pendências, elas aparecerão como ressalvas críticas no resumo e podem exigir Termo de Responsabilidade.</p>
+
+  <!-- DRAFT CONTROLS -->
+  <div class="draftbar no-print">
+    <span>RASCUNHO</span>
+    <button class="dbtn" id="btnSave">Salvar rascunho</button>
+    <button class="dbtn" id="btnLoad">Carregar rascunho</button>
+    <button class="dbtn danger" id="btnClear">Limpar checklist</button>
+    <span id="autosave-hint"></span>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div class="bar no-print" style="margin-top:14px;">
+    <div class="barflex">
+      <div class="track"><div class="fill-ok" id="fill"></div></div>
+      <div class="count" id="count">0 de 0 itens resolvidos</div>
+      <span class="crit-badge" id="critBadge"></span>
+    </div>
+  </div>
+
+  <form id="form">
+
+    <!-- IDENTIFICATION -->
+    <div class="card">
+      <div class="sec-h"><span class="sec-t">Identificação</span></div>
+      <div class="idgrid" id="idgrid">
+        <div><label>Cliente *</label><input data-id="cliente" required></div>
+        <div><label>Projeto / Pedido *</label><input data-id="projeto" required></div>
+        <div><label>Consultor(a) *</label><input data-id="consultor" required></div>
+        <div class="span2"><label>Endereço da obra *</label><input data-id="endereco" required></div>
+        <div><label>Loja *</label>
+          <select data-id="loja" required>
+            <option value="">Selecionar</option>
+            <option>Gabriel (São Paulo)</option>
+            <option>Campinas</option>
+          </select></div>
+        <div><label>Tipo de obra *</label>
+          <select data-id="tipo" id="tipo" required>
+            <option value="">Selecionar</option>
+            <option>Obra nova</option>
+            <option>Reforma</option>
+            <option>Herança / acervo</option>
+          </select></div>
+        <div><label>Data preenchimento *</label><input data-id="data_checklist" type="date" required></div>
+        <div><label>Data solicitação da medição *</label><input data-id="data_solicitacao" type="date" required></div>
+        <div></div>
+        <div><label>Responsável pela obra *</label><input data-id="resp_obra" required></div>
+        <div><label>Telefone do responsável *</label><input data-id="tel_resp_obra" type="tel" required></div>
+        <div><label>Quem informará medidas pendentes *</label>
+          <select data-id="quem_informa" required>
+            <option value="">Selecionar</option>
+            <option>Cliente</option>
+            <option>Profissional (arquiteto/eng.)</option>
+            <option>Consultor(a)</option>
+            <option>Outro</option>
+          </select></div>
+        <div class="span2"><label>Profissional resp. pelas informações técnicas</label><input data-id="prof_tecnico"></div>
+        <div><label>Tel / e-mail do profissional</label><input data-id="contato_prof"></div>
+      </div>
+      <div class="heritage" id="heritage">⚠ Obra de herança/acervo: atenção redobrada — confirme cada medida e registre divergências, pois é onde o ruído de informação mais ocorre.</div>
+
+      <!-- ENVIRONMENTS -->
+      <div style="margin-top:14px;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Ambientes a serem medidos *</div>
+        <div class="env-list" id="envList"></div>
+        <button type="button" class="env-add" id="btnAddEnv">+ Adicionar ambiente</button>
+      </div>
+    </div>
+
+    <!-- SECTION 0: FOTOS E DOCUMENTAÇÃO -->
+    <div class="card">
+      <div class="sec-h">
+        <span class="sec-n">0</span>
+        <span class="sec-t">Fotos e Documentação Obrigatória</span>
+        <span class="badge info">ANTES DE TUDO</span>
+      </div>
+      <div class="sec-d">Confirme cada item antes de avançar. Itens não confirmados aparecerão como pendências no resumo.</div>
+      <div id="sec0"></div>
+      <div class="f" style="margin-top:10px;">
+        <label>Link da pasta SharePoint do cliente</label>
+        <input id="sharepoint-link" placeholder="https://byzagofabrilis.sharepoint.com/...">
+      </div>
+      <div class="f" style="margin-top:8px;">
+        <label>Observações sobre documentos ausentes</label>
+        <textarea id="doc-obs" rows="2" placeholder="Descreva documentos faltantes ou pendentes"></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION 1: OBRA CIVIL -->
+    <div class="card" id="card-1">
+      <div class="sec-h">
+        <span class="sec-n">1</span>
+        <span class="sec-t">Obra Civil Finalizada</span>
+        <span class="badge guide">BASE PARA AVALIAÇÃO DA JAMILE</span>
+      </div>
+      <div class="sec-d">Itens pendentes são <strong>ressalvas críticas</strong> e aparecerão destacados no resumo. O consultor deve confirmar ciência para avançar com ressalvas.</div>
+      <div id="sec1"></div>
+    </div>
+
+    <!-- SECTION 2: ELETRODOMÉSTICOS -->
+    <div class="card" id="card-2">
+      <div class="sec-h"><span class="sec-n">2</span><span class="sec-t">Eletrodomésticos</span></div>
+      <div class="sec-d">Informar marca, modelo e dimensões de cada item, ou marcar "não se aplica" com justificativa.</div>
+      <div id="sec2"></div>
+    </div>
+
+    <!-- SECTION 3: CUBAS E LOUÇAS -->
+    <div class="card" id="card-3">
+      <div class="sec-h"><span class="sec-n">3</span><span class="sec-t">Cubas e Louças</span></div>
+      <div class="sec-d">Informar modelo/material e dimensões de cada peça, ou marcar "não se aplica" com justificativa.</div>
+      <div id="sec3"></div>
+    </div>
+
+    <!-- SECTION 4: METAIS -->
+    <div class="card" id="card-4">
+      <div class="sec-h"><span class="sec-n">4</span><span class="sec-t">Metais e Acabamentos</span></div>
+      <div class="sec-d">Informar especificação e dimensões de cada item, ou marcar "não se aplica" com justificativa.</div>
+      <div id="sec4linked"></div>
+      <div id="sec4"></div>
+    </div>
+
+    <!-- SECTION 5: MOBILIÁRIO -->
+    <div class="card" id="card-5">
+      <div class="sec-h"><span class="sec-n">5</span><span class="sec-t">Mobiliário de Terceiros</span></div>
+      <div class="sec-d">Cama, escrivaninha, criados-mudos, móveis de acervo — qualquer móvel que impacte o projeto (abertura de porta, circulação).</div>
+      <div class="secq">
+        <span>Há mobiliário de terceiros que impacta o projeto?</span>
+        <div class="seg" data-secq="5">
+          <button type="button" data-v="sim">Sim</button>
+          <button type="button" data-v="nao">Não</button>
+        </div>
+      </div>
+      <div class="dyn-wrap" id="wrap5">
+        <div id="rows5"></div>
+        <button type="button" class="addbtn" data-add="5">+ Adicionar item</button>
+      </div>
+    </div>
+
+    <!-- SECTION 6: DEMAIS ITENS -->
+    <div class="card" id="card-6">
+      <div class="sec-h"><span class="sec-n">6</span><span class="sec-t">Demais Itens que Interferem no Projeto</span></div>
+      <div class="sec-d">TV em nicho, objetos de coleção/decoração e outros itens que ocupem ou condicionem o ambiente.</div>
+      <div class="secq">
+        <span>Há outros itens que interferem no projeto?</span>
+        <div class="seg" data-secq="6">
+          <button type="button" data-v="sim">Sim</button>
+          <button type="button" data-v="nao">Não</button>
+        </div>
+      </div>
+      <div class="dyn-wrap" id="wrap6">
+        <div id="rows6"></div>
+        <button type="button" class="addbtn" data-add="6">+ Adicionar item</button>
+      </div>
+    </div>
+
+    <!-- SECTION 7: AVALIAÇÃO PRÉVIA -->
+    <div class="card">
+      <div class="sec-h">
+        <span class="sec-n">7</span>
+        <span class="sec-t">Avaliação Prévia da Obra</span>
+        <span class="badge info">JAMILE</span>
+      </div>
+      <div class="sec-d">Preenchido pela responsável técnica após análise das fotos e checklist. Se a obra não estiver apta, o consultor será comunicado formalmente.</div>
+
+      <div style="margin:10px 0 6px;font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;">Status da avaliação</div>
+      <div class="aval-status">
+        <button type="button" class="aval-btn" data-aval="apt">✔ Apta para medição</button>
+        <button type="button" class="aval-btn" data-aval="ressalva">⚠ Apta com ressalvas</button>
+        <button type="button" class="aval-btn" data-aval="inapt">✖ Não apta para medição</button>
+      </div>
+
+      <div class="aval-grid" style="margin-top:10px;">
+        <div class="f"><label>Responsável pela avaliação</label><input id="aval-resp" placeholder="Nome da avaliadora"></div>
+        <div class="f"><label>Data da avaliação</label><input id="aval-data" type="date"></div>
+        <div class="f"></div>
+      </div>
+
+      <div class="aval-detail" id="aval-detail">
+        <div class="f"><label>Motivo da ressalva / reprovação</label>
+          <textarea id="aval-motivo" rows="2" placeholder="Descreva o motivo detalhadamente"></textarea></div>
+        <div class="f" style="margin-top:8px;"><label>Orientação formal ao consultor</label>
+          <textarea id="aval-orientacao" rows="2" placeholder="O que o consultor deve fazer antes de prosseguir"></textarea></div>
+      </div>
+    </div>
+
+    <!-- TERMO -->
+    <div class="termo">
+      <h3>Termo de Responsabilidade pelas Medidas Informadas</h3>
+      <p>Todo item considerado no projeto executivo que ainda não estiver fisicamente executado na obra deverá estar respaldado pelo Termo de Responsabilidade pelas Medidas Informadas, devidamente preenchido, assinado pelo cliente/profissional responsável e anexado à pasta do cliente antes do início do projeto executivo.<br>
+      Arquivo: <code>SharePoint &gt; Público &gt; 01 - DOCUMENTOS COMERCIAIS &gt; TERMO DE RESPONSABILIDADE</code></p>
+    </div>
+
+    <!-- VALIDATION BLOCK -->
+    <div class="val-block" id="valBlock">
+      <h4>Itens pendentes</h4>
+      <ul id="valList"></ul>
+    </div>
+
+    <div class="actions no-print">
+      <button type="button" class="btn primary" id="finish">Gerar solicitação de medição</button>
+      <span class="hint" id="hint">Preencha todos os campos obrigatórios.</span>
+    </div>
+  </form>
+
+  <!-- SUMMARY -->
+  <div id="summary"></div>
+
+  <div class="foot">
+    <span>Uso interno | Fabrilis · Checklist v2</span>
+    <span>Marcenaria Autoral</span>
+  </div>
+</div>
+
+<script>
+(function(){
+
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+
+const sec0items = [
+  {id:"foto_ambientes", label:"Fotos atualizadas de todos os ambientes a serem medidos"},
+  {id:"fotos_gerais",   label:"Fotos gerais da obra (estado atual)"},
+  {id:"memorial",       label:"Memorial pronto e aprovado pelas gerentes"},
+  {id:"email_ag",       label:"E-mail de solicitação de agendamento enviado"},
+];
+
+const sec1items = [
+  "Revestimentos instalados em todos os ambientes (pisos, paredes, azulejos)",
+  "Forro / gesso concluído, com altura final definida",
+  "Cortineiro executado, com medidas confirmadas",
+  "Aberturas de portas finalizadas (vãos, batentes e vistas)",
+  "Rodapés definidos (tipo e altura)",
+  "Pontos hidráulicos posicionados (água quente e fria, esgoto)",
+  "Pontos elétricos posicionados (tomadas, interruptores, saídas para eletros)",
+  "Ambiente livre de entulho e estrutura antiga"
+];
+
+const sec2items = ["Geladeira","Freezer","Cooktop / Fogão","Forno","Micro-ondas",
+  "Coifa / Depurador","Lava-louças","Máquina de lavar","Secadora","Adega","Cervejeira",
+  "Icemaker","Purificador de água","Triturador de resíduos","Gaveta aquecida","Gaveta refrigerada",
+  "Cafeteira embutida","Frigobar","Outros eletros embutidos"];
+
+const sec3items = ["Cuba(s) da cozinha","Cuba(s) dos banheiros","Cuba(s) da área de serviço",
+  "Tanque (área de serviço)","Vaso(s) sanitário(s) / louças"];
+const sec3bases = ["Cuba cozinha","Cuba banheiro","Cuba área de serviço","Tanque área de serviço","Louça sanitária"];
+
+const sec4items = ["Misturadores e acessórios hidráulicos",
+  "Material das bancadas / pedras","Altura das saias das bancadas (por ambiente)",
+  "Válvulas, ralos e acabamentos"];
+
+const F2 = [{l:"Marca",k:"marca",r:true},{l:"Modelo",k:"modelo",r:true},{l:"Dimensões (L×A×P)",k:"dim",r:true}];
+const F3 = [{l:"Marca / fornecedor",k:"marca",r:false},{l:"Modelo / material",k:"modelo",r:true},{l:"Dimensões",k:"dim",r:true}];
+const F4 = [{l:"Marca / fornecedor",k:"marca",r:false},{l:"Especificação (tipo, cor, espessura…)",k:"espec",r:true},{l:"Dimensões / altura",k:"dim",r:false}];
+
+const ENV_OPTS = ["Cozinha","Dormitório casal","Dormitório filhos","Dormitório hóspedes",
+  "Banheiro social","Banheiro suíte","Banheiro filhos","Lavabo","Sala de estar",
+  "Sala de jantar","Home office","Lavanderia","Área gourmet / varanda","Closet","Outro"];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+
+const state = {};
+const sec0state = {}; // id -> {checked, obs}
+let secq = {5:null,6:null};
+const dynRows = {5:[],6:[]};
+let environments = [];
+let avalStatus = null;
+
+// ─── ENVIRONMENTS ─────────────────────────────────────────────────────────────
+
+function addEnv(val){
+  const envId = "env_"+Date.now()+"_"+Math.floor(Math.random()*1000);
+  environments.push({id:envId, value:val||""});
+  renderEnvRow(envId, val||"");
+  update();
+}
+
+function renderEnvRow(envId, val){
+  const list = document.getElementById("envList");
+  const wrap = document.createElement("div");
+  wrap.className = "env-row";
+  wrap.id = "envrow_"+envId;
+  const sel = document.createElement("select");
+  sel.dataset.envId = envId;
+  sel.innerHTML = '<option value="">Selecionar ou digitar…</option>' +
+    ENV_OPTS.map(o=>'<option'+(val===o?' selected':'')+'>'+o+'</option>').join('');
+  sel.addEventListener("change", e=>{
+    const env = environments.find(x=>x.id===envId);
+    if(env){ env.value = e.target.value; } update();
+  });
+  if(val) sel.value = val;
+  const rm = document.createElement("button");
+  rm.type="button"; rm.className="rm"; rm.title="Remover"; rm.textContent="×";
+  rm.addEventListener("click",()=>{
+    environments = environments.filter(x=>x.id!==envId);
+    wrap.remove(); update();
+  });
+  wrap.appendChild(sel); wrap.appendChild(rm);
+  list.appendChild(wrap);
+}
+
+// ─── SECTION 0 RENDER ─────────────────────────────────────────────────────────
+
+function renderSec0(){
+  const c = document.getElementById("sec0");
+  sec0items.forEach(item=>{
+    sec0state[item.id] = {checked:false, obs:""};
+    const div = document.createElement("div");
+    div.className = "photo-item";
+    div.innerHTML =
+      '<div style="flex:1">'+
+      '<div class="photo-check">'+
+      '<input type="checkbox" id="ph_'+item.id+'" data-ph="'+item.id+'">'+
+      '<label for="ph_'+item.id+'">'+item.label+'</label>'+
+      '</div>'+
+      '</div>';
+    c.appendChild(div);
+  });
+}
+
+// ─── SECTION 1 RENDER ─────────────────────────────────────────────────────────
+
+function renderSec1(){
+  const c = document.getElementById("sec1");
+  sec1items.forEach((name,i)=>{
+    const id = "s1_"+i;
+    state[id] = {status:null, fields:{}, ciencia:false};
+    const row = document.createElement("div");
+    row.className = "item";
+    row.innerHTML =
+      '<div class="item-top">'+
+        '<span class="item-name">'+name+'</span>'+
+        '<span class="state" id="st_'+id+'"></span>'+
+        '<div class="seg" data-id="'+id+'">'+
+          '<button type="button" data-s="ok">Concluído</button>'+
+          '<button type="button" data-s="pend">Pendente</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="fields one" id="f_'+id+'" style="display:none;">'+
+        '<div class="f"><label>Descrição da pendência *</label>'+
+          '<textarea data-fk="obs" data-fid="'+id+'" placeholder="O que falta executar e qual o impacto no projeto" rows="2"></textarea></div>'+
+      '</div>'+
+      '<div class="crit-warn" id="cw_'+id+'">'+
+        '<strong>⚠ Ressalva crítica</strong>'+
+        'Esta pendência será registrada no resumo e pode exigir Termo de Responsabilidade.'+
+      '</div>'+
+      '<div class="ciencia-row" id="ci_'+id+'" style="display:none;">'+
+        '<input type="checkbox" id="ch_'+id+'" data-ciencia="'+id+'">'+
+        '<label for="ch_'+id+'">Estou ciente desta pendência e assumo responsabilidade por prosseguir com a solicitação mesmo com esta ressalva.</label>'+
+      '</div>';
+    c.appendChild(row);
+  });
+}
+
+// ─── DEF ROWS (sec 2,3,4) ────────────────────────────────────────────────────
+
+function fieldClass(fields){ return fields.length===3?"":fields.length===2?"two":"one"; }
+
+function renderDefRows(containerId, items, fields, sec){
+  const c = document.getElementById(containerId);
+  items.forEach((name,i)=>{
+    const id = "s"+sec+"_"+i;
+    state[id] = {status:null, fields:{}, naJust:""};
+    if(sec===3){ state[id].entries=[]; state[id].base=sec3bases[i]; }
+    const row = document.createElement("div");
+    row.className = "item";
+    let fieldsHtml = "";
+    if(sec===3){
+      fieldsHtml =
+        '<div class="fields one" id="f_'+id+'">'+
+          '<div id="list_'+id+'"></div>'+
+          '<button type="button" class="addbtn" data-add-s3="'+id+'">+ Adicionar peça</button>'+
+        '</div>';
+    } else {
+      fieldsHtml = '<div class="fields '+fieldClass(fields)+'" id="f_'+id+'">';
+      fields.forEach(f=>{
+        fieldsHtml += '<div class="f"><label>'+f.l+(f.r?' *':'')+'</label>'+
+          '<input data-fk="'+f.k+'" data-fid="'+id+'"></div>';
+      });
+      fieldsHtml += '</div>';
+    }
+    fieldsHtml +=
+      '<div class="fields one" id="naj_'+id+'" style="display:none;">'+
+        '<div class="f"><label>Justificativa do "não se aplica"'+(sec>1?' *':'')+'</label>'+
+          '<input data-naj="'+id+'" placeholder="Por que este item não se aplica a este projeto"></div>'+
+      '</div>';
+    row.innerHTML =
+      '<div class="item-top"><span class="item-name">'+name+'</span>'+
+        '<span class="state" id="st_'+id+'"></span>'+
+        '<div class="seg" data-id="'+id+'">'+
+          '<button type="button" data-s="def">Definido</button>'+
+          '<button type="button" data-s="na">Não se aplica</button>'+
+        '</div>'+
+      '</div>'+fieldsHtml;
+    c.appendChild(row);
+  });
+}
+
+// ─── S3 ENTRIES ───────────────────────────────────────────────────────────────
+
+function addS3Entry(id){
+  const s = state[id]; if(!s) return;
+  const entryId = id+"_"+Date.now()+"_"+Math.floor(Math.random()*1000);
+  const n = s.entries.length+1;
+  const entry = {id:entryId, fields:{nome:(s.base||"Peça")+" "+n}};
+  s.entries.push(entry);
+  renderS3Entry(id, entry);
+  updateMetalRows();
+  update();
+}
+
+function renderS3Entry(parentId, entry){
+  const list = document.getElementById("list_"+parentId); if(!list) return;
+  const row = document.createElement("div");
+  row.className = "fixture-row";
+  row.id = "entry_"+entry.id;
+  row.innerHTML =
+    '<div class="f"><label>Identificação *</label><input data-s3-id="'+parentId+'" data-s3-entry="'+entry.id+'" data-fk="nome" value="'+escAttr(entry.fields.nome||'')+'"></div>'+
+    '<div class="f"><label>Marca / fornecedor</label><input data-s3-id="'+parentId+'" data-s3-entry="'+entry.id+'" data-fk="marca"></div>'+
+    '<div class="f"><label>Modelo / material *</label><input data-s3-id="'+parentId+'" data-s3-entry="'+entry.id+'" data-fk="modelo"></div>'+
+    '<div class="f"><label>Dimensões *</label><input data-s3-id="'+parentId+'" data-s3-entry="'+entry.id+'" data-fk="dim"></div>'+
+    '<button type="button" class="rm" title="Remover" data-rm-s3="'+parentId+'|'+entry.id+'">×</button>';
+  list.appendChild(row);
+}
+
+// ─── LINKED METAL ROWS ────────────────────────────────────────────────────────
+
+function activeFixtureEntries(){
+  const out = [];
+  sec3items.forEach((_,i)=>{
+    const parentId = "s3_"+i, s = state[parentId];
+    if(!s || s.status!=="def") return;
+    s.entries.forEach(entry=>{
+      out.push({id:"m4_"+entry.id, label:"Metal — "+(entry.fields.nome||s.base||"peça"), source:entry.id});
+    });
+  });
+  return out;
+}
+
+function updateMetalRows(){
+  const c = document.getElementById("sec4linked"); if(!c) return;
+  const entries = activeFixtureEntries();
+  const activeIds = new Set(entries.map(e=>e.id));
+  Object.keys(state).forEach(id=>{ if(id.startsWith("m4_") && !activeIds.has(id)) delete state[id]; });
+  if(entries.length===0){ c.innerHTML=""; return; }
+  c.innerHTML = '<div class="linked-title">Metais vinculados ao Quadro 3</div>';
+  entries.forEach(entry=>{
+    if(!state[entry.id]) state[entry.id] = {status:null, fields:{}, linked:true, label:entry.label, naJust:""};
+    else state[entry.id].label = entry.label;
+    const s = state[entry.id];
+    const row = document.createElement("div");
+    row.className = "item";
+    let fieldsHtml = '<div class="fields '+fieldClass(F4)+(s.status==="def"?" show":"")+'" id="f_'+entry.id+'">';
+    F4.forEach(f=>{
+      fieldsHtml += '<div class="f"><label>'+f.l+(f.r?' *':'')+'</label>'+
+        '<input data-fk="'+f.k+'" data-fid="'+entry.id+'" value="'+escAttr(s.fields[f.k]||'')+'"></div>';
+    });
+    fieldsHtml += '</div>';
+    fieldsHtml +=
+      '<div class="fields one" id="naj_'+entry.id+'" style="'+(s.status==="na"?"display:grid;":"display:none;")+'">'+
+        '<div class="f"><label>Justificativa do "não se aplica" *</label>'+
+          '<input data-naj="'+entry.id+'" value="'+escAttr(s.naJust||'')+'"></div>'+
+      '</div>';
+    row.innerHTML =
+      '<div class="item-top"><span class="item-name">'+escHtml(entry.label)+'</span>'+
+        '<span class="state" id="st_'+entry.id+'"></span>'+
+        '<div class="seg" data-id="'+entry.id+'">'+
+          '<button type="button" data-s="def" class="'+(s.status==="def"?"on-y":"")+'">Definido</button>'+
+          '<button type="button" data-s="na" class="'+(s.status==="na"?"on-n":"")+'">Não se aplica</button>'+
+        '</div>'+
+      '</div>'+fieldsHtml;
+    c.appendChild(row);
+    paintState(entry.id);
+  });
+}
+
+// ─── DYN ROWS (sec 5,6) ───────────────────────────────────────────────────────
+
+function addDyn(sec){
+  const id = "d"+sec+"_"+Date.now();
+  dynRows[sec].push(id);
+  state[id] = {status:"def", fields:{}, dyn:true};
+  const c = document.getElementById("rows"+sec);
+  const row = document.createElement("div"); row.className="dyn-row"; row.id="row_"+id;
+  const ph = sec===5 ? "Móvel (ex.: cama queen, criado-mudo)" : "Item (ex.: TV em nicho 65\")";
+  row.innerHTML =
+    '<div class="f"><label>Descrição *</label><input data-fk="desc" data-fid="'+id+'" placeholder="'+ph+'"></div>'+
+    '<div class="f"><label>Dimensões / observação *</label><input data-fk="dim" data-fid="'+id+'"></div>'+
+    '<button type="button" class="rm" title="Remover" data-rm="'+id+'">×</button>';
+  c.appendChild(row);
+  update();
+}
+
+// ─── VALIDATION ───────────────────────────────────────────────────────────────
+
+function rowResolved(id){
+  const s = state[id]; if(!s) return false;
+  if(s.dyn){ return !!(s.fields.desc && s.fields.dim); }
+  if(id.startsWith("s1_")){
+    if(s.status==="ok") return true;
+    if(s.status==="pend") return !!(s.fields.obs && s.ciencia);
+    return false;
+  }
+  if(s.status==="na") return !!(s.naJust && s.naJust.trim());
+  if(id.startsWith("s3_") && s.status==="def"){
+    return s.entries && s.entries.length>0 &&
+      s.entries.every(e=>e.fields.nome && e.fields.modelo && e.fields.dim);
+  }
+  if(s.status==="def"){
+    const sec = id.startsWith("m4_") ? "4" : id.charAt(1);
+    const fields = sec==="2"?F2:sec==="3"?F3:F4;
+    return fields.every(f=> !f.r || (s.fields[f.k]&&s.fields[f.k].trim()));
+  }
+  return false;
+}
+
+function idComplete(){
+  const required = ["cliente","projeto","consultor","endereco","loja","tipo",
+    "data_checklist","data_solicitacao","resp_obra","tel_resp_obra","quem_informa"];
+  return required.every(id=>{
+    const el = document.querySelector('#idgrid [data-id="'+id+'"]');
+    return el && el.value.trim();
+  }) && environments.length>0 && environments.every(e=>e.value.trim());
+}
+
+function sec0Complete(){
+  return sec0items.every(item=>{
+    const el = document.getElementById("ph_"+item.id);
+    return el && el.checked;
+  });
+}
+
+function criticalPendingCount(){
+  return sec1items.filter((_,i)=>state["s1_"+i] && state["s1_"+i].status==="pend").length;
+}
+
+function update(){
+  const ids = Object.keys(state).filter(id=>!state[id].dyn);
+  let resolved = ids.filter(rowResolved).length;
+  let total = ids.length;
+  // sec yes/no
+  let secqTotal=2, secqOk=0;
+  [5,6].forEach(s=>{
+    if(secq[s]==="nao") secqOk++;
+    else if(secq[s]==="sim"){
+      const rows = dynRows[s].filter(id=>document.getElementById("row_"+id));
+      if(rows.length>0 && rows.every(rowResolved)) secqOk++;
+    }
+  });
+  total += secqTotal; resolved += secqOk;
+  if(idComplete()){ resolved++; } total++;
+  if(sec0Complete()){ resolved++; } total++;
+
+  const pct = total ? Math.round(resolved/total*100) : 0;
+  document.getElementById("fill").style.width = pct+"%";
+  document.getElementById("count").textContent = resolved+" de "+total+" itens resolvidos";
+
+  const crit = criticalPendingCount();
+  const badge = document.getElementById("critBadge");
+  if(crit>0){
+    badge.textContent = crit+" pendência"+(crit>1?"s":"")+" crítica"+(crit>1?"s":"");
+    badge.classList.add("show");
+  } else {
+    badge.classList.remove("show");
+  }
+
+  const allOk = resolved===total;
+  const btn = document.getElementById("finish");
+  const hint = document.getElementById("hint");
+  // allow generate even with critical pending (consultant must acknowledge)
+  const canGenerate = allOk || (crit>0 && resolved===total);
+  btn.disabled = !allOk;
+  if(allOk && crit===0){
+    hint.textContent="Tudo resolvido — gere a solicitação."; hint.classList.add("ok");
+  } else if(crit>0){
+    hint.textContent="Existem "+crit+" pendência(s) crítica(s) — confirme ciência em cada uma."; hint.classList.remove("ok");
+  } else {
+    hint.textContent="Preencha todos os campos obrigatórios."; hint.classList.remove("ok");
+  }
+}
+
+// ─── PAINT STATE ──────────────────────────────────────────────────────────────
+
+function paintState(id){
+  const st = document.getElementById("st_"+id); if(!st) return;
+  const s = state[id];
+  if(id.startsWith("s1_")){
+    if(s.status==="ok"){ st.className="state ok"; st.textContent="CONCLUÍDO"; }
+    else if(s.status==="pend"){ st.className="state pend"; st.textContent="PENDENTE"; }
+    else { st.className="state"; st.textContent=""; }
+  } else {
+    if(s.status==="def"){ st.className="state ok"; st.textContent="DEFINIDO"; }
+    else if(s.status==="na"){ st.className="state na"; st.textContent="N/A"; }
+    else { st.className="state"; st.textContent=""; }
+  }
+}
+
+// ─── EVENTS ───────────────────────────────────────────────────────────────────
+
+document.addEventListener("click",function(e){
+  // segmented item state
+  const seg = e.target.closest(".seg[data-id]");
+  if(seg && e.target.dataset.s){
+    const id = seg.dataset.id, v = e.target.dataset.s;
+    state[id].status = v;
+    [...seg.querySelectorAll("button")].forEach(b=>b.classList.remove("on-y","on-n"));
+    e.target.classList.add(v==="def"||v==="ok"?"on-y":"on-n");
+    const f = document.getElementById("f_"+id);
+    if(f){ f.style.display = (v==="def"||v==="pend")?"grid":"none"; }
+    const naj = document.getElementById("naj_"+id);
+    if(naj){ naj.style.display = v==="na"?"grid":"none"; }
+    // sec1 critical UI
+    if(id.startsWith("s1_")){
+      const cw = document.getElementById("cw_"+id);
+      const ci = document.getElementById("ci_"+id);
+      if(cw) cw.classList.toggle("show", v==="pend");
+      if(ci){ ci.style.display = v==="pend"?"flex":"none"; }
+      if(v!=="pend"){ state[id].ciencia=false;
+        const ch=document.getElementById("ch_"+id); if(ch) ch.checked=false; }
+    }
+    if(id.startsWith("s3_") && v==="def" && state[id].entries.length===0) addS3Entry(id);
+    if(id.startsWith("s3_")) updateMetalRows();
+    paintState(id); update(); autoSave(); return;
+  }
+  // section yes/no
+  const sq = e.target.closest(".seg[data-secq]");
+  if(sq && e.target.dataset.v){
+    const sec = sq.dataset.secq, v = e.target.dataset.v; secq[sec]=v;
+    [...sq.querySelectorAll("button")].forEach(b=>b.classList.remove("on-y","on-n"));
+    e.target.classList.add(v==="sim"?"on-y":"on-n");
+    document.getElementById("wrap"+sec).classList.toggle("show",v==="sim");
+    if(v==="sim" && dynRows[sec].length===0) addDyn(sec);
+    update(); autoSave(); return;
+  }
+  if(e.target.dataset.add){ addDyn(e.target.dataset.add); return; }
+  if(e.target.dataset.addS3){ addS3Entry(e.target.dataset.addS3); return; }
+  if(e.target.dataset.rmS3){
+    const parts = e.target.dataset.rmS3.split("|");
+    const parentId=parts[0], entryId=parts[1];
+    const s = state[parentId];
+    if(s) s.entries = s.entries.filter(e=>e.id!==entryId);
+    const r = document.getElementById("entry_"+entryId); if(r) r.remove();
+    updateMetalRows(); update(); return;
+  }
+  if(e.target.dataset.rm){
+    const id = e.target.dataset.rm;
+    const r = document.getElementById("row_"+id); if(r) r.remove();
+    delete state[id];
+    [5,6].forEach(s=>dynRows[s]=dynRows[s].filter(x=>x!==id));
+    update(); return;
+  }
+  // avaliação buttons
+  const av = e.target.dataset.aval;
+  if(av){
+    avalStatus = av;
+    document.querySelectorAll(".aval-btn").forEach(b=>{
+      b.classList.remove("apt","ressalva","inapt");
+    });
+    e.target.classList.add(av);
+    const det = document.getElementById("aval-detail");
+    det.classList.toggle("show", av==="ressalva"||av==="inapt");
+    return;
+  }
+});
+
+document.addEventListener("change",function(e){
+  if(e.target.id==="tipo"){
+    document.getElementById("heritage").classList.toggle("show", e.target.value==="Herança / acervo");
+  }
+  // photo checkboxes
+  if(e.target.dataset.ph){
+    sec0state[e.target.dataset.ph].checked = e.target.checked;
+    update(); autoSave(); return;
+  }
+  if(e.target.closest("#idgrid")){ update(); autoSave(); return; }
+});
+
+document.addEventListener("input",function(e){
+  // s3 entry fields
+  if(e.target.dataset.s3Id && e.target.dataset.s3Entry && e.target.dataset.fk){
+    const s = state[e.target.dataset.s3Id];
+    const entry = s && s.entries.find(x=>x.id===e.target.dataset.s3Entry);
+    if(entry){ entry.fields[e.target.dataset.fk]=e.target.value; updateMetalRows(); update(); }
+    return;
+  }
+  // na justification
+  if(e.target.dataset.naj){
+    const id = e.target.dataset.naj;
+    if(state[id]) state[id].naJust = e.target.value;
+    paintState(id); update(); autoSave(); return;
+  }
+  // ciencia checkbox handled in change, but catch input on fid/fk
+  const fid=e.target.dataset.fid, fk=e.target.dataset.fk;
+  if(fid && fk){ state[fid].fields[fk]=e.target.value; paintState(fid); update(); autoSave(); }
+  if(e.target.closest("#idgrid")){ update(); autoSave(); }
+});
+
+// ciencia checkboxes
+document.addEventListener("change",function(e){
+  if(e.target.dataset.ciencia){
+    const id = e.target.dataset.ciencia;
+    if(state[id]) state[id].ciencia = e.target.checked;
+    update(); autoSave();
+  }
+  if(e.target.dataset.envId){
+    const env = environments.find(x=>x.id===e.target.dataset.envId);
+    if(env) env.value = e.target.value;
+    update(); autoSave();
+  }
+});
+
+document.getElementById("btnAddEnv").addEventListener("click",()=>{ addEnv(); });
+
+// ─── LOCALSTORAGE ─────────────────────────────────────────────────────────────
+
+const LS_KEY = "fabrilis_checklist_v2";
+let autoSaveTimer = null;
+
+function collectFormData(){
+  const id = {};
+  document.querySelectorAll("#idgrid [data-id]").forEach(el=>{ id[el.dataset.id]=el.value; });
+  const ph = {}; sec0items.forEach(item=>{
+    const el=document.getElementById("ph_"+item.id); if(el) ph[item.id]=el.checked;
+  });
+  const sp = document.getElementById("sharepoint-link");
+  const docObs = document.getElementById("doc-obs");
+  return {
+    id, ph,
+    sharepoint: sp?sp.value:"",
+    doc_obs: docObs?docObs.value:"",
+    state: JSON.parse(JSON.stringify(state)),
+    secq, dynRows, environments, avalStatus,
+    aval_resp: document.getElementById("aval-resp")?document.getElementById("aval-resp").value:"",
+    aval_data: document.getElementById("aval-data")?document.getElementById("aval-data").value:"",
+    aval_motivo: document.getElementById("aval-motivo")?document.getElementById("aval-motivo").value:"",
+    aval_orientacao: document.getElementById("aval-orientacao")?document.getElementById("aval-orientacao").value:"",
+  };
+}
+
+function autoSave(){
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(()=>{
+    try{
+      localStorage.setItem(LS_KEY, JSON.stringify(collectFormData()));
+      const h = document.getElementById("autosave-hint");
+      if(h){ h.textContent="Rascunho salvo automaticamente"; setTimeout(()=>{ h.textContent=""; },3000); }
+    }catch(e){}
+  }, 800);
+}
+
+document.getElementById("btnSave").addEventListener("click",()=>{
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(collectFormData()));
+    alert("Rascunho salvo com sucesso.");
+  }catch(e){ alert("Erro ao salvar: "+e.message); }
+});
+
+document.getElementById("btnLoad").addEventListener("click",()=>{
+  const raw = localStorage.getItem(LS_KEY);
+  if(!raw){ alert("Nenhum rascunho salvo."); return; }
+  if(!confirm("Carregar rascunho salvo? Os dados atuais serão substituídos.")) return;
+  try{ loadFormData(JSON.parse(raw)); }
+  catch(e){ alert("Erro ao carregar: "+e.message); }
+});
+
+document.getElementById("btnClear").addEventListener("click",()=>{
+  if(!confirm("Limpar todos os dados do checklist?")) return;
+  localStorage.removeItem(LS_KEY);
+  location.reload();
+});
+
+function loadFormData(data){
+  if(data.id){
+    Object.entries(data.id).forEach(([k,v])=>{
+      const el = document.querySelector('#idgrid [data-id="'+k+'"]');
+      if(el){ el.value=v; if(k==="tipo") document.getElementById("heritage").classList.toggle("show",v==="Herança / acervo"); }
+    });
+  }
+  if(data.ph){
+    Object.entries(data.ph).forEach(([k,v])=>{
+      const el=document.getElementById("ph_"+k); if(el){ el.checked=v; sec0state[k].checked=v; }
+    });
+  }
+  const sp=document.getElementById("sharepoint-link"); if(sp&&data.sharepoint) sp.value=data.sharepoint;
+  const docObs=document.getElementById("doc-obs"); if(docObs&&data.doc_obs) docObs.value=data.doc_obs;
+  // environments
+  document.getElementById("envList").innerHTML="";
+  environments = [];
+  if(data.environments) data.environments.forEach(e=>{ environments.push(e); renderEnvRow(e.id, e.value); });
+  // state (best effort)
+  if(data.state){ Object.entries(data.state).forEach(([k,v])=>{ if(state[k]) Object.assign(state[k],v); }); }
+  // redraw UI for sec1
+  sec1items.forEach((_,i)=>{
+    const id="s1_"+i, s=state[id]; if(!s) return;
+    if(s.status){
+      const seg=document.querySelector('.seg[data-id="'+id+'"]');
+      if(seg){ const btn=seg.querySelector('[data-s="'+s.status+'"]'); if(btn){ btn.classList.add(s.status==="ok"?"on-y":"on-n"); } }
+      const f=document.getElementById("f_"+id); if(f) f.style.display=s.status==="pend"?"grid":"none";
+      const cw=document.getElementById("cw_"+id); if(cw) cw.classList.toggle("show",s.status==="pend");
+      const ci=document.getElementById("ci_"+id); if(ci) ci.style.display=s.status==="pend"?"flex":"none";
+      const ch=document.getElementById("ch_"+id); if(ch) ch.checked=!!s.ciencia;
+      if(s.fields&&s.fields.obs){ const ta=document.querySelector('[data-fid="'+id+'"][data-fk="obs"]'); if(ta) ta.value=s.fields.obs; }
+      paintState(id);
+    }
+  });
+  // sec 2,3,4
+  ["2","3","4"].forEach(sec=>{
+    const items = sec==="2"?sec2items:sec==="3"?sec3items:sec4items;
+    items.forEach((_,i)=>{
+      const id="s"+sec+"_"+i, s=state[id]; if(!s||!s.status) return;
+      const seg=document.querySelector('.seg[data-id="'+id+'"]');
+      if(seg){ const btn=seg.querySelector('[data-s="'+s.status+'"]');
+        if(btn) btn.classList.add(s.status==="def"?"on-y":"on-n"); }
+      const f=document.getElementById("f_"+id); if(f) f.style.display=s.status==="def"?"grid":"none";
+      const naj=document.getElementById("naj_"+id); if(naj) naj.style.display=s.status==="na"?"grid":"none";
+      if(s.naJust){ const naji=document.querySelector('[data-naj="'+id+'"]'); if(naji) naji.value=s.naJust; }
+      const fields=sec==="2"?F2:sec==="3"?F3:F4;
+      fields.forEach(fld=>{ const inp=document.querySelector('[data-fid="'+id+'"][data-fk="'+fld.k+'"]'); if(inp&&s.fields&&s.fields[fld.k]) inp.value=s.fields[fld.k]; });
+      paintState(id);
+    });
+  });
+  // secq
+  if(data.secq){ secq=data.secq; [5,6].forEach(s=>{
+    if(secq[s]){
+      const sq=document.querySelector('.seg[data-secq="'+s+'"]');
+      if(sq){ const btn=sq.querySelector('[data-v="'+secq[s]+'"]'); if(btn) btn.classList.add(secq[s]==="sim"?"on-y":"on-n"); }
+      document.getElementById("wrap"+s).classList.toggle("show",secq[s]==="sim");
+    }
+  }); }
+  // dynRows
+  if(data.dynRows){ [5,6].forEach(s=>{
+    if(data.dynRows[s]) data.dynRows[s].forEach(id=>{
+      if(data.state&&data.state[id]){
+        dynRows[s].push(id); state[id]=Object.assign({status:"def",fields:{},dyn:true},data.state[id]);
+        const c=document.getElementById("rows"+s);
+        const row=document.createElement("div"); row.className="dyn-row"; row.id="row_"+id;
+        const ph=s===5?"Móvel":"Item";
+        row.innerHTML='<div class="f"><label>Descrição *</label><input data-fk="desc" data-fid="'+id+'" value="'+escAttr(state[id].fields.desc||'')+'"></div>'+
+          '<div class="f"><label>Dimensões / observação *</label><input data-fk="dim" data-fid="'+id+'" value="'+escAttr(state[id].fields.dim||'')+'"></div>'+
+          '<button type="button" class="rm" title="Remover" data-rm="'+id+'">×</button>';
+        c.appendChild(row);
+      }
+    });
+  }); }
+  // aval
+  if(data.avalStatus){ avalStatus=data.avalStatus;
+    const btn=document.querySelector('.aval-btn[data-aval="'+avalStatus+'"]');
+    if(btn){ btn.classList.add(avalStatus);
+      document.getElementById("aval-detail").classList.toggle("show",avalStatus==="ressalva"||avalStatus==="inapt"); }
+  }
+  const ar=document.getElementById("aval-resp"); if(ar&&data.aval_resp) ar.value=data.aval_resp;
+  const ad=document.getElementById("aval-data"); if(ad&&data.aval_data) ad.value=data.aval_data;
+  const am=document.getElementById("aval-motivo"); if(am&&data.aval_motivo) am.value=data.aval_motivo;
+  const ao=document.getElementById("aval-orientacao"); if(ao&&data.aval_orientacao) ao.value=data.aval_orientacao;
+  updateMetalRows();
+  update();
+}
+
+// ─── BUILD & INIT ─────────────────────────────────────────────────────────────
+
+renderSec0();
+renderSec1();
+renderDefRows("sec2", sec2items, F2, 2);
+renderDefRows("sec3", sec3items, F3, 3);
+renderDefRows("sec4", sec4items, F4, 4);
+addEnv();
+update();
+
+// auto-load if draft exists
+const savedRaw = localStorage.getItem(LS_KEY);
+if(savedRaw){
+  try{
+    const saved = JSON.parse(savedRaw);
+    if(saved && (saved.id||saved.environments)){
+      const h=document.getElementById("autosave-hint");
+      if(h) h.textContent="Rascunho disponível — clique em 'Carregar rascunho' para restaurar.";
+    }
+  }catch(e){}
+}
+
+// ─── SUMMARY ──────────────────────────────────────────────────────────────────
+
+document.getElementById("finish").addEventListener("click",function(){
+  const g = id=>{
+    const el=document.querySelector('#idgrid [data-id="'+id+'"]');
+    return el?el.value:"";
+  };
+
+  // collect critical pending
+  const critPending = sec1items.filter((_,i)=>state["s1_"+i]&&state["s1_"+i].status==="pend");
+  const critPendingItems = critPending.map((name,_)=>{
+    const i = sec1items.indexOf(name);
+    return {name, obs: state["s1_"+i].fields.obs||""};
+  });
+
+  // sec0 unchecked
+  const uncheckedDocs = sec0items.filter(item=>!sec0state[item.id]||!sec0state[item.id].checked);
+
+  let h = '<div class="sumhead">FABRILIS · MARCENARIA AUTORAL</div>';
+  h += '<h1 style="font-size:22px;margin:6px 0 2px;">Solicitação de Medição</h1>';
+  h += '<div class="rule"></div>';
+
+  // 1. IDENTIFICAÇÃO
+  h += '<div class="sum-sec"><h4>Identificação</h4>';
+  h += '<div class="sum-line"><b>Cliente:</b> '+esc(g("cliente"))+'</div>';
+  h += '<div class="sum-line"><b>Projeto / Pedido:</b> '+esc(g("projeto"))+'  ·  <b>Consultor(a):</b> '+esc(g("consultor"))+'</div>';
+  h += '<div class="sum-line"><b>Loja:</b> '+esc(g("loja"))+'  ·  <b>Tipo de obra:</b> '+esc(g("tipo"))+'</div>';
+  h += '<div class="sum-line"><b>Endereço da obra:</b> '+esc(g("endereco"))+'</div>';
+  h += '<div class="sum-line"><b>Responsável pela obra:</b> '+esc(g("resp_obra"))+'  ·  <b>Tel:</b> '+esc(g("tel_resp_obra"))+'</div>';
+  h += '<div class="sum-line"><b>Prof. técnico:</b> '+esc(g("prof_tecnico")||"—")+'  ·  <b>Contato:</b> '+esc(g("contato_prof")||"—")+'</div>';
+  h += '<div class="sum-line"><b>Quem informará medidas pendentes:</b> '+esc(g("quem_informa"))+'</div>';
+  h += '<div class="sum-line"><b>Data preenchimento:</b> '+esc(g("data_checklist"))+'  ·  <b>Data solicitação:</b> '+esc(g("data_solicitacao"))+'</div>';
+  h += '</div>';
+
+  // 2. PENDÊNCIAS CRÍTICAS
+  if(critPendingItems.length>0 || uncheckedDocs.length>0){
+    h += '<div class="sum-sec critical"><h4>⚠ Pendências Críticas e Ressalvas</h4>';
+    h += '<div class="sum-crit-block">';
+    if(critPendingItems.length>0){
+      h += '<h4 style="color:var(--red);font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin:0 0 8px;">Obra Civil — Itens Pendentes</h4>';
+      critPendingItems.forEach(item=>{
+        h += '<div class="sum-line sum-pend">✖ '+escHtml(item.name);
+        if(item.obs) h += ' — <em>'+esc(item.obs)+'</em>';
+        h += '</div>';
+      });
+      h += '<div class="sum-line" style="margin-top:6px;font-size:11.5px;color:var(--text);">O consultor confirmou ciência e optou por prosseguir com ressalvas. A responsabilidade sobre os impactos decorrentes dos itens pendentes é do consultor.</div>';
+    }
+    if(uncheckedDocs.length>0){
+      if(critPendingItems.length>0) h+='<div style="height:10px;"></div>';
+      h += '<h4 style="color:var(--red);font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin:0 0 8px;">Documentação — Itens Não Confirmados</h4>';
+      uncheckedDocs.forEach(item=>{
+        h += '<div class="sum-line sum-pend">✖ '+escHtml(item.label)+'</div>';
+      });
+    }
+    h += '</div></div>';
+  }
+
+  // 3. FOTOS E DOCUMENTAÇÃO
+  h += '<div class="sum-sec"><h4>Fotos e Documentação</h4>';
+  sec0items.forEach(item=>{
+    const ok = sec0state[item.id]&&sec0state[item.id].checked;
+    h += '<div class="sum-line '+(ok?'sum-ok':'sum-pend')+'">'+(ok?'✔':'✖')+' '+escHtml(item.label)+'</div>';
+  });
+  const sp=document.getElementById("sharepoint-link");
+  if(sp&&sp.value) h+='<div class="sum-line"><b>Pasta SharePoint:</b> '+esc(sp.value)+'</div>';
+  const docObs=document.getElementById("doc-obs");
+  if(docObs&&docObs.value) h+='<div class="sum-line"><b>Obs. documentação:</b> '+esc(docObs.value)+'</div>';
+  h += '</div>';
+
+  // 4. AMBIENTES
+  h += '<div class="sum-sec"><h4>Ambientes a Medir</h4>';
+  if(environments.length===0){ h+='<div class="sum-line sum-pend">Nenhum ambiente informado.</div>'; }
+  else { environments.forEach((e,i)=>{ h+='<div class="sum-line"><b>'+(i+1)+'.</b> '+esc(e.value)+'</div>'; }); }
+  h += '</div>';
+
+  // 5. OBRA CIVIL
+  h += '<div class="sum-sec"><h4>1 · Obra Civil Finalizada</h4>';
+  sec1items.forEach((n,i)=>{
+    const s = state["s1_"+i];
+    if(s.status==="ok") h+='<div class="sum-line sum-ok">✔ '+escHtml(n)+'</div>';
+    else h+='<div class="sum-line sum-pend">✖ '+escHtml(n)+(s.fields.obs?' — <em>'+esc(s.fields.obs)+'</em>':'')+'</div>';
+  });
+  h += '</div>';
+
+  // 6. ELETRODOMÉSTICOS
+  h += sumDef("2 · Eletrodomésticos", sec2items, 2, F2);
+  // 7. CUBAS
+  h += sumDef("3 · Cubas e Louças", sec3items, 3, F3);
+  // 8. METAIS
+  h += sumDef("4 · Metais e Acabamentos", sec4items, 4, F4);
+  // 9. MOBILIÁRIO
+  h += sumDyn("5 · Mobiliário de Terceiros", 5);
+  // 10. DEMAIS ITENS
+  h += sumDyn("6 · Demais Itens que Interferem", 6);
+
+  // AVALIAÇÃO
+  const avalResp=document.getElementById("aval-resp");
+  const avalData=document.getElementById("aval-data");
+  const avalMotivo=document.getElementById("aval-motivo");
+  const avalOrient=document.getElementById("aval-orientacao");
+  if(avalStatus){
+    h += '<div class="sum-sec"><h4>Avaliação Prévia da Obra</h4>';
+    const statusLabel = avalStatus==="apt"?"✔ Apta para medição":avalStatus==="ressalva"?"⚠ Apta com ressalvas":"✖ Não apta para medição";
+    const statusClass = avalStatus==="apt"?"sum-ok":avalStatus==="inapt"?"sum-pend":"";
+    h += '<div class="sum-line '+statusClass+'"><b>Status:</b> '+statusLabel+'</div>';
+    if(avalResp&&avalResp.value) h+='<div class="sum-line"><b>Responsável:</b> '+esc(avalResp.value)+'</div>';
+    if(avalData&&avalData.value) h+='<div class="sum-line"><b>Data:</b> '+esc(avalData.value)+'</div>';
+    if(avalMotivo&&avalMotivo.value) h+='<div class="sum-line"><b>Motivo:</b> '+esc(avalMotivo.value)+'</div>';
+    if(avalOrient&&avalOrient.value) h+='<div class="sum-line"><b>Orientação ao consultor:</b> '+esc(avalOrient.value)+'</div>';
+    h += '</div>';
+  }
+
+  // 11. TERMO
+  h += '<div class="sum-sec"><h4>Termo de Responsabilidade pelas Medidas Informadas</h4>';
+  h += '<div class="sum-line">Todo item considerado no projeto executivo que ainda não estiver fisicamente executado na obra deverá estar respaldado pelo Termo de Responsabilidade pelas Medidas Informadas, devidamente preenchido, assinado pelo cliente/profissional responsável e anexado à pasta do cliente antes do início do projeto executivo.</div>';
+  h += '<div class="sum-line"><b>Arquivo:</b> SharePoint &gt; Público &gt; 01 - DOCUMENTOS COMERCIAIS &gt; TERMO DE RESPONSABILIDADE PELAS MEDIDAS INFORMADAS</div>';
+  h += '</div>';
+
+  // 12 & 13. ASSINATURAS
+  h += '<div class="sign">';
+  h += '<div>Consultor(a) responsável<br><span style="color:#aaa;font-size:10px;">'+esc(g("consultor"))+'</span></div>';
+  h += '<div>Data do envio</div>';
+  if(avalStatus){ h += '<div>Avaliação técnica (Jamile)<br><span style="color:#aaa;font-size:10px;">'+(avalResp&&avalResp.value?esc(avalResp.value):"")+'</span></div>'; }
+  h += '</div>';
+
+  h += '<div class="foot" style="margin-top:32px;"><span>Uso interno | Fabrilis · v2</span><span>Marcenaria Autoral</span></div>';
+
+  const sum = document.getElementById("summary");
+  sum.innerHTML = h;
+  sum.classList.add("show");
+
+  const bar = document.createElement("div"); bar.className="actions no-print";
+  bar.innerHTML='<button type="button" class="btn primary" id="prt">Imprimir / Salvar PDF</button>'+
+                '<button type="button" class="btn ghost" id="edit">Voltar e editar</button>';
+  sum.appendChild(bar);
+  document.getElementById("form").style.display="none";
+  sum.scrollIntoView({behavior:"smooth"});
+  document.getElementById("prt").onclick=()=>window.print();
+  document.getElementById("edit").onclick=()=>{
+    sum.classList.remove("show"); sum.innerHTML="";
+    document.getElementById("form").style.display="";
+    window.scrollTo({top:0,behavior:"smooth"});
+  };
+});
+
+// ─── SUMMARY HELPERS ──────────────────────────────────────────────────────────
+
+function sumDef(title, items, sec, fields){
+  let def="", na="";
+  items.forEach((n,i)=>{
+    const s = state["s"+sec+"_"+i];
+    if(sec===3){
+      if(s.status==="def"){
+        s.entries.forEach(entry=>{
+          const parts=[
+            entry.fields.marca?'<b>Marca:</b> '+esc(entry.fields.marca):null,
+            entry.fields.modelo?'<b>Modelo:</b> '+esc(entry.fields.modelo):null,
+            entry.fields.dim?'<b>Dim:</b> '+esc(entry.fields.dim):null
+          ].filter(Boolean).join(' · ');
+          def+='<div class="sum-line"><b>'+esc(entry.fields.nome||n)+'</b>'+(parts?' — '+parts:'')+'</div>';
+        });
+      } else {
+        na+='<div class="sum-line sum-na">N/A — '+escHtml(n)+(s.naJust?' ('+esc(s.naJust)+')':'')+'</div>';
+      }
+      return;
+    }
+    if(s.status==="def"){
+      let parts = fields.map(f=>s.fields[f.k]?'<b>'+f.l.replace(' *','')+':</b> '+esc(s.fields[f.k]):null).filter(Boolean).join(' · ');
+      def+='<div class="sum-line">'+escHtml(n)+(parts?' — '+parts:'')+'</div>';
+    } else {
+      na+='<div class="sum-line sum-na">N/A — '+escHtml(n)+(s.naJust?' ('+esc(s.naJust)+')':'')+'</div>';
+    }
+  });
+  if(sec===4){
+    Object.keys(state).filter(id=>id.startsWith("m4_")).forEach(id=>{
+      const s=state[id], label=s.label||"Metal vinculado";
+      if(s.status==="def"){
+        let parts=F4.map(f=>s.fields[f.k]?'<b>'+f.l.replace(' *','')+':</b> '+esc(s.fields[f.k]):null).filter(Boolean).join(' · ');
+        def+='<div class="sum-line">'+escHtml(label)+(parts?' — '+parts:'')+'</div>';
+      } else if(s.status==="na"){
+        na+='<div class="sum-line sum-na">N/A — '+escHtml(label)+(s.naJust?' ('+esc(s.naJust)+')':'')+'</div>';
+      }
+    });
+  }
+  let h='<div class="sum-sec"><h4>'+title+'</h4>'+(def||'<div class="sum-line sum-na">Nenhum item definido.</div>');
+  if(na) h+=na;
+  return h+'</div>';
+}
+
+function sumDyn(title, sec){
+  let h='<div class="sum-sec"><h4>'+title+'</h4>';
+  if(secq[sec]==="nao"){ h+='<div class="sum-line sum-na">Não há itens que impactam o projeto.</div>'; }
+  else{ dynRows[sec].forEach(id=>{ const s=state[id]; if(s) h+='<div class="sum-line"><b>'+esc(s.fields.desc||'')+'</b> — '+esc(s.fields.dim||'')+'</div>'; }); }
+  return h+'</div>';
+}
+
+function esc(t){ return (t||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function escHtml(t){ return esc(t); }
+function escAttr(t){ return esc(t).replace(/"/g,'&quot;'); }
+
+})();
+</script>
+</body>
+</html>
