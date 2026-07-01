@@ -63,7 +63,12 @@ npm run validate    # typecheck + lint + test + build em sequência
 | `npm run lint`       | Valida `index.html` com html-validate                  |
 | `npm test`           | Roda os testes com Vitest                              |
 | `npm run test:watch` | Testes em modo watch                                   |
+| `npm run test:e2e`   | Fluxo crítico em navegador real (Playwright)           |
 | `npm run validate`   | `typecheck` + `lint` + `test` + `build`                |
+
+O `validate` **não** inclui o e2e (que exige navegador/servidor); rode
+`npm run test:e2e` à parte. Há um roteiro de smoke manual em
+[`docs/QA_SMOKE.md`](docs/QA_SMOKE.md).
 
 ---
 

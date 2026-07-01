@@ -1,6 +1,6 @@
 {
   "name": "checklist-de-medicao",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "private": true,
   "description": "Checklist de Envio para Medição — FABRILIS. Ferramenta interna single-page para consultores prepararem a solicitação de medição de um projeto de marcenaria.",
   "type": "module",
@@ -12,6 +12,7 @@
     "lint": "html-validate index.html",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "validate": "npm run typecheck && npm run lint && npm run test && npm run build"
   },
   "engines": {
@@ -19,6 +20,7 @@
   },
   "license": "UNLICENSED",
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^26.1.0",

@@ -17,11 +17,11 @@ export function ProgressBar() {
   return (
     <div className="bar no-print">
       <div className="barflex">
-        <div className="track"><div className="fill" id="fill" style={{ width: pct + '%' }}></div></div>
-        <div className="count" id="count">{resolved} de {total} itens resolvidos</div>
+        <div className="track" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}><div className="fill" id="fill" style={{ width: pct + '%' }}></div></div>
+        <div className="count" id="count" aria-live="polite">{resolved} de {total} itens resolvidos</div>
       </div>
       <div className="barflex autosave-row">
-        <span className="autosave-msg" id="autosaveMsg">{autosaveMsg}</span>
+        <span className="autosave-msg" id="autosaveMsg" aria-live="polite">{autosaveMsg}</span>
         <button type="button" className="autosave-clear" id="clearDraft" onClick={onClear}>Limpar rascunho</button>
       </div>
     </div>
