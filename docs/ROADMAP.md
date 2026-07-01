@@ -79,10 +79,20 @@ introduz React incremental; D publica.
 - Publicado em https://checklist-de-medicao.pages.dev (`public/_headers`,
   `docs/DEPLOY_CLOUDFLARE.md`, `npm run deploy`). Smoke pós-deploy OK.
 
-## 0.5.1 — Retrospectiva e roadmap seguinte
+## ✅ 0.5.1 — Retrospectiva e roadmap seguinte (concluída)
 
-- Retrospectiva do ciclo, lista de PRs/versões, riscos e próximos passos
-  (envio da solicitação, histórico/exportação, backend leve, etc.).
+- Retrospectiva em `docs/release-0.5/RETROSPECTIVE.md` (PRs/versões, arquitetura,
+  riscos, próximo roadmap). **Ciclo 0.2.0 → 0.5.1 concluído.**
+
+## Próximo roadmap (sugerido)
+
+Detalhes em `docs/release-0.5/RETROSPECTIVE.md`:
+
+1. Deploy contínuo (integração Git do Cloudflare) + rotação do token.
+2. Acessibilidade: associar `label`↔campo e reativar `input-missing-label`.
+3. Saída além do PDF (export JSON / envio) — provável Pages Functions.
+4. Histórico de solicitações (export local ou, com decisão humana, KV/D1).
+5. Integração com CRM/estúdio e guia visual da Fabrilis.
 
 ---
 
