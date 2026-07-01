@@ -8,9 +8,9 @@ conforme o handoff pack. Atualizado a cada sprint.
 - Ciclo: Refatoração progressiva + Cloudflare Pages
 - Repositório: `gpgamoeda/CHECKLIST-DE-MEDICAO`
 - Branch base: `main`
-- Último PR mergeado: #5 (Sprint 0.3.1 — tipagem do domínio)
-- Última versão: `0.4.0` (em PR)
-- Próxima sprint: `0.4.1` — Componentização das seções e resumo imprimível
+- Último PR mergeado: #6 (Sprint 0.4.0 — React shell)
+- Última versão: `0.4.1` (em PR)
+- Próxima sprint: `0.4.2` — QA de UX/a11y/impressão + Playwright
 - Modo de execução: loop autônomo, um branch/PR por sprint, merge quando os
   gates aplicáveis estão verdes.
 
@@ -23,8 +23,8 @@ conforme o handoff pack. Atualizado a cada sprint.
 | 0.2.1 | `claude/release-021-autosave-localstorage` | #3 | Mergeada | lint+25 testes+build | Autosave local; testes jsdom de comportamento |
 | 0.3.0 | `claude/release-030-vite-typescript-base` | #4 | Mergeada | typecheck+lint+25 testes+build | Vite+TS |
 | 0.3.1 | `claude/release-031-domain-logic-tests` | #5 | Mergeada | typecheck+lint+44 testes+build | domain.ts tipado; @ts-nocheck removido |
-| 0.4.0 | `claude/release-040-react-shell` | — | Em PR | typecheck+lint+41 testes+build | React shell; initApp com teardown |
-| 0.4.1 | `claude/release-041-componentizar-secoes-resumo` | | Pendente | | |
+| 0.4.0 | `claude/release-040-react-shell` | #6 | Mergeada | typecheck+lint+41 testes+build | React shell; initApp com teardown |
+| 0.4.1 | `claude/release-041-componentizar-secoes-resumo` | — | Em PR | typecheck+lint+43 testes+build | Componentização completa; app.ts removido; estado no React |
 | 0.4.2 | `claude/release-042-qa-ux-a11y-print` | | Pendente | | |
 | 0.5.0 | `claude/release-050-cloudflare-pages` | | Pendente | | Publicação exige credenciais humanas |
 | 0.5.1 | `claude/release-051-retrospective-roadmap` | | Pendente | | |
@@ -48,6 +48,10 @@ conforme o handoff pack. Atualizado a cada sprint.
   (assets com hash); `archive/` fica fora do bundle por não ser referenciado.
 - **0.3.0:** testes de comportamento passaram a montar um `JSDOM` próprio por caso
   e chamar `initApp()` do módulo TS (isola listeners e estado por teste).
+- **0.4.1:** o `Model` React reutiliza o MESMO formato do rascunho (draft), então o
+  autosave/restauração continuam compatíveis (sem bump de versão da chave). Estado
+  centralizado no `ChecklistProvider`; "voltar e editar" só alterna a exibição.
+  `app.ts` imperativo removido; testes migrados para `fireEvent` (React).
 
 ## Riscos encontrados
 

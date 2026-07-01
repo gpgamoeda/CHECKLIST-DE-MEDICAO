@@ -15,9 +15,9 @@ export type Fields = Record<string, string>;
 export interface ItemState {
   status?: string | null;
   fields: Fields;
-  cuba?: CubaType;
-  modeloCuba?: CubaModelo;
-  metalInstal?: MetalInstal;
+  cuba?: string | null;
+  modeloCuba?: string | null;
+  metalInstal?: string | null;
 }
 
 export interface FieldDef {

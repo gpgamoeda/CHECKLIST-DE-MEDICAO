@@ -29,21 +29,29 @@ describe('index.html — casca React', () => {
 describe('src/ — fontes', () => {
   it('existem entrada, módulos e componentes', () => {
     for (const f of [
-      'src/main.tsx', 'src/app.ts', 'src/draft.ts', 'src/domain.ts', 'src/styles.css',
-      'src/components/App.tsx', 'src/components/Header.tsx', 'src/components/ProgressBar.tsx',
-      'src/components/IdentificationCard.tsx', 'src/components/ChecklistSections.tsx',
+      'src/main.tsx', 'src/model.ts', 'src/draft.ts', 'src/domain.ts', 'src/styles.css',
+      'src/components/App.tsx', 'src/components/store.tsx', 'src/components/Header.tsx',
+      'src/components/ProgressBar.tsx', 'src/components/IdentificationCard.tsx',
+      'src/components/Section1.tsx', 'src/components/Section2.tsx', 'src/components/Section3.tsx',
+      'src/components/DynSection.tsx', 'src/components/Section6.tsx', 'src/components/Summary.tsx',
       'src/components/Actions.tsx', 'src/components/Footer.tsx', 'src/components/Termo.tsx',
     ]) {
       expect(existsSync(resolve(root, f))).toBe(true);
     }
   });
 
-  it('app.ts exporta initApp (com teardown), importa o domínio e é type-checked', () => {
-    const app = read('src/app.ts');
-    expect(app).toContain('export function initApp(): () => void');
-    expect(app).toContain("from './domain'");
-    expect(app).toContain('function rowResolved');
-    expect(app).not.toContain('@ts-nocheck');
+  it('não há mais o app imperativo (app.ts) nem @ts-nocheck no src', () => {
+    expect(existsSync(resolve(root, 'src/app.ts'))).toBe(false);
+    for (const f of ['src/model.ts', 'src/domain.ts', 'src/components/store.tsx', 'src/components/App.tsx']) {
+      expect(read(f)).not.toContain('@ts-nocheck');
+    }
+  });
+
+  it('model.ts calcula progresso a partir do domínio', () => {
+    const model = read('src/model.ts');
+    expect(model).toContain('export function computeProgress');
+    expect(model).toContain('export function isComplete');
+    expect(model).toContain("from './domain'");
   });
 
   it('domain.ts concentra dados e regras puras', () => {
@@ -55,12 +63,11 @@ describe('src/ — fontes', () => {
   });
 
   it('os componentes mantêm os marcadores da versão vigente (não a v1)', () => {
-    const sections = read('src/components/ChecklistSections.tsx');
-    expect(sections).toContain('Bancadas, Cubas e Metais');
-    expect(sections).toContain('Observações Gerais');
-    expect(sections).not.toContain('Cubas e Louças');
+    expect(read('src/components/Section3.tsx')).toContain('Bancadas, Cubas e Metais');
+    expect(read('src/components/Section6.tsx')).toContain('Observações Gerais');
     expect(read('src/components/IdentificationCard.tsx')).toContain('data-id="tipo_medicao"');
     expect(read('src/components/Actions.tsx')).toContain('Gerar solicitação de medição');
+    expect(read('src/components/Summary.tsx')).not.toContain('Cubas e Louças');
   });
 });
 

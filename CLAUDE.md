@@ -17,15 +17,20 @@ anteriores estão em `archive/` apenas como histórico.
 ## Stack e restrições
 
 - **React + TypeScript + Vite.** O `index.html` tem só `<div id="root">` e carrega
-  `src/main.tsx`, que monta o `<App/>` (shell em `src/components/`: Header,
-  ProgressBar, IdentificationCard, ChecklistSections, Termo, Actions, Footer). O
-  `App` chama `initApp()` (de `src/app.ts`) no `useEffect`, que gerencia estado,
-  itens dinâmicos, autosave e resumo imperativamente sobre o DOM; `initApp()`
-  retorna um teardown (removido no unmount). **Abrir o `index.html` cru via
-  `file://` não é o fluxo** (use `npm run dev`).
-- Componentização incremental: em 0.4.0 o shell é React, mas o **conteúdo dinâmico
-  das seções ainda é montado por `initApp()`**. Ao migrar uma parte para React,
-  não duplique estado e mantenha os testes de comportamento verdes.
+  `src/main.tsx`, que monta o `<App/>`. **Abrir o `index.html` cru via `file://`
+  não é o fluxo** (use `npm run dev`).
+- **Estado no React** (`src/components/store.tsx` — `ChecklistProvider` + hook
+  `useChecklist`): guarda o `Model` (de `src/model.ts`, mesmo formato do rascunho),
+  expõe ações e cuida do autosave (debounce) + restauração. Progresso/conclusão
+  vêm de `computeProgress`/`isComplete` (model.ts), que usam as regras de
+  `src/domain.ts`.
+- **Componentes** (`src/components/`): `App` (alterna form ⇄ `Summary`), `Header`,
+  `ProgressBar`, `IdentificationCard`, `Section1`, `Section2`, `Section3`
+  (bancada/cuba/metal condicionais), `DynSection` (seções 4 e 5), `Section6`,
+  `Termo`, `Actions`, `Summary`. "Voltar e editar" só alterna a exibição — o estado
+  fica no provider, então o preenchimento é preservado.
+- Ao mexer em regra, altere `src/domain.ts` (+ `tests/domain.test.js`); ao mexer em
+  UI/fluxo, mantenha `tests/behavior.dom.test.tsx` (renderiza `<App/>`) verde.
 - As **regras de negócio puras e os tipos** vivem em `src/domain.ts` (fonte única);
   `src/app.ts` é a camada de DOM que importa o domínio. Ao mudar regra, altere o
   `domain.ts` e o teste correspondente (`tests/domain.test.js`).
