@@ -7,8 +7,22 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Não lançado]
 
-### A fazer (próximas sprints)
-- Retrospectiva do ciclo e próximo roadmap (0.5.1).
+_Sem itens pendentes deste ciclo. Próximo roadmap sugerido em
+`docs/release-0.5/RETROSPECTIVE.md`._
+
+## [0.5.1] — 2026-07-01
+
+Sprint 0.5.1 — Retrospectiva e fechamento do ciclo. Somente documentação.
+
+### Adicionado
+- `docs/release-0.5/RETROSPECTIVE.md`: PRs/versões entregues, mudanças de
+  arquitetura, regras preservadas, riscos reduzidos/remanescentes, decisões
+  técnicas e o próximo roadmap sugerido.
+
+### Notas
+- Ciclo de refatoração + publicação (0.2.0 → 0.5.0) **concluído**: de monólito
+  `index.html` para React + TS + Vite, testado (43 unit + e2e) e publicado no
+  Cloudflare Pages, sem quebrar comportamento nem regras de negócio.
 
 ## [0.5.0] — 2026-07-01
 
