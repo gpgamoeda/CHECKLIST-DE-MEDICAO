@@ -1,44 +1,33 @@
-// @ts-nocheck
-// Migração incremental para TypeScript (Sprint 0.3.0): este módulo legado ainda
-// não é type-checked. A tipagem forte do domínio (estado, itens, resumo) entra na
-// Sprint 0.3.1, quando o @ts-nocheck será removido.
+// App do checklist (camada de DOM). As regras de negócio puras, os dados e os
+// tipos vivem em src/domain.ts; aqui ficam a montagem da UI, o estado e a ligação
+// com o DOM. Este módulo é type-checked (o domínio é tipado); os acessos ao DOM
+// usam helpers que retornam `any` para manter o glue leve.
 import * as Draft from './draft';
+import {
+  SEC1_ITEMS as sec1items,
+  SEC2_ITEMS as sec2items,
+  F2,
+  ELETRO_EXTRAS as eletroExtras,
+  CUBA_LABEL,
+  MOD_LABEL,
+  MET_LABEL,
+  esc,
+  maskPhone,
+  brDate,
+  isSection1Resolved,
+  isEletroResolved,
+  isDynEletroResolved,
+  isBancadaResolved,
+  isDynResolved,
+  isIdentificationComplete,
+} from './domain';
 
 export function initApp(){
-  // ---------- DATA ----------
-  const sec1items = [
-    "Revestimentos instalados em todos os ambientes (pisos, paredes, azulejos)",
-    "Forro / gesso concluído, com altura final definida",
-    "Cortineiro executado, com medidas confirmadas",
-    "Aberturas de portas finalizadas (vãos, batentes e vistas)",
-    "Rodapés definidos",
-    "Pontos hidráulicos posicionados (água quente e fria, esgoto)",
-    "Pontos elétricos posicionados (tomadas, interruptores, saídas para eletros)",
-    "Ambiente livre de entulho e estrutura antiga",
-    "Base de alvenaria (cozinha)",
-    "Base de alvenaria (lavanderia)",
-    "Ponto de aspiração central",
-    "Ponto de ar condicionado"
-  ];
-  const sec2items = ["Refrigerador","Freezer","Cooktop / Fogão","Forno","Micro-ondas",
-    "Coifa / Depurador","Ar condicionado","Lava-louças","Máquina de lavar","Secadora","Adega","Cervejeira",
-    "Icemaker","Purificador de água","Triturador de resíduos","Gaveta aquecida","Gaveta refrigerada",
-    "Cafeteira embutida","Frigobar"];
-
-  const F2 = [{l:"Ambiente",k:"ambiente",r:true},{l:"Marca",k:"marca",r:true},{l:"Modelo",k:"modelo",r:true},{l:"Referência / Código",k:"ref",r:true},{l:"Dimensões (L×A×P) em mm",k:"dim",r:true}];
-  // campos extras por eletrodoméstico
-  const eletroExtras = {
-    "Cooktop / Fogão":{alimentacao:true, respiro:false},
-    "Forno":{alimentacao:true, respiro:true},
-    "Micro-ondas":{alimentacao:true, respiro:true},
-    "Refrigerador":{alimentacao:true, respiro:true},
-    "Freezer":{alimentacao:true, respiro:true},
-    "Ar condicionado":{obs:true}
-  };
-
-  const CUBA_LABEL = {inox:"Inox", louca:"Louça, vidro ou acrílico", esculpida:"Esculpida", na:"Não se aplica"};
-  const MOD_LABEL  = {apoio:"Apoio", sobrepor:"Sobrepor", embutir:"Embutir", semi:"Semi-encaixe"};
-  const MET_LABEL  = {parede:"Parede", bancada:"Bancada"};
+  // Helpers de DOM (retornam `any` para manter o glue leve; a lógica de negócio
+  // tipada está em domain.ts).
+  const byId = (id: string): any => document.getElementById(id);
+  const qs = (sel: string, root: any = document): any => root.querySelector(sel);
+  const qsa = (sel: string, root: any = document): any[] => Array.from(root.querySelectorAll(sel));
 
   const state: Record<string, any> = {}; // id -> {status, fields:{}}
   let secq: Record<string, any> = {ban:null, 5:null, 6:null};
@@ -59,14 +48,14 @@ export function initApp(){
   function setFieldValues(id, fields){
     if(!fields) return;
     Object.keys(fields).forEach(k=>{
-      const el=document.querySelector('[data-fid="'+id+'"][data-fk="'+k+'"]');
+      const el=qs('[data-fid="'+id+'"][data-fk="'+k+'"]');
       if(el && fields[k]!=null) el.value=fields[k];
     });
   }
 
   // ---------- DEFINIDO/NA ROWS (eletros) ----------
   function renderDefRows(containerId, items, fields, prefix){
-    const c = document.getElementById(containerId);
+    const c = byId(containerId);
     items.forEach((name,i)=>{
       const id = prefix+"_"+i;
       state[id] = {status:null, fields:{}};
@@ -105,10 +94,10 @@ export function initApp(){
   }
 
   // ---------- DYNAMIC ELETROS ----------
-  function addEletro(preset){
+  function addEletro(preset?){
     const id=preset?preset.id:("de_"+Date.now());
     dynEletros.push(id); state[id]={status:"def", fields:preset?Object.assign({},preset.fields):{}, dynEletro:true};
-    const c=document.getElementById("eletrosExtra");
+    const c=byId("eletrosExtra");
     const sub=document.createElement("div"); sub.className="subcard"; sub.id="row_"+id;
     sub.innerHTML=
       '<div class="subhead"><span>Eletrodoméstico adicional</span>'+
@@ -129,7 +118,7 @@ export function initApp(){
   }
 
   // ---------- BANCADAS / CUBAS / METAIS ----------
-  function addBancada(preset){
+  function addBancada(preset?){
     const id=preset?preset.id:("ba_"+Date.now());
     bancadas.push(id);
     state[id]={dynBancada:true, fields:preset?Object.assign({},preset.fields):{},
@@ -139,16 +128,16 @@ export function initApp(){
     renderBancada(id);
     if(preset){
       setFieldValues(id, state[id].fields);
-      const cubaSel=document.querySelector('[data-cuba][data-fid="'+id+'"]');
+      const cubaSel=qs('[data-cuba][data-fid="'+id+'"]');
       if(cubaSel && state[id].cuba) cubaSel.value=state[id].cuba;
-      if(state[id].modeloCuba){ const mb=document.getElementById("modblk_"+id); const b=mb&&mb.querySelector('[data-modelo="'+state[id].modeloCuba+'"]'); if(b) b.classList.add("on-y"); }
-      if(state[id].metalInstal){ const meb=document.getElementById("metblk_"+id); const b=meb&&meb.querySelector('[data-metal="'+state[id].metalInstal+'"]'); if(b) b.classList.add("on-y"); }
+      if(state[id].modeloCuba){ const mb=byId("modblk_"+id); const b=mb&&mb.querySelector('[data-modelo="'+state[id].modeloCuba+'"]'); if(b) b.classList.add("on-y"); }
+      if(state[id].metalInstal){ const meb=byId("metblk_"+id); const b=meb&&meb.querySelector('[data-metal="'+state[id].metalInstal+'"]'); if(b) b.classList.add("on-y"); }
       updateBancadaVis(id);
     }
     update();
   }
   function renderBancada(id){
-    const c=document.getElementById("bancadasRows");
+    const c=byId("bancadasRows");
     const sub=document.createElement("div"); sub.className="subcard"; sub.id="row_"+id;
     sub.innerHTML=`
       <div class="subhead"><span class="ba-title">Bancada / Ambiente</span>
@@ -224,12 +213,12 @@ export function initApp(){
     renumberBancadas();
   }
   function renumberBancadas(){
-    [...document.querySelectorAll("#bancadasRows .ba-title")].forEach((el,i)=>{
+    [...qsa("#bancadasRows .ba-title")].forEach((el,i)=>{
       el.textContent="Bancada / Ambiente "+(i+1);
     });
   }
   function clearBancadas(){
-    document.getElementById("bancadasRows").innerHTML="";
+    byId("bancadasRows").innerHTML="";
     bancadas.forEach(id=>delete state[id]); bancadas=[];
   }
   function updateBancadaVis(id){
@@ -238,7 +227,7 @@ export function initApp(){
     const showCuba = !!cuba && cuba!=="na";
     const isLouca = cuba==="louca";
     const cubaReady = showCuba && (!isLouca || !!s.modeloCuba);
-    const set=(elId,on)=>{const el=document.getElementById(elId); if(el) el.style.display=on?"":"none";};
+    const set=(elId,on)=>{const el=byId(elId); if(el) el.style.display=on?"":"none";};
     set("cubablk_"+id, showCuba);
     set("modblk_"+id, isLouca);
     set("cubaf_"+id, cubaReady);
@@ -248,7 +237,7 @@ export function initApp(){
 
   // ---------- SECTION 1 ----------
   function renderSec1(){
-    const c = document.getElementById("sec1");
+    const c = byId("sec1");
     sec1items.forEach((name,i)=>{
       const id="s1_"+i; state[id]={status:null, fields:{}};
       const row=document.createElement("div"); row.className="item";
@@ -268,10 +257,10 @@ export function initApp(){
   }
 
   // ---------- DYNAMIC ROWS (sec 5, 6) ----------
-  function addDyn(sec, preset){
+  function addDyn(sec, preset?){
     const id=preset?preset.id:("d"+sec+"_"+Date.now());
     dynRows[sec].push(id); state[id]={status:"def", fields:preset?Object.assign({},preset.fields):{}, dyn:true};
-    const c=document.getElementById("rows"+sec);
+    const c=byId("rows"+sec);
     const titulo = sec==="5" ? "Móvel" : "Item";
     const phDesc = sec==="5" ? "Ex.: cama queen, criado-mudo" : "Ex.: TV em nicho 65\"";
     const sub=document.createElement("div"); sub.className="subcard"; sub.id="row_"+id;
@@ -289,52 +278,25 @@ export function initApp(){
   }
   function renumberDyn(sec){
     const t = sec==="5" ? "Móvel " : "Item ";
-    [...document.querySelectorAll('.dyn-title-'+sec)].forEach((el,i)=>{ el.textContent=t+(i+1); });
+    [...qsa('.dyn-title-'+sec)].forEach((el,i)=>{ el.textContent=t+(i+1); });
   }
 
   // ---------- VALIDATION ----------
+  // Dispatcher fino: as regras puras estão em src/domain.ts.
   function rowResolved(id){
     const s=state[id]; if(!s) return false;
-    if(s.dynBancada){
-      if(!(s.fields.ambiente && s.fields.material && s.fields.dim)) return false;
-      if(!s.cuba) return false;
-      if(s.cuba==="na") return true;
-      if(s.cuba==="louca" && !s.modeloCuba) return false;
-      if(!s.metalInstal) return false;
-      return true;
-    }
-    if(s.dyn){ return !!(s.fields.ambiente && s.fields.desc && s.fields.dim); }
-    if(s.dynEletro){ return !!(s.fields.ambiente && s.fields.nome && s.fields.marca && s.fields.modelo && s.fields.ref && s.fields.dim); }
-    if(id.startsWith("s1_")){
-      if(s.status==="ok") return true;
-      if(s.status==="pend") return !!(s.fields.amb_pend && s.fields.obs); return false;
-    }
+    if(s.dynBancada) return isBancadaResolved(s);
+    if(s.dyn) return isDynResolved(s);
+    if(s.dynEletro) return isDynEletroResolved(s);
+    if(id.startsWith("s1_")) return isSection1Resolved(s);
+    if(id.startsWith("s2_")) return isEletroResolved(s, sec2items[parseInt(id.split("_")[1],10)]);
     if(s.status==="na") return true;
-    if(id.startsWith("s2_")){
-      if(s.status!=="def") return false;
-      if(!F2.every(f=>!f.r||(s.fields[f.k]&&s.fields[f.k].trim()))) return false;
-      const ex = eletroExtras[sec2items[parseInt(id.split("_")[1],10)]];
-      if(ex){
-        if(ex.alimentacao && !s.fields.alimentacao) return false;
-        if(ex.respiro){
-          if(!s.fields.respiro) return false;
-          if(s.fields.respiro==="Sim" && !(s.fields.respiro_espec && s.fields.respiro_espec.trim())) return false;
-        }
-      }
-      return true;
-    }
     return false;
   }
   function idComplete(){
-    const optional={link_fotos:1, arquiteto:1, complemento:1, referencia:1};
-    const els=[...document.querySelectorAll('#idgrid [data-id]')];
-    for(const el of els){
-      if(optional[el.dataset.id]) continue;
-      if(!el.value.trim()) return false;
-    }
-    const lf=document.querySelector('#idgrid [data-id="link_fotos"]');
-    if(!photosNA && !(lf && lf.value.trim())) return false;
-    return true;
+    const values: Record<string,string> = {};
+    qsa('#idgrid [data-id]').forEach(el=>{ values[el.dataset.id]=el.value; });
+    return isIdentificationComplete(values, photosNA);
   }
   function fixedIds(){ return Object.keys(state).filter(id=>!state[id].dyn && !state[id].dynBancada); }
 
@@ -347,22 +309,22 @@ export function initApp(){
     gTotal++;
     if(secq.ban==="nao") gOk++;
     else if(secq.ban==="sim"){
-      const bs=bancadas.filter(id=>document.getElementById("row_"+id));
+      const bs=bancadas.filter(id=>byId("row_"+id));
       if(bs.length>0 && bs.every(rowResolved)) gOk++;
     }
     // dyn-row gates: 5, 6
     [5,6].forEach(s=>{ gTotal++; if(secq[s]==="nao") gOk++; else if(secq[s]==="sim"){
-      const rows=dynRows[s].filter(id=>document.getElementById("row_"+id));
+      const rows=dynRows[s].filter(id=>byId("row_"+id));
       if(rows.length>0 && rows.every(rowResolved)) gOk++; }});
     total+=gTotal; resolved+=gOk;
     if(idComplete()){ resolved++; } total++;
 
     const pct = total? Math.round(resolved/total*100):0;
-    document.getElementById("fill").style.width=pct+"%";
-    document.getElementById("count").textContent = resolved+" de "+total+" itens resolvidos";
+    byId("fill").style.width=pct+"%";
+    byId("count").textContent = resolved+" de "+total+" itens resolvidos";
     const ok = resolved===total;
-    const btn=document.getElementById("finish"); btn.disabled=!ok;
-    const hint=document.getElementById("hint");
+    const btn=byId("finish"); btn.disabled=!ok;
+    const hint=byId("hint");
     if(ok){ hint.textContent="Tudo resolvido — gere a solicitação."; hint.classList.add("ok"); }
     else { hint.textContent="Resolva todos os itens para liberar o resumo."; hint.classList.remove("ok"); }
     scheduleSave();
@@ -370,7 +332,7 @@ export function initApp(){
 
   // ---------- STATE BADGES ----------
   function paintState(id){
-    const st=document.getElementById("st_"+id); if(!st) return;
+    const st=byId("st_"+id); if(!st) return;
     const s=state[id];
     if(id.startsWith("s1_")){
       st.className="state "+(s.status==="ok"?"ok":s.status==="pend"?"pend":"");
@@ -382,13 +344,13 @@ export function initApp(){
   }
 
   // ---------- EVENTS ----------
-  document.addEventListener("click",function(e){
+  document.addEventListener("click",function(e: any){
     if(e.target.id==="fotosNA"){
       photosNA=!photosNA;
-      const inp=document.getElementById("link_fotos");
+      const inp=byId("link_fotos");
       e.target.classList.toggle("on-n",photosNA);
       inp.disabled=photosNA; if(photosNA) inp.value="";
-      document.getElementById("fotosHint").textContent=photosNA?"Sem fotos — marcado como não se aplica.":"Se ainda não houver fotos, marque “não se aplica”.";
+      byId("fotosHint").textContent=photosNA?"Sem fotos — marcado como não se aplica.":"Se ainda não houver fotos, marque “não se aplica”.";
       update(); return;
     }
     // segmented bancada (modelo da cuba / instalação do metal)
@@ -409,7 +371,7 @@ export function initApp(){
       [...seg.querySelectorAll("button")].forEach(b=>{b.classList.remove("on-y","on-n");});
       if(v==="def"||v==="ok"){ e.target.classList.add("on-y"); }
       else { e.target.classList.add("on-n"); }
-      const f=document.getElementById("f_"+id);
+      const f=byId("f_"+id);
       if(f){ const show = (v==="def"||v==="pend"); f.classList.toggle("show",show); }
       paintState(id); update(); return;
     }
@@ -419,7 +381,7 @@ export function initApp(){
       const sec=sq.dataset.secq, v=e.target.dataset.v; secq[sec]=v;
       [...sq.querySelectorAll("button")].forEach(b=>b.classList.remove("on-y","on-n"));
       e.target.classList.add(v==="sim"?"on-y":"on-n");
-      document.getElementById("wrap"+sec).classList.toggle("show",v==="sim");
+      byId("wrap"+sec).classList.toggle("show",v==="sim");
       if(sec==="ban"){ if(v==="sim"){ if(bancadas.length===0) addBancada(); } else clearBancadas(); }
       else { if(v==="sim" && dynRows[sec].length===0) addDyn(sec); }
       update(); return;
@@ -428,35 +390,35 @@ export function initApp(){
     if(e.target.id==="addEletro"){ addEletro(); return; }
     if(e.target.dataset.add){ addDyn(e.target.dataset.add); return; }
     if(e.target.dataset.rmBan){
-      const id=e.target.dataset.rmBan; const r=document.getElementById("row_"+id);
+      const id=e.target.dataset.rmBan; const r=byId("row_"+id);
       if(r) r.remove(); delete state[id]; bancadas=bancadas.filter(x=>x!==id);
       renumberBancadas(); update(); return;
     }
     if(e.target.dataset.rmEl){
-      const id=e.target.dataset.rmEl; const r=document.getElementById("row_"+id);
+      const id=e.target.dataset.rmEl; const r=byId("row_"+id);
       if(r) r.remove(); delete state[id]; dynEletros=dynEletros.filter(x=>x!==id); update(); return;
     }
     if(e.target.dataset.rm){
-      const id=e.target.dataset.rm; const r=document.getElementById("row_"+id);
+      const id=e.target.dataset.rm; const r=byId("row_"+id);
       if(r) r.remove(); delete state[id];
       [5,6].forEach(s=>dynRows[s]=dynRows[s].filter(x=>x!==id));
       renumberDyn("5"); renumberDyn("6"); update(); return;
     }
   });
 
-  document.addEventListener("input",function(e){
+  document.addEventListener("input",function(e: any){
     if(e.target.dataset.id==="telefone_responsavel"){ e.target.value=maskPhone(e.target.value); }
     const fid=e.target.dataset.fid, fk=e.target.dataset.fk;
     if(fid && fk){ state[fid].fields[fk]=e.target.value; if(state[fid].status) paintState(fid); update(); }
     if(e.target.dataset.id!==undefined && e.target.closest("#idgrid")) update();
   });
-  document.addEventListener("change",function(e){
+  document.addEventListener("change",function(e: any){
     // selects de campo (alimentação / respiro dos eletros)
     if(e.target.dataset.fid && e.target.dataset.fk && e.target.dataset.cuba===undefined){
       const id=e.target.dataset.fid, fk=e.target.dataset.fk;
       state[id].fields[fk]=e.target.value;
       if(fk==="respiro"){
-        const esp=document.getElementById("respesp_"+id);
+        const esp=byId("respesp_"+id);
         if(esp) esp.style.display = e.target.value==="Sim" ? "" : "none";
         if(e.target.value!=="Sim") state[id].fields.respiro_espec="";
       }
@@ -465,12 +427,12 @@ export function initApp(){
     // tipo de cuba
     if(e.target.dataset.cuba!==undefined && e.target.dataset.fid){
       const id=e.target.dataset.fid, s=state[id]; s.cuba=e.target.value||null;
-      if(s.cuba!=="louca"){ s.modeloCuba=null; const mb=document.getElementById("modblk_"+id); if(mb) [...mb.querySelectorAll('button')].forEach(b=>b.classList.remove('on-y')); }
-      if(!s.cuba || s.cuba==="na"){ s.metalInstal=null; const meb=document.getElementById("metblk_"+id); if(meb) [...meb.querySelectorAll('button')].forEach(b=>b.classList.remove('on-y')); }
+      if(s.cuba!=="louca"){ s.modeloCuba=null; const mb=byId("modblk_"+id); if(mb) [...mb.querySelectorAll('button')].forEach(b=>b.classList.remove('on-y')); }
+      if(!s.cuba || s.cuba==="na"){ s.metalInstal=null; const meb=byId("metblk_"+id); if(meb) [...meb.querySelectorAll('button')].forEach(b=>b.classList.remove('on-y')); }
       updateBancadaVis(id); update(); return;
     }
     if(e.target.id==="tipo"){
-      document.getElementById("heritage").classList.toggle("show", e.target.value==="Herança / acervo");
+      byId("heritage").classList.toggle("show", e.target.value==="Herança / acervo");
     }
     if(e.target.closest("#idgrid")) update();
   });
@@ -478,8 +440,8 @@ export function initApp(){
   // ---------- AUTOSAVE: coleta / restauração / persistência ----------
   function collectDraft(){
     const idVals={};
-    document.querySelectorAll('#idgrid [data-id]').forEach(el=>{ idVals[el.dataset.id]=el.value; });
-    const obsEl=document.getElementById("observacoes_gerais");
+    qsa('#idgrid [data-id]').forEach(el=>{ idVals[el.dataset.id]=el.value; });
+    const obsEl=byId("observacoes_gerais");
     const fixed={};
     Object.keys(state).forEach(k=>{
       if(k.startsWith("s1_")||k.startsWith("s2_")){
@@ -508,21 +470,21 @@ export function initApp(){
     if(!d || typeof d!=="object") return;
     // Identificação
     if(d.id){
-      document.querySelectorAll('#idgrid [data-id]').forEach(el=>{
+      qsa('#idgrid [data-id]').forEach(el=>{
         if(d.id[el.dataset.id]!=null) el.value=d.id[el.dataset.id];
       });
     }
-    const tipoEl=document.querySelector('#idgrid [data-id="tipo"]');
-    if(tipoEl){ document.getElementById("heritage").classList.toggle("show", tipoEl.value==="Herança / acervo"); }
-    const obsEl=document.getElementById("observacoes_gerais");
+    const tipoEl=qs('#idgrid [data-id="tipo"]');
+    if(tipoEl){ byId("heritage").classList.toggle("show", tipoEl.value==="Herança / acervo"); }
+    const obsEl=byId("observacoes_gerais");
     if(obsEl && d.observacoes!=null) obsEl.value=d.observacoes;
     // Fotos "não se aplica"
     if(d.photosNA){
       photosNA=true;
-      const inp=document.getElementById("link_fotos"); const btn=document.getElementById("fotosNA");
+      const inp=byId("link_fotos"); const btn=byId("fotosNA");
       if(btn) btn.classList.add("on-n");
       if(inp){ inp.disabled=true; inp.value=""; }
-      const fh=document.getElementById("fotosHint"); if(fh) fh.textContent="Sem fotos — marcado como não se aplica.";
+      const fh=byId("fotosHint"); if(fh) fh.textContent="Sem fotos — marcado como não se aplica.";
     }
     // Itens fixos (seções 1 e 2)
     if(d.fixed){
@@ -531,16 +493,16 @@ export function initApp(){
         const fs=d.fixed[id];
         state[id].status=fs.status;
         state[id].fields=Object.assign({}, fs.fields);
-        const seg=document.querySelector('.seg[data-id="'+id+'"]');
+        const seg=qs('.seg[data-id="'+id+'"]');
         if(seg && fs.status){
           seg.querySelectorAll("button").forEach(b=>b.classList.remove("on-y","on-n"));
           const b=seg.querySelector('[data-s="'+fs.status+'"]');
           if(b) b.classList.add((fs.status==="def"||fs.status==="ok")?"on-y":"on-n");
         }
-        const f=document.getElementById("f_"+id);
+        const f=byId("f_"+id);
         if(f) f.classList.toggle("show", fs.status==="def"||fs.status==="pend");
         setFieldValues(id, fs.fields);
-        if(fs.fields && fs.fields.respiro==="Sim"){ const esp=document.getElementById("respesp_"+id); if(esp) esp.style.display=""; }
+        if(fs.fields && fs.fields.respiro==="Sim"){ const esp=byId("respesp_"+id); if(esp) esp.style.display=""; }
         paintState(id);
       });
     }
@@ -549,13 +511,13 @@ export function initApp(){
       const v=d.secq?d.secq[sec]:undefined;
       if(!v) return;
       secq[sec]=v;
-      const sq=document.querySelector('.seg[data-secq="'+sec+'"]');
+      const sq=qs('.seg[data-secq="'+sec+'"]');
       if(sq){
         sq.querySelectorAll("button").forEach(b=>b.classList.remove("on-y","on-n"));
         const b=sq.querySelector('[data-v="'+(v==="sim"?"sim":"nao")+'"]');
         if(b) b.classList.add(v==="sim"?"on-y":"on-n");
       }
-      const wrap=document.getElementById("wrap"+sec);
+      const wrap=byId("wrap"+sec);
       if(wrap) wrap.classList.toggle("show", v==="sim");
     });
     // Linhas dinâmicas
@@ -567,7 +529,7 @@ export function initApp(){
   }
 
   function hasDraftApi(){ return true; }
-  function setAutosaveMsg(txt){ const m=document.getElementById("autosaveMsg"); if(m) m.textContent=txt; }
+  function setAutosaveMsg(txt){ const m=byId("autosaveMsg"); if(m) m.textContent=txt; }
   function persist(){
     if(!hasDraftApi()) return;
     try{ if(Draft.saveDraft(collectDraft())) setAutosaveMsg("Rascunho salvo ✓ neste navegador."); }catch(e){}
@@ -577,7 +539,7 @@ export function initApp(){
     if(saveTimer) clearTimeout(saveTimer);
     saveTimer=setTimeout(persist, SAVE_DELAY);
   }
-  function autosaveFieldListener(e){
+  function autosaveFieldListener(e: any){
     if(e.target && e.target.closest && e.target.closest("#form")) scheduleSave();
   }
 
@@ -603,7 +565,7 @@ export function initApp(){
   document.addEventListener("change", autosaveFieldListener);
 
   // Limpar rascunho.
-  const clearBtn=document.getElementById("clearDraft");
+  const clearBtn=byId("clearDraft");
   if(clearBtn){
     clearBtn.addEventListener("click", function(){
       const ok = (typeof window!=="undefined" && typeof window.confirm==="function")
@@ -616,8 +578,8 @@ export function initApp(){
   }
 
   // ---------- SUMMARY ----------
-  document.getElementById("finish").addEventListener("click",function(){
-    const g=id=>{const el=document.querySelector('#idgrid [data-id="'+id+'"]');return el?el.value:"";};
+  byId("finish").addEventListener("click",function(){
+    const g=id=>{const el=qs('#idgrid [data-id="'+id+'"]');return el?el.value:"";};
     let h='<h1 style="font-size:22px;margin:0;">Solicitação de Medição</h1>';
     h+='<div class="rule"></div>';
     let endr=esc(g("endereco"));
@@ -646,24 +608,24 @@ export function initApp(){
     h+=sumDyn("4 · Mobiliário de Terceiros",5);
     h+=sumDyn("5 · Demais Itens que Interferem",6);
 
-    const obsGerais=(document.getElementById("observacoes_gerais").value||"").trim();
+    const obsGerais=(byId("observacoes_gerais").value||"").trim();
     h+='<div class="sum-sec"><h4>6 · Observações Gerais</h4>'+
        (obsGerais?'<div class="sum-line">'+esc(obsGerais).replace(/\n/g,'<br>')+'</div>':'<div class="sum-line sum-na">Nenhuma observação registrada.</div>')+'</div>';
 
     h+='<div class="sum-sec"><h4>Termo de Responsabilidade</h4><div class="sum-line">Itens definidos e não executados exigem o Termo de Responsabilidade pelas Medidas Informadas, assinado pelo cliente e anexado à pasta (SharePoint &gt; Público &gt; 01 - DOCUMENTOS COMERCIAIS).</div></div>';
     h+='<div class="sign"><div>Consultor(a) responsável</div><div>Gerente</div></div>';
 
-    const sum=document.getElementById("summary"); sum.innerHTML=h; sum.classList.add("show");
+    const sum=byId("summary"); sum.innerHTML=h; sum.classList.add("show");
     const bar=document.createElement("div"); bar.className="actions no-print";
     bar.innerHTML='<button type="button" class="btn primary" id="prt">Imprimir / Salvar PDF</button>'+
                   '<button type="button" class="btn ghost" id="edit">Voltar e editar</button>';
     sum.appendChild(bar);
-    document.getElementById("form").style.display="none";
+    byId("form").style.display="none";
     sum.scrollIntoView({behavior:"smooth"});
-    document.getElementById("prt").onclick=()=>window.print();
-    document.getElementById("edit").onclick=()=>{
+    byId("prt").onclick=()=>window.print();
+    byId("edit").onclick=()=>{
       sum.classList.remove("show"); sum.innerHTML="";
-      document.getElementById("form").style.display="";
+      byId("form").style.display="";
       window.scrollTo({top:0,behavior:"smooth"});
     };
   });
@@ -721,16 +683,4 @@ export function initApp(){
     else{ dynRows[sec].forEach(id=>{const s=state[id]; if(s){ const f=s.fields; h+='<div class="sum-line"><b>'+esc(f.ambiente||'')+'</b> — '+esc(f.desc||'')+(f.dim?' ('+esc(f.dim)+')':'')+'</div>';}});}
     return h+'</div>';
   }
-  function maskPhone(value){
-    let d=(value||'').replace(/\D/g,'').slice(0,11);
-    if(!d) return '';
-    let r='('+d.slice(0,2);
-    if(d.length<2) return r;
-    r+=') ';
-    if(d.length<=6){ r+=d.slice(2); return r; }
-    if(d.length<=10){ r+=d.slice(2,6)+'-'+d.slice(6,10); return r; }
-    return r+d.slice(2,3)+' '+d.slice(3,7)+'-'+d.slice(7,11);
-  }
-  function brDate(v){ if(!v||!/^\d{4}-\d{2}-\d{2}$/.test(v)) return esc(v); const p=v.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
-  function esc(t){return (t||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 }
