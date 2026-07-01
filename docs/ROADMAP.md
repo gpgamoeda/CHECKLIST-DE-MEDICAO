@@ -59,10 +59,12 @@ introduz React incremental; D publica.
 - `initApp()` retorna teardown, chamado no `useEffect` do `App`; sem duplicar
   estado. Testes de comportamento renderizam o app React.
 
-## 0.4.1 — Componentização das seções e resumo imprimível
+## ✅ 0.4.1 — Componentização das seções e resumo imprimível (concluída)
 
-- Seções e resumo em componentes; campos condicionais e listas dinâmicas.
-- "Voltar e editar" e autosave preservados.
+- Formulário e resumo em componentes React controlados; estado no
+  `ChecklistProvider` (+ `src/model.ts`). `app.ts` imperativo removido.
+- Campos condicionais (cuba) e listas dinâmicas em React; "voltar e editar" e
+  autosave preservados.
 
 ## 0.4.2 — QA de UX, a11y, responsividade e impressão/PDF
 

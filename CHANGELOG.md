@@ -8,8 +8,36 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 ## [Não lançado]
 
 ### A fazer (próximas sprints)
-- Componentizar o conteúdo dinâmico das seções e o resumo em React (0.4.1).
 - QA de UX/acessibilidade/impressão + Playwright no fluxo crítico (0.4.2).
+- Preparar e publicar no Cloudflare Pages (0.5.0).
+
+## [0.4.1] — 2026-07-01
+
+Sprint 0.4.1 — Componentização das seções e do resumo em **React** (estado
+reativo). Comportamento preservado (coberto pelos testes que renderizam o app).
+
+### Alterado
+- O formulário e o resumo passaram a ser **componentes React controlados**, com o
+  estado no `ChecklistProvider` (`src/components/store.tsx`). Fim da montagem
+  imperativa: **`src/app.ts` foi removido** (assim como o shell estático
+  `ChecklistSections.tsx`).
+- Novo `src/model.ts`: tipo `Model` (mesmo formato do rascunho salvo, então o
+  autosave segue compatível), `computeProgress`, `isComplete` e `modelFromDraft`.
+- Componentes por seção: `Section1`, `Section2`, `Section3` (bancada/cuba/metal
+  com campos condicionais), `DynSection` (seções 4 e 5), `Section6`, além de
+  `IdentificationCard`, `ProgressBar`, `Actions` e `Summary` (resumo imprimível).
+- **"Voltar e editar"** agora só alterna a exibição (form ⇄ resumo); o estado é
+  preservado por estar no provider. O resumo usa o escape automático do React.
+
+### Testes
+- `tests/behavior.dom.test.tsx` reescrito para interações React (`fireEvent`):
+  estrutura, restauração de rascunho, autosave, **campos condicionais da cuba**
+  (louça pede modelo; inox libera metal), fluxo de conclusão gerando o resumo e
+  **"voltar e editar" preservando o preenchimento**. 43 testes verdes.
+
+### Notas
+- Sem dependências novas. Regras de obrigatoriedade inalteradas (mesmas funções de
+  `src/domain.ts`). Build/`dist/` OK; `archive/` fora do bundle.
 
 ## [0.4.0] — 2026-07-01
 
