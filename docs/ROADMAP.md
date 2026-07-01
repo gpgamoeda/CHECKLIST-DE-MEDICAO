@@ -74,11 +74,10 @@ introduz React incremental; D publica.
 
 ### Bloco D — Cloudflare Pages
 
-## 0.5.0 — Preparação e publicação via Cloudflare Pages
+## ✅ 0.5.0 — Preparação e publicação via Cloudflare Pages (concluída)
 
-- `docs/DEPLOY_CLOUDFLARE.md`, `_headers`/`_redirects` se necessário, config de
-  Pages (`build` → `dist`, Node 20). Publicação só com credenciais/autorização
-  humana — caso contrário, parar com instruções manuais.
+- Publicado em https://checklist-de-medicao.pages.dev (`public/_headers`,
+  `docs/DEPLOY_CLOUDFLARE.md`, `npm run deploy`). Smoke pós-deploy OK.
 
 ## 0.5.1 — Retrospectiva e roadmap seguinte
 

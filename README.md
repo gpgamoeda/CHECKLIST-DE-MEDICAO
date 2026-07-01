@@ -1,5 +1,7 @@
 # Checklist de Envio para Medição — FABRILIS
 
+**Produção:** https://checklist-de-medicao.pages.dev (Cloudflare Pages)
+
 Ferramenta interna de página única (single-page) usada por consultores da FABRILIS
 (marcenaria autoral) para **preparar e conferir a solicitação de medição** de um
 projeto antes de enviá-lo ao setor técnico.
@@ -118,14 +120,16 @@ apenas sem o autosave.
 
 ## Deploy (Cloudflare Pages)
 
-O projeto já está preparado para o Cloudflare Pages:
+Publicado em **https://checklist-de-medicao.pages.dev**.
 
 - **Build command:** `npm run build`
 - **Build output directory:** `dist`
 - **Node version:** 20 (ver `.nvmrc`)
 
-O `build` atual apenas copia o app estático para `dist/`. Quando a migração para
-Vite acontecer (ver roadmap), o mesmo contrato (`build` → `dist/`) continua válido.
+Deploy manual: `npm run deploy` (requer `CLOUDFLARE_API_TOKEN` e
+`CLOUDFLARE_ACCOUNT_ID` no ambiente — **nunca** comitar o token). Detalhes e a
+opção de integração com Git (deploy automático a cada push na `main`) em
+[`docs/DEPLOY_CLOUDFLARE.md`](docs/DEPLOY_CLOUDFLARE.md).
 
 ---
 
