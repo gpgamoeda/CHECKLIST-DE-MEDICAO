@@ -142,9 +142,21 @@
   }
   @media print{
     @page{margin:14mm;}
-    /* Resumo imprimível sempre em fundo branco. */
-    html,body{background:#fff;color:#15140F;}
+    /* Resumo imprimível: fundo branco e ALTO CONTRASTE (0.6.2).
+       Impressoras descartam fundos e clareiam cinzas — na impressão trocamos a
+       paleta FRS por tinta escura e trocamos a linha-título (background, que não
+       imprime) por borda, que imprime sempre. */
+    :root{--ink:#000;--text:#000;--muted:#3F3B33;--paper:#fff;--card:#fff;--line:#8A857C;}
+    html,body{background:#fff;color:#000;}
     .bar,.actions,.no-print,form#form{display:none !important;}
     #summary.show{display:block;background:#fff;}
     .wrap{padding:0;max-width:none;}
+    .rule{background:none;height:0;border-top:1.6px solid #000;}
+    .kick,.lead{color:#3F3B33;}
+    .sum-sec h4{color:#000;border-bottom-color:#000;}
+    .sum-line{color:#000;border-bottom:1px dotted #8A857C;}
+    .sum-line b{color:#000;}
+    .sum-na{color:#3F3B33;}
+    .sum-pend{color:#8C2D12;}
+    .sign div{border-top-color:#000;color:#3F3B33;}
   }

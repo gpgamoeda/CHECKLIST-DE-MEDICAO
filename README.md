@@ -126,9 +126,10 @@ Publicado em **https://checklist-de-medicao.pages.dev**.
 - **Build output directory:** `dist`
 - **Node version:** 20 (ver `.nvmrc`)
 
-Deploy manual: `npm run deploy` (requer `CLOUDFLARE_API_TOKEN` e
-`CLOUDFLARE_ACCOUNT_ID` no ambiente — **nunca** comitar o token). Detalhes e a
-opção de integração com Git (deploy automático a cada push na `main`) em
+**Deploy automático (ativo):** a integração Git do Cloudflare Pages publica a cada
+push na `main` (merge = produção). Deploy manual de contingência: `npm run deploy`
+(requer `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` no ambiente — **nunca**
+comitar o token). Detalhes em
 [`docs/DEPLOY_CLOUDFLARE.md`](docs/DEPLOY_CLOUDFLARE.md).
 
 ---
