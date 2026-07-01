@@ -8,8 +8,37 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 ## [Não lançado]
 
 ### A fazer (próximas sprints)
-- Adicionar autosave em `localStorage` (evitar perda de preenchimento).
 - Migrar a base para Vite + TypeScript e, em seguida, componentizar em React.
+
+## [0.2.1] — 2026-07-01
+
+Sprint 0.2.1 — Autosave local em `localStorage`. Resolve o maior risco de UX
+identificado na auditoria: perda do preenchimento ao recarregar/fechar a página.
+
+### Adicionado
+- **Autosave local:** o preenchimento é salvo automaticamente no `localStorage`
+  do navegador (com debounce) e **restaurado** ao reabrir o app. Inclui
+  identificação, itens das seções, gates sim/não e todas as linhas dinâmicas
+  (bancadas, eletros adicionais, mobiliário e demais itens).
+- Indicador discreto de "salvo/restaurado" e botão **"Limpar rascunho"** (pede
+  confirmação e reinicia o formulário).
+- Módulo puro e testável `src/draft.js` (`serializeDraft`, `parseDraft`,
+  `saveDraft`, `loadDraft`, `clearDraft`) com chave versionada
+  `checklist-medicao:draft:v1`.
+- Testes: unitários da serialização (round-trip, JSON inválido, versão
+  incompatível, limpeza, storage indisponível) e testes de comportamento em jsdom
+  (restauração da identificação/itens/bancada, autosave com debounce, rascunho
+  corrompido ignorado com segurança e **fluxo de conclusão preservado**).
+
+### Privacidade
+- Os dados ficam **somente no navegador do usuário**. Nada é enviado a servidor.
+  O acesso ao `localStorage` é defensivo: se indisponível (ex.: `file://` restrito
+  ou navegação privada), o app segue funcionando sem autosave.
+
+### Notas
+- A regra de conclusão do checklist não foi alterada. O rascunho **não** é apagado
+  ao gerar a solicitação (só pelo botão "Limpar rascunho").
+- Nova dependência apenas de teste: `jsdom` (para os testes de comportamento).
 
 ## [0.2.0] — 2026-07-01
 

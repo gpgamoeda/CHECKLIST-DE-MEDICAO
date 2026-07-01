@@ -72,7 +72,8 @@ npm run validate    # lint + test + build em sequência
 ├── index.html            # App vigente (marcação). É o que roda e o que é publicado.
 ├── src/
 │   ├── styles.css        # Estilos extraídos do index.html (Sprint 0.2.0)
-│   └── app.js            # Lógica do checklist extraída do index.html (Sprint 0.2.0)
+│   ├── app.js            # Lógica do checklist extraída do index.html (Sprint 0.2.0)
+│   └── draft.js          # Autosave local: serialização do rascunho (Sprint 0.2.1)
 ├── archive/              # Snapshots históricos (v1 a v4.1). Não são publicados.
 │   └── README.md
 ├── docs/
@@ -90,6 +91,18 @@ npm run validate    # lint + test + build em sequência
 ```
 
 ---
+
+## Autosave e privacidade
+
+Desde a versão 0.2.1, o preenchimento é salvo automaticamente no `localStorage`
+do navegador e restaurado quando o app é reaberto — evitando perder o trabalho ao
+recarregar ou fechar a página por engano. Há um botão **"Limpar rascunho"** para
+reiniciar.
+
+Os dados ficam **apenas no navegador de quem preenche**: nada é enviado a nenhum
+servidor. Se o `localStorage` não estiver disponível (por exemplo, ao abrir via
+`file://` com restrições ou em navegação privada), o app continua funcionando,
+apenas sem o autosave.
 
 ## Deploy (Cloudflare Pages)
 

@@ -41,7 +41,22 @@
   let dynEletros = [];
   let photosNA = false;
 
+  // ---------- AUTOSAVE (rascunho local) ----------
+  let restoring = false;    // true enquanto o rascunho é aplicado ao carregar
+  let autosaveReady = false; // só salva depois do build + restauração inicial
+  let saveTimer = null;
+  const SAVE_DELAY = 400;
+
   function fieldClass(fields){ return fields.length===2?"two":fields.length===1?"one":""; }
+
+  // Escreve valores salvos nos inputs/selects de um item (por data-fid/data-fk).
+  function setFieldValues(id, fields){
+    if(!fields) return;
+    Object.keys(fields).forEach(k=>{
+      const el=document.querySelector('[data-fid="'+id+'"][data-fk="'+k+'"]');
+      if(el && fields[k]!=null) el.value=fields[k];
+    });
+  }
 
   // ---------- DEFINIDO/NA ROWS (eletros) ----------
   function renderDefRows(containerId, items, fields, prefix){
@@ -84,9 +99,9 @@
   }
 
   // ---------- DYNAMIC ELETROS ----------
-  function addEletro(){
-    const id="de_"+Date.now();
-    dynEletros.push(id); state[id]={status:"def", fields:{}, dynEletro:true};
+  function addEletro(preset){
+    const id=preset?preset.id:("de_"+Date.now());
+    dynEletros.push(id); state[id]={status:"def", fields:preset?Object.assign({},preset.fields):{}, dynEletro:true};
     const c=document.getElementById("eletrosExtra");
     const sub=document.createElement("div"); sub.className="subcard"; sub.id="row_"+id;
     sub.innerHTML=
@@ -102,15 +117,29 @@
         '<div class="f"><label>Referência / Código *</label><input data-fk="ref" data-fid="'+id+'"></div>'+
         '<div class="f"><label>Dimensões (L×A×P) em mm *</label><input data-fk="dim" data-fid="'+id+'"></div>'+
       '</div>';
-    c.appendChild(sub); update();
+    c.appendChild(sub);
+    if(preset) setFieldValues(id, state[id].fields);
+    update();
   }
 
   // ---------- BANCADAS / CUBAS / METAIS ----------
-  function addBancada(){
-    const id="ba_"+Date.now();
+  function addBancada(preset){
+    const id=preset?preset.id:("ba_"+Date.now());
     bancadas.push(id);
-    state[id]={dynBancada:true, fields:{}, cuba:null, modeloCuba:null, metalInstal:null};
-    renderBancada(id); update();
+    state[id]={dynBancada:true, fields:preset?Object.assign({},preset.fields):{},
+      cuba:preset?(preset.cuba||null):null,
+      modeloCuba:preset?(preset.modeloCuba||null):null,
+      metalInstal:preset?(preset.metalInstal||null):null};
+    renderBancada(id);
+    if(preset){
+      setFieldValues(id, state[id].fields);
+      const cubaSel=document.querySelector('[data-cuba][data-fid="'+id+'"]');
+      if(cubaSel && state[id].cuba) cubaSel.value=state[id].cuba;
+      if(state[id].modeloCuba){ const mb=document.getElementById("modblk_"+id); const b=mb&&mb.querySelector('[data-modelo="'+state[id].modeloCuba+'"]'); if(b) b.classList.add("on-y"); }
+      if(state[id].metalInstal){ const meb=document.getElementById("metblk_"+id); const b=meb&&meb.querySelector('[data-metal="'+state[id].metalInstal+'"]'); if(b) b.classList.add("on-y"); }
+      updateBancadaVis(id);
+    }
+    update();
   }
   function renderBancada(id){
     const c=document.getElementById("bancadasRows");
@@ -233,9 +262,9 @@
   }
 
   // ---------- DYNAMIC ROWS (sec 5, 6) ----------
-  function addDyn(sec){
-    const id="d"+sec+"_"+Date.now();
-    dynRows[sec].push(id); state[id]={status:"def", fields:{}, dyn:true};
+  function addDyn(sec, preset){
+    const id=preset?preset.id:("d"+sec+"_"+Date.now());
+    dynRows[sec].push(id); state[id]={status:"def", fields:preset?Object.assign({},preset.fields):{}, dyn:true};
     const c=document.getElementById("rows"+sec);
     const titulo = sec==="5" ? "Móvel" : "Item";
     const phDesc = sec==="5" ? "Ex.: cama queen, criado-mudo" : "Ex.: TV em nicho 65\"";
@@ -248,7 +277,9 @@
         '<div class="f"><label>Descrição *</label><input data-fk="desc" data-fid="'+id+'" placeholder="'+phDesc+'"></div>'+
         '<div class="f"><label>Dimensões / observação *</label><input data-fk="dim" data-fid="'+id+'"></div>'+
       '</div>';
-    c.appendChild(sub); renumberDyn(sec); update();
+    c.appendChild(sub); renumberDyn(sec);
+    if(preset) setFieldValues(id, state[id].fields);
+    update();
   }
   function renumberDyn(sec){
     const t = sec==="5" ? "Móvel " : "Item ";
@@ -328,6 +359,7 @@
     const hint=document.getElementById("hint");
     if(ok){ hint.textContent="Tudo resolvido — gere a solicitação."; hint.classList.add("ok"); }
     else { hint.textContent="Resolva todos os itens para liberar o resumo."; hint.classList.remove("ok"); }
+    scheduleSave();
   }
 
   // ---------- STATE BADGES ----------
@@ -437,10 +469,145 @@
     if(e.target.closest("#idgrid")) update();
   });
 
+  // ---------- AUTOSAVE: coleta / restauração / persistência ----------
+  function collectDraft(){
+    const idVals={};
+    document.querySelectorAll('#idgrid [data-id]').forEach(el=>{ idVals[el.dataset.id]=el.value; });
+    const obsEl=document.getElementById("observacoes_gerais");
+    const fixed={};
+    Object.keys(state).forEach(k=>{
+      if(k.startsWith("s1_")||k.startsWith("s2_")){
+        fixed[k]={status:state[k].status, fields:Object.assign({},state[k].fields)};
+      }
+    });
+    const mapRows=(list)=>list.filter(id=>state[id]).map(id=>({id:id, fields:Object.assign({},state[id].fields)}));
+    const bancadasArr=bancadas.filter(id=>state[id]).map(id=>({
+      id:id, fields:Object.assign({},state[id].fields),
+      cuba:state[id].cuba, modeloCuba:state[id].modeloCuba, metalInstal:state[id].metalInstal
+    }));
+    return {
+      id:idVals,
+      observacoes: obsEl?obsEl.value:"",
+      photosNA: photosNA,
+      secq: {ban:secq.ban, 5:secq[5], 6:secq[6]},
+      fixed: fixed,
+      bancadas: bancadasArr,
+      dynEletros: mapRows(dynEletros),
+      dyn5: mapRows(dynRows[5]),
+      dyn6: mapRows(dynRows[6])
+    };
+  }
+
+  function applyDraft(d){
+    if(!d || typeof d!=="object") return;
+    // Identificação
+    if(d.id){
+      document.querySelectorAll('#idgrid [data-id]').forEach(el=>{
+        if(d.id[el.dataset.id]!=null) el.value=d.id[el.dataset.id];
+      });
+    }
+    const tipoEl=document.querySelector('#idgrid [data-id="tipo"]');
+    if(tipoEl){ document.getElementById("heritage").classList.toggle("show", tipoEl.value==="Herança / acervo"); }
+    const obsEl=document.getElementById("observacoes_gerais");
+    if(obsEl && d.observacoes!=null) obsEl.value=d.observacoes;
+    // Fotos "não se aplica"
+    if(d.photosNA){
+      photosNA=true;
+      const inp=document.getElementById("link_fotos"); const btn=document.getElementById("fotosNA");
+      if(btn) btn.classList.add("on-n");
+      if(inp){ inp.disabled=true; inp.value=""; }
+      const fh=document.getElementById("fotosHint"); if(fh) fh.textContent="Sem fotos — marcado como não se aplica.";
+    }
+    // Itens fixos (seções 1 e 2)
+    if(d.fixed){
+      Object.keys(d.fixed).forEach(id=>{
+        if(!state[id]) return;
+        const fs=d.fixed[id];
+        state[id].status=fs.status;
+        state[id].fields=Object.assign({}, fs.fields);
+        const seg=document.querySelector('.seg[data-id="'+id+'"]');
+        if(seg && fs.status){
+          seg.querySelectorAll("button").forEach(b=>b.classList.remove("on-y","on-n"));
+          const b=seg.querySelector('[data-s="'+fs.status+'"]');
+          if(b) b.classList.add((fs.status==="def"||fs.status==="ok")?"on-y":"on-n");
+        }
+        const f=document.getElementById("f_"+id);
+        if(f) f.classList.toggle("show", fs.status==="def"||fs.status==="pend");
+        setFieldValues(id, fs.fields);
+        if(fs.fields && fs.fields.respiro==="Sim"){ const esp=document.getElementById("respesp_"+id); if(esp) esp.style.display=""; }
+        paintState(id);
+      });
+    }
+    // Gates de seção (reflete botão + visibilidade; linhas recriadas abaixo)
+    ["ban",5,6].forEach(sec=>{
+      const v=d.secq?d.secq[sec]:undefined;
+      if(!v) return;
+      secq[sec]=v;
+      const sq=document.querySelector('.seg[data-secq="'+sec+'"]');
+      if(sq){
+        sq.querySelectorAll("button").forEach(b=>b.classList.remove("on-y","on-n"));
+        const b=sq.querySelector('[data-v="'+(v==="sim"?"sim":"nao")+'"]');
+        if(b) b.classList.add(v==="sim"?"on-y":"on-n");
+      }
+      const wrap=document.getElementById("wrap"+sec);
+      if(wrap) wrap.classList.toggle("show", v==="sim");
+    });
+    // Linhas dinâmicas
+    if(Array.isArray(d.bancadas)) d.bancadas.forEach(b=>addBancada(b));
+    if(Array.isArray(d.dynEletros)) d.dynEletros.forEach(e=>addEletro(e));
+    if(Array.isArray(d.dyn5)) d.dyn5.forEach(r=>addDyn("5", r));
+    if(Array.isArray(d.dyn6)) d.dyn6.forEach(r=>addDyn("6", r));
+    update();
+  }
+
+  function hasDraftApi(){ return typeof ChecklistDraft!=="undefined" && ChecklistDraft; }
+  function setAutosaveMsg(txt){ const m=document.getElementById("autosaveMsg"); if(m) m.textContent=txt; }
+  function persist(){
+    if(!hasDraftApi()) return;
+    try{ if(ChecklistDraft.saveDraft(collectDraft())) setAutosaveMsg("Rascunho salvo ✓ neste navegador."); }catch(e){}
+  }
+  function scheduleSave(){
+    if(!autosaveReady || restoring) return;
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer=setTimeout(persist, SAVE_DELAY);
+  }
+  function autosaveFieldListener(e){
+    if(e.target && e.target.closest && e.target.closest("#form")) scheduleSave();
+  }
+
   // ---------- BUILD ----------
   renderSec1();
   renderDefRows("sec2", sec2items, F2, "s2");
   update();
+
+  // Restaura rascunho salvo neste navegador, se houver e for válido.
+  try{
+    const draft = hasDraftApi() ? ChecklistDraft.loadDraft() : null;
+    if(draft){
+      restoring=true;
+      applyDraft(draft);
+      restoring=false;
+      setAutosaveMsg("Rascunho restaurado deste navegador.");
+    }
+  }catch(e){ restoring=false; }
+  autosaveReady=true;
+
+  // Autosave para digitação em campos de texto (inclui observações gerais).
+  document.addEventListener("input", autosaveFieldListener);
+  document.addEventListener("change", autosaveFieldListener);
+
+  // Limpar rascunho.
+  const clearBtn=document.getElementById("clearDraft");
+  if(clearBtn){
+    clearBtn.addEventListener("click", function(){
+      const ok = (typeof window!=="undefined" && typeof window.confirm==="function")
+        ? window.confirm("Limpar o rascunho salvo neste navegador? O formulário será reiniciado.")
+        : true;
+      if(!ok) return;
+      try{ if(hasDraftApi()) ChecklistDraft.clearDraft(); }catch(e){}
+      if(typeof window!=="undefined" && window.location && typeof window.location.reload==="function") window.location.reload();
+    });
+  }
 
   // ---------- SUMMARY ----------
   document.getElementById("finish").addEventListener("click",function(){
