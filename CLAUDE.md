@@ -72,8 +72,13 @@ Este projeto segue um padrão de releases pequenas:
   de metal (parede/bancada).
 - **Seções 4 e 5:** listas dinâmicas condicionadas a um "sim/não".
 - **Seção 6 (Observações):** campo livre, opcional.
-- Saída = resumo imprimível + "Voltar e editar". **Não há autosave**: recarregar
-  perde o preenchimento (limitação conhecida, ver roadmap).
+- Saída = resumo imprimível + "Voltar e editar".
+- **Autosave local (desde 0.2.1):** o preenchimento é salvo no `localStorage` do
+  navegador e restaurado ao reabrir; há botão "Limpar rascunho". Os dados ficam
+  **só no navegador** — nada vai para servidor. Serialização em `src/draft.js`
+  (chave versionada `checklist-medicao:draft:v1`); acesso ao storage é defensivo
+  (funciona sem autosave se indisponível). Não apagar o rascunho ao gerar a
+  solicitação.
 
 ## O que NÃO fazer
 

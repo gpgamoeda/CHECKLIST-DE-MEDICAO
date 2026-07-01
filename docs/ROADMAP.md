@@ -29,11 +29,11 @@ introduz React incremental; D publica.
   `index.html`. Extração byte-a-byte fiel — comportamento idêntico.
 - Build passa a copiar `src/` para `dist/`; smoke tests atualizados.
 
-## 0.2.1 — Autosave local em `localStorage`
+## ✅ 0.2.1 — Autosave local em `localStorage` (concluída)
 
-- Salvar/restaurar rascunho automaticamente; ação de limpar rascunho.
-- Sem envio ao servidor; sem mudar a regra de conclusão.
-- Testes de serialização/restauração/limpeza.
+- Salva/restaura rascunho automaticamente (debounce); ação de limpar rascunho.
+- Sem envio ao servidor; regra de conclusão inalterada.
+- Módulo puro `src/draft.js` + testes de serialização e de comportamento (jsdom).
 
 ### Bloco B — base moderna de build e tipos
 
