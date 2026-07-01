@@ -5,12 +5,12 @@ conforme o handoff pack. Atualizado a cada sprint.
 
 ## Estado geral
 
-- Ciclo: Refatoração progressiva + Cloudflare Pages
+- Ciclo: Refatoração progressiva + Cloudflare Pages (concluído) → repaginação visual
 - Repositório: `gpgamoeda/CHECKLIST-DE-MEDICAO`
 - Branch base: `main`
-- Último PR mergeado: #9 (Sprint 0.5.0 — Cloudflare Pages)
-- Última versão: `0.5.1` (em PR — fecha o ciclo)
-- Próxima sprint: — (ciclo concluído; próximo roadmap em `docs/release-0.5/RETROSPECTIVE.md`)
+- Último PR mergeado: #10 (Sprint 0.5.1 — retrospectiva)
+- Última versão: `0.6.0` (em PR — repaginação visual FRS)
+- Próxima sprint: — (próximo roadmap em `docs/release-0.5/RETROSPECTIVE.md`)
 - Produção: https://checklist-de-medicao.pages.dev (publicado)
 - Modo de execução: loop autônomo, um branch/PR por sprint, merge quando os
   gates aplicáveis estão verdes.
@@ -28,7 +28,8 @@ conforme o handoff pack. Atualizado a cada sprint.
 | 0.4.1 | `claude/release-041-componentizar-secoes-resumo` | #7 | Mergeada | typecheck+lint+43 testes+build | Componentização completa; app.ts removido; estado no React |
 | 0.4.2 | `claude/release-042-qa-ux-a11y-print` | #8 | Mergeada | typecheck+lint+43 testes+build+e2e | Playwright fluxo crítico (real) verde; a11y básica |
 | 0.5.0 | `claude/release-050-cloudflare-pages` | #9 | Mergeada | validate+deploy+smoke | Publicado em checklist-de-medicao.pages.dev |
-| 0.5.1 | `claude/release-051-retrospective-roadmap` | — | Em PR | validate | Retrospectiva; ciclo concluído |
+| 0.5.1 | `claude/release-051-retrospective-roadmap` | #10 | Mergeada | validate | Retrospectiva; ciclo concluído |
+| 0.6.0 | `release/0.6.0-frs-visual-theme` | — | Em PR | validate+e2e+build+smoke visual | Tema FRS (só visual); Manrope + styles.css |
 
 ## Decisões tomadas
 
