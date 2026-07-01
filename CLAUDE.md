@@ -84,12 +84,15 @@ Este projeto segue um padrão de releases pequenas:
   ambientes, datas e link das fotos (ou "não se aplica"). Opcionais: arquiteto,
   complemento, ponto de referência, observações gerais.
 - Telefone usa máscara `(00) 0 0000-0000`; datas são exibidas no resumo em pt-BR.
-- Obra "Herança / acervo" dispara um aviso de atenção redobrada.
+- **Tipo de obra:** opções "Obra nova" e "Reforma". A opção "Herança / acervo" foi
+  removida na 0.6.1 (o aviso de atenção redobrada só aparece para rascunhos
+  antigos que ainda tenham esse valor).
 - **Seção 1 (Obra Civil):** cada item é "Concluído" ou "Pendente" (pendência exige
   ambiente + motivo). Pendências embasam o Termo de Responsabilidade.
 - **Seção 2 (Eletrodomésticos):** "Definido" (com campos) ou "não se aplica".
-  Alguns itens têm campos extras (alimentação, necessidade de respiro). É possível
-  adicionar eletrodomésticos fora da lista.
+  Campos extras (desde 0.6.1): **alimentação** só em Cooktop/Fogão e Forno;
+  **respiro** em Forno, Micro-ondas, Refrigerador e Freezer (se "Sim", exige
+  especificação). É possível adicionar eletrodomésticos fora da lista.
 - **Seção 3 (Bancadas, Cubas e Metais):** por ambiente. O **tipo de cuba**
   (Inox / Louça / Esculpida / Não se aplica) define os campos seguintes; "Louça"
   ainda pede o modelo (apoio/sobrepor/embutir/semi-encaixe). Depois vêm os campos

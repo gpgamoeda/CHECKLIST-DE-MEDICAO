@@ -43,7 +43,6 @@ export function IdentificationCard() {
             <option value="">Selecionar</option>
             <option>Obra nova</option>
             <option>Reforma</option>
-            <option>Herança / acervo</option>
           </select></div>
 
         <div><label>Quantidade de ambientes a serem medidos</label><input data-id="qtd_ambientes" type="number" min="1" step="1" value={v('qtd_ambientes')} onChange={set('qtd_ambientes')} required /></div>
