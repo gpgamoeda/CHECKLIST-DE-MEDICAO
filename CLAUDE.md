@@ -36,7 +36,10 @@ anteriores estão em `archive/` apenas como histórico.
   `domain.ts` e o teste correspondente (`tests/domain.test.js`).
 - Ferramentas de dev: Node ≥ 20, Vite (dev/build), TypeScript (`typecheck`),
   Vitest (testes, incl. comportamento em jsdom), html-validate (lint).
-- Alvo de deploy: **Cloudflare Pages** (`build` → `dist/`).
+- Deploy: **Cloudflare Pages** (`build` → `dist/`), publicado em
+  https://checklist-de-medicao.pages.dev. `npm run deploy` (Wrangler) com
+  `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` no ambiente — **nunca** comitar o
+  token. Ver `docs/DEPLOY_CLOUDFLARE.md`.
 - Direção desejada: componentizar em React (mantendo CSS atual / CSS Modules).
   **Não migre tudo de uma vez.**
 

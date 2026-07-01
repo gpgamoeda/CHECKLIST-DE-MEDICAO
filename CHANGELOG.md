@@ -8,7 +8,28 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 ## [Não lançado]
 
 ### A fazer (próximas sprints)
-- Preparar e publicar no Cloudflare Pages (0.5.0).
+- Retrospectiva do ciclo e próximo roadmap (0.5.1).
+
+## [0.5.0] — 2026-07-01
+
+Sprint 0.5.0 — **Publicação no Cloudflare Pages.**
+
+### Adicionado
+- App publicado em **https://checklist-de-medicao.pages.dev** (Cloudflare Pages,
+  projeto `checklist-de-medicao`).
+- `public/_headers`: cabeçalhos de segurança (X-Frame-Options, nosniff,
+  Referrer-Policy, Permissions-Policy) e cache longo para os assets com hash.
+- Script `npm run deploy` (Wrangler; token via variável de ambiente, nunca comitado).
+- `docs/DEPLOY_CLOUDFLARE.md`: configuração de deploy (build `npm run build`, saída
+  `dist`, Node 20), integração com Git e deploy manual via Wrangler.
+
+### Deploy / smoke
+- Deploy inicial via `wrangler pages deploy dist` (upload direto). Smoke pós-deploy:
+  HTTP 200, cabeçalhos do `_headers` aplicados, `#root` + bundle React servidos.
+
+### Notas
+- Nova dependência apenas de deploy: `wrangler` (dev). Sem backend/Functions/D1/KV.
+  Nenhum secret no repositório.
 
 ## [0.4.2] — 2026-07-01
 
