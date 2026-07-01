@@ -9,6 +9,11 @@ comportamento a cada passo.** Nada de reescrever tudo de uma vez.
 
 ---
 
+## ✅ 0.6.3 — Impressão à prova de dispositivo + HTML sem cache (concluída)
+
+- Print em preto puro/peso 500 (iOS Quartz clareia tons médios) + `print-color-adjust`.
+- `_headers`: HTML com `no-cache` → após deploy, navegador puxa CSS novo.
+
 ## ✅ 0.6.2 — Contraste na impressão do resumo (concluída)
 
 - `@media print` com tinta escura de alto contraste (4,2→11,1:1 nos secundários) e

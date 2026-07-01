@@ -10,6 +10,28 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 _Sem itens pendentes. Próximo roadmap sugerido em
 `docs/release-0.5/RETROSPECTIVE.md`._
 
+## [0.6.3] — 2026-07-01
+
+Release 0.6.3 — **Impressão à prova de dispositivo + HTML sem cache.** Follow-up
+da 0.6.2 após teste real em iPhone (Chrome/iOS): o PDF do usuário saiu com o CSS
+antigo (aba/cache carregados antes do deploy) e, além disso, o pipeline de
+impressão do iOS (Quartz) clareia tons médios.
+
+### Corrigido
+- `@media print` endurecido: conteúdo do resumo em **preto puro** (valores,
+  assinaturas), secundários em `#262319` (~18:1), pendências `#7A230C`,
+  **peso 500** no corpo (Manrope 400 fica fina no papel) e corpo em 13px;
+  `print-color-adjust: exact` para o WebKit respeitar as cores.
+- **`_headers`: `Cache-Control: no-cache, must-revalidate` para `/` e
+  `/index.html`** — após cada deploy, o navegador revalida o HTML e puxa o
+  CSS/JS novos (com hash). Evita imprimir com estilos velhos em cache; os assets
+  hasheados continuam com cache longo/imutável.
+
+### Nota
+- Abas que já estavam abertas antes de um deploy ainda seguram o CSS antigo até
+  recarregar (comportamento de SPA) — o autosave garante que recarregar não perde
+  o preenchimento.
+
 ## [0.6.2] — 2026-07-01
 
 Release 0.6.2 — **Correção de contraste na impressão do resumo** (regressão
