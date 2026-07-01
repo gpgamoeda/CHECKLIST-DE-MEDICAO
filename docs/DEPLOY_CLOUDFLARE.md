@@ -13,9 +13,11 @@ O app é estático (React + Vite, sem backend). Publicado no **Cloudflare Pages*
 O `public/_headers` define cabeçalhos de segurança (X-Frame-Options, nosniff,
 Referrer-Policy, Permissions-Policy) e cache longo para os assets com hash.
 
-## Opção A — Integração com Git (recomendada para deploy contínuo)
+## Opção A — Integração com Git (**ATIVA** desde 0.6.x)
 
-No painel do Cloudflare Pages, conecte o repositório `gpgamoeda/CHECKLIST-DE-MEDICAO`:
+A integração está conectada: **cada push na `main` publica automaticamente** e PRs
+ganham preview deployments. Configuração no painel do Cloudflare Pages
+(repositório `gpgamoeda/CHECKLIST-DE-MEDICAO`):
 
 - Production branch: `main`
 - Build command: `npm run build`

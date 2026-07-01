@@ -10,6 +10,26 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 _Sem itens pendentes. Próximo roadmap sugerido em
 `docs/release-0.5/RETROSPECTIVE.md`._
 
+## [0.6.2] — 2026-07-01
+
+Release 0.6.2 — **Correção de contraste na impressão do resumo** (regressão
+introduzida pelo tema FRS na 0.6.0). Somente `@media print`; tela inalterada.
+
+### Corrigido
+- Na impressão, a paleta FRS é trocada por **tinta escura de alto contraste**:
+  corpo/títulos em preto (21:1), textos secundários ("não informado", lista
+  "não se aplica", assinaturas) de `#807B72` (4,2:1) para `#3F3B33` (**11,1:1**),
+  pendências de terracota `#B43C1E` (5,8:1) para `#8C2D12` (**8,4:1**) e
+  separadores pontilhados escurecidos.
+- A **linha sob os títulos** (`.rule`) era um `background` — que impressoras
+  descartam — e **sumia no PDF**; virou `border-top`, que imprime sempre.
+
+### Notas
+- Medição feita sob mídia de impressão em Chromium real, com PDFs antes/depois
+  gerados como o usuário imprime (sem fundos). Tela (tema FRS) intocada.
+- Deploy: automático via integração Git do Cloudflare Pages (merge na `main`
+  publica).
+
 ## [0.6.1] — 2026-07-01
 
 Release 0.6.1 — Ajustes de conteúdo do formulário solicitados pelo produto.

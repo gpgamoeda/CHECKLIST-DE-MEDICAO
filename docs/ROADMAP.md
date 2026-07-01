@@ -9,6 +9,11 @@ comportamento a cada passo.** Nada de reescrever tudo de uma vez.
 
 ---
 
+## ✅ 0.6.2 — Contraste na impressão do resumo (concluída)
+
+- `@media print` com tinta escura de alto contraste (4,2→11,1:1 nos secundários) e
+  linha-título por borda (imprimia como background e sumia). Tela FRS intocada.
+
 ## ✅ 0.6.1 — Ajustes de conteúdo do formulário (concluída)
 
 - Seção 2: Ar condicionado renomeado (Painel/nicho/prateleira) e sem extras;
