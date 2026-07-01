@@ -1,17 +1,6 @@
-// Testes da camada pura de rascunho (src/draft.js).
-// draft.js é UMD; como o projeto é "type":"module", carregamos o arquivo
-// fornecendo um `module` para acionar o caminho CommonJS do UMD.
+// Testes da camada pura de rascunho (src/draft.ts).
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-
-function loadDraftModule() {
-  const src = readFileSync(resolve(import.meta.dirname, '../src/draft.js'), 'utf8');
-  const mod = { exports: {} };
-  new Function('module', 'exports', src)(mod, mod.exports);
-  return mod.exports;
-}
-const Draft = loadDraftModule();
+import * as Draft from '../src/draft.ts';
 
 function memStorage() {
   const m = new Map();
@@ -96,6 +85,5 @@ describe('draft — storage', () => {
 
   it('retorna false/null quando não há storage disponível', () => {
     expect(Draft.saveDraft(sampleDraft, null)).toBe(false);
-    // Sem storage e sem localStorage global (ambiente node), usa o padrão nulo.
   });
 });

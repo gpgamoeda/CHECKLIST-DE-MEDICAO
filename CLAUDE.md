@@ -16,25 +16,30 @@ anteriores estão em `archive/` apenas como histórico.
 
 ## Stack e restrições
 
-- HTML + CSS + JS puro, sem framework e sem dependências em runtime. Desde a
-  Sprint 0.2.0 **não é mais arquivo único**: `index.html` referencia
-  `src/styles.css` e `src/app.js` (JS é script clássico com `defer`, então abrir
-  o `index.html` via `file://` continua funcionando).
-- Ferramentas de dev: Node ≥ 20, Vitest (testes), html-validate (lint). Servidor
-  de dev e build são scripts Node sem dependências, em `scripts/`.
+- **Vite + TypeScript**, sem framework de UI ainda (React vem no Bloco C). O
+  `index.html` carrega `src/main.ts` (módulo), que importa `src/styles.css` e chama
+  `initApp()` de `src/app.ts` (rascunho em `src/draft.ts`). Sem dependências em
+  runtime — o bundle final é estático. Como agora é bundling ES, **abrir o
+  `index.html` cru via `file://` deixou de ser o fluxo** (use `npm run dev`).
+- `src/app.ts` ainda tem `// @ts-nocheck` (legado); a tipagem forte do domínio é a
+  Sprint 0.3.1 — ao tipá-lo, remova o `@ts-nocheck`.
+- Ferramentas de dev: Node ≥ 20, Vite (dev/build), TypeScript (`typecheck`),
+  Vitest (testes, incl. comportamento em jsdom), html-validate (lint).
 - Alvo de deploy: **Cloudflare Pages** (`build` → `dist/`).
-- Direção desejada (futuro, ainda não aplicado): React + TypeScript + Vite, com
-  CSS Modules ou Tailwind. **Não migre tudo de uma vez.**
+- Direção desejada: componentizar em React (mantendo CSS atual / CSS Modules).
+  **Não migre tudo de uma vez.**
 
 ## Comandos
 
 ```bash
-npm install         # instala ferramentas de dev
-npm run dev         # servidor local em http://localhost:5173
+npm install         # instala dependências
+npm run dev         # servidor Vite em http://localhost:5173
+npm run typecheck   # tsc --noEmit
 npm run lint        # html-validate no index.html
 npm test            # Vitest
-npm run build       # gera dist/
-npm run validate    # lint + test + build
+npm run build       # Vite build → dist/
+npm run preview     # serve o dist/ para conferência
+npm run validate    # typecheck + lint + test + build
 ```
 
 ## Forma de trabalho (obrigatória)

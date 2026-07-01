@@ -8,7 +8,43 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 ## [Não lançado]
 
 ### A fazer (próximas sprints)
-- Migrar a base para Vite + TypeScript e, em seguida, componentizar em React.
+- Tipar o domínio (remover `@ts-nocheck` do app) e ampliar testes de regras (0.3.1).
+- Componentizar em React de forma incremental (0.4.x).
+
+## [0.3.0] — 2026-07-01
+
+Sprint 0.3.0 — Base moderna de build: **Vite + TypeScript**. Comportamento do app
+preservado (coberto pelos testes de comportamento em jsdom).
+
+### Adicionado
+- **Vite** como servidor de desenvolvimento (`npm run dev`) e build
+  (`npm run build` → `dist/`), com `npm run preview` para conferir o build.
+- **TypeScript** configurado (`tsconfig.json`) e script `npm run typecheck`
+  (`tsc --noEmit`), agora parte do `npm run validate`.
+- `src/main.ts` como ponto de entrada (importa os estilos e chama `initApp`).
+
+### Alterado
+- `src/draft.js` → `src/draft.ts` (módulo ES com tipos; fim do UMD).
+- `src/app.js` → `src/app.ts`: a IIFE virou `export function initApp()` e passou a
+  importar `draft` por módulo (em vez do global `window.ChecklistDraft`). O módulo
+  ainda usa `// @ts-nocheck` — a tipagem forte do domínio vem na 0.3.1.
+- `index.html` carrega o app via `<script type="module" src="/src/main.ts">`; o
+  CSS passou a ser importado pelo `main.ts` (Vite injeta no build).
+- `package.json`: scripts migrados para Vite/TS; `validate` agora roda
+  `typecheck → lint → test → build`.
+
+### Removido
+- Scripts próprios `scripts/dev-server.mjs` e `scripts/build.mjs` (o Vite assume
+  dev e build).
+
+### Nota de comportamento
+- O contrato `npm run build` → `dist/` foi mantido (Cloudflare Pages), e a pasta
+  `archive/` continua fora do build.
+- Como o app agora é servido/empacotado pelo Vite (módulos ES), **abrir o
+  `index.html` cru via `file://` deixa de ser o fluxo** — use `npm run dev` em
+  desenvolvimento e o `dist/` publicado em produção.
+- Testes migrados para os módulos TS (25 testes, incluindo os de comportamento em
+  jsdom que exercitam autosave, restauração e o fluxo de conclusão).
 
 ## [0.2.1] — 2026-07-01
 
