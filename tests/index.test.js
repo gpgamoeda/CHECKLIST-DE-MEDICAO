@@ -59,18 +59,26 @@ describe('index.html — página vigente', () => {
 });
 
 describe('src/ — fontes TypeScript', () => {
-  it('existem main.ts, app.ts, draft.ts e styles.css', () => {
-    for (const f of ['src/main.ts', 'src/app.ts', 'src/draft.ts', 'src/styles.css']) {
+  it('existem main.ts, app.ts, draft.ts, domain.ts e styles.css', () => {
+    for (const f of ['src/main.ts', 'src/app.ts', 'src/draft.ts', 'src/domain.ts', 'src/styles.css']) {
       expect(existsSync(resolve(root, f))).toBe(true);
     }
   });
 
-  it('app.ts exporta initApp e contém a lógica do checklist', () => {
+  it('app.ts exporta initApp, importa o domínio e não usa mais @ts-nocheck', () => {
     const app = read('src/app.ts');
     expect(app).toContain('export function initApp');
-    expect(app).toContain('Refrigerador');
+    expect(app).toContain("from './domain'");
     expect(app).toContain('function rowResolved');
-    expect(app).toContain('function maskPhone');
+    expect(app).not.toContain('@ts-nocheck');
+  });
+
+  it('domain.ts concentra dados e regras puras', () => {
+    const domain = read('src/domain.ts');
+    expect(domain).toContain('Refrigerador');
+    expect(domain).toContain('export function maskPhone');
+    expect(domain).toContain('export function isBancadaResolved');
+    expect(domain).toContain('export function isIdentificationComplete');
   });
 
   it('styles.css contém o estilo do app', () => {

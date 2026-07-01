@@ -43,11 +43,12 @@ introduz React incremental; D publica.
   com `npm run typecheck` (no `validate`). Sem React ainda.
 - `app.ts` com `@ts-nocheck` temporário — a tipagem forte é a 0.3.1.
 
-## 0.3.1 — Tipagem de regras de negócio e testes reais
+## ✅ 0.3.1 — Tipagem de regras de negócio e testes reais (concluída)
 
-- Tipos para identificação, seções, itens, pendências, eletros, bancadas e resumo.
-- Testes reais das funções puras (máscara, datas, escape, progresso, validação,
-  resumo, rascunho).
+- `src/domain.ts` tipado com dados + formatação + regras de "resolvido"; app passa
+  a importar o domínio (fonte única) e removeu o `@ts-nocheck`.
+- Testes reais das regras (identificação, seção 1, eletros, bancada/cuba, datas,
+  escape).
 
 ### Bloco C — React incremental
 

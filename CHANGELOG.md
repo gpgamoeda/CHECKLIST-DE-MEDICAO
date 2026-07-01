@@ -8,8 +8,34 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 ## [Não lançado]
 
 ### A fazer (próximas sprints)
-- Tipar o domínio (remover `@ts-nocheck` do app) e ampliar testes de regras (0.3.1).
 - Componentizar em React de forma incremental (0.4.x).
+
+## [0.3.1] — 2026-07-01
+
+Sprint 0.3.1 — Tipagem das regras de negócio e testes reais. **Sem mudança de
+comportamento** (as funções extraídas são as mesmas que o app já usava).
+
+### Adicionado
+- **`src/domain.ts`**: módulo puro e tipado com os dados (itens das seções,
+  campos, rótulos), a formatação (`maskPhone`, `brDate`, `esc`) e as regras de
+  "resolvido" (`isSection1Resolved`, `isEletroResolved`, `isDynEletroResolved`,
+  `isBancadaResolved`, `isDynResolved`, `isIdentificationComplete`). É a **fonte
+  única** das regras.
+- **`tests/domain.test.js`**: testes das regras — identificação incompleta/completa
+  e link de fotos, pendência de obra civil (ambiente+motivo), eletro definido com
+  campos e extras (alimentação/respiro), cuba louça exigindo modelo, metal
+  obrigatório com cuba, datas em pt-BR e escape de HTML.
+
+### Alterado
+- `src/app.ts` passou a **importar** o domínio (removendo as definições
+  duplicadas) e virou um dispatcher fino em `rowResolved`/`idComplete`. O
+  `// @ts-nocheck` foi **removido**: o módulo agora é type-checked (os acessos ao
+  DOM usam helpers `byId`/`qs`/`qsa` que retornam `any`).
+
+### Notas
+- As mudanças são somente de organização/tipagem; os testes de comportamento em
+  jsdom (autosave, restauração e fluxo de conclusão) seguem verdes, confirmando a
+  preservação do comportamento. Total: 44 testes.
 
 ## [0.3.0] — 2026-07-01
 

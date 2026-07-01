@@ -21,8 +21,9 @@ anteriores estão em `archive/` apenas como histórico.
   `initApp()` de `src/app.ts` (rascunho em `src/draft.ts`). Sem dependências em
   runtime — o bundle final é estático. Como agora é bundling ES, **abrir o
   `index.html` cru via `file://` deixou de ser o fluxo** (use `npm run dev`).
-- `src/app.ts` ainda tem `// @ts-nocheck` (legado); a tipagem forte do domínio é a
-  Sprint 0.3.1 — ao tipá-lo, remova o `@ts-nocheck`.
+- As **regras de negócio puras e os tipos** vivem em `src/domain.ts` (fonte única);
+  `src/app.ts` é a camada de DOM que importa o domínio. Ao mudar regra, altere o
+  `domain.ts` e o teste correspondente (`tests/domain.test.js`).
 - Ferramentas de dev: Node ≥ 20, Vite (dev/build), TypeScript (`typecheck`),
   Vitest (testes, incl. comportamento em jsdom), html-validate (lint).
 - Alvo de deploy: **Cloudflare Pages** (`build` → `dist/`).
