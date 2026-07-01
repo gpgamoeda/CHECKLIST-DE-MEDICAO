@@ -1,11 +1,8 @@
 // Smoke tests da estrutura do app.
-// A partir da Sprint 0.2.0 o app deixou de ser single-file: o CSS vive em
-// src/styles.css e o JS em src/app.js, referenciados pelo index.html.
-// Estes testes travam essa estrutura e a presença das regras/marcadores da
-// versão vigente, sem depender de DOM/navegador.
-import { describe, it, expect, beforeAll } from 'vitest';
+// Desde a Sprint 0.3.0 o app usa Vite + TypeScript: o index.html carrega
+// src/main.ts (módulo), que importa os estilos e inicializa o checklist.
+import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
@@ -20,21 +17,18 @@ describe('index.html — página vigente', () => {
     expect(html).toContain('<title>Checklist de Envio para Medição — FABRILIS</title>');
   });
 
-  it('referencia CSS e JS externos (não é mais single-file)', () => {
-    expect(html).toMatch(/<link[^>]+rel="stylesheet"[^>]+href="src\/styles\.css"/);
-    expect(html).toMatch(/<script[^>]+src="src\/app\.js"/);
-    // Não deve restar CSS/JS inline no HTML.
+  it('carrega o app via módulo Vite (src/main.ts) e sem código inline', () => {
+    expect(html).toMatch(/<script[^>]+type="module"[^>]+src="\/src\/main\.ts"/);
     expect(html).not.toContain(':root{');
     expect(html).not.toContain('(function(){');
+    expect(html).not.toContain('src/app.js');
   });
 
   it('corresponde à versão vigente v5 (não à v1 arquivada)', () => {
-    // Marcadores que vivem no HTML.
     expect(html).toContain('Bancadas, Cubas e Metais');
     expect(html).toContain('Observações Gerais');
     expect(html).toContain('Gerar solicitação de medição');
     expect(html).toContain('data-id="tipo_medicao"');
-    // Marcadores exclusivos da v1 não devem estar presentes.
     expect(html).not.toContain('Concluir e gerar resumo');
     expect(html).not.toContain('Cubas e Louças');
   });
@@ -57,25 +51,32 @@ describe('index.html — página vigente', () => {
       expect(html).toContain(`data-id="${campo}"`);
     }
   });
+
+  it('mantém a UI de autosave (barra + botão limpar)', () => {
+    expect(html).toContain('id="autosaveMsg"');
+    expect(html).toContain('id="clearDraft"');
+  });
 });
 
-describe('src/ — CSS e JS extraídos', () => {
-  it('src/styles.css existe e contém o estilo do app', () => {
-    expect(existsSync(resolve(root, 'src/styles.css'))).toBe(true);
-    const css = read('src/styles.css');
-    expect(css).toContain(':root{');
-    expect(css).toContain('.card{');
-    expect(css).toContain('@media print');
+describe('src/ — fontes TypeScript', () => {
+  it('existem main.ts, app.ts, draft.ts e styles.css', () => {
+    for (const f of ['src/main.ts', 'src/app.ts', 'src/draft.ts', 'src/styles.css']) {
+      expect(existsSync(resolve(root, f))).toBe(true);
+    }
   });
 
-  it('src/app.js existe e contém a lógica do checklist', () => {
-    expect(existsSync(resolve(root, 'src/app.js'))).toBe(true);
-    const js = read('src/app.js');
-    expect(js).toContain('(function(){');
-    // Regras/dados que vivem no JS.
-    expect(js).toContain('Refrigerador');
-    expect(js).toContain('function rowResolved');
-    expect(js).toContain('function maskPhone');
+  it('app.ts exporta initApp e contém a lógica do checklist', () => {
+    const app = read('src/app.ts');
+    expect(app).toContain('export function initApp');
+    expect(app).toContain('Refrigerador');
+    expect(app).toContain('function rowResolved');
+    expect(app).toContain('function maskPhone');
+  });
+
+  it('styles.css contém o estilo do app', () => {
+    const css = read('src/styles.css');
+    expect(css).toContain(':root{');
+    expect(css).toContain('@media print');
   });
 });
 
@@ -84,21 +85,5 @@ describe('archive/ — histórico de versões', () => {
     for (const versao of ['v1', 'v2', 'v3', 'v4', 'v4.1']) {
       expect(existsSync(resolve(root, `archive/checklist-${versao}.html`))).toBe(true);
     }
-  });
-});
-
-describe('build — dist/ publicável', () => {
-  beforeAll(() => {
-    execFileSync('node', ['scripts/build.mjs'], { cwd: root, stdio: 'ignore' });
-  });
-
-  it('copia HTML, CSS e JS para dist/', () => {
-    expect(existsSync(resolve(root, 'dist/index.html'))).toBe(true);
-    expect(existsSync(resolve(root, 'dist/src/styles.css'))).toBe(true);
-    expect(existsSync(resolve(root, 'dist/src/app.js'))).toBe(true);
-  });
-
-  it('não publica a pasta archive/', () => {
-    expect(existsSync(resolve(root, 'dist/archive'))).toBe(false);
   });
 });

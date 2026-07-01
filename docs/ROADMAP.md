@@ -37,10 +37,11 @@ introduz React incremental; D publica.
 
 ### Bloco B — base moderna de build e tipos
 
-## 0.3.0 — Vite + TypeScript base
+## ✅ 0.3.0 — Vite + TypeScript base (concluída)
 
 - Vite como dev server/build (mantendo `build` → `dist/`); TypeScript configurado
-  com `npm run typecheck`. Sem React ainda.
+  com `npm run typecheck` (no `validate`). Sem React ainda.
+- `app.ts` com `@ts-nocheck` temporário — a tipagem forte é a 0.3.1.
 
 ## 0.3.1 — Tipagem de regras de negócio e testes reais
 

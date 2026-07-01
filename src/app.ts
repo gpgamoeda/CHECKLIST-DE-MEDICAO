@@ -1,4 +1,10 @@
-(function(){
+// @ts-nocheck
+// Migração incremental para TypeScript (Sprint 0.3.0): este módulo legado ainda
+// não é type-checked. A tipagem forte do domínio (estado, itens, resumo) entra na
+// Sprint 0.3.1, quando o @ts-nocheck será removido.
+import * as Draft from './draft';
+
+export function initApp(){
   // ---------- DATA ----------
   const sec1items = [
     "Revestimentos instalados em todos os ambientes (pisos, paredes, azulejos)",
@@ -34,17 +40,17 @@
   const MOD_LABEL  = {apoio:"Apoio", sobrepor:"Sobrepor", embutir:"Embutir", semi:"Semi-encaixe"};
   const MET_LABEL  = {parede:"Parede", bancada:"Bancada"};
 
-  const state = {}; // id -> {status, fields:{}}
-  let secq = {ban:null, 5:null, 6:null};
-  const dynRows = {5:[], 6:[]};
-  let bancadas = [];
-  let dynEletros = [];
+  const state: Record<string, any> = {}; // id -> {status, fields:{}}
+  let secq: Record<string, any> = {ban:null, 5:null, 6:null};
+  const dynRows: Record<string, string[]> = {5:[], 6:[]};
+  let bancadas: string[] = [];
+  let dynEletros: string[] = [];
   let photosNA = false;
 
   // ---------- AUTOSAVE (rascunho local) ----------
   let restoring = false;    // true enquanto o rascunho é aplicado ao carregar
   let autosaveReady = false; // só salva depois do build + restauração inicial
-  let saveTimer = null;
+  let saveTimer: any = null;
   const SAVE_DELAY = 400;
 
   function fieldClass(fields){ return fields.length===2?"two":fields.length===1?"one":""; }
@@ -560,11 +566,11 @@
     update();
   }
 
-  function hasDraftApi(){ return typeof ChecklistDraft!=="undefined" && ChecklistDraft; }
+  function hasDraftApi(){ return true; }
   function setAutosaveMsg(txt){ const m=document.getElementById("autosaveMsg"); if(m) m.textContent=txt; }
   function persist(){
     if(!hasDraftApi()) return;
-    try{ if(ChecklistDraft.saveDraft(collectDraft())) setAutosaveMsg("Rascunho salvo ✓ neste navegador."); }catch(e){}
+    try{ if(Draft.saveDraft(collectDraft())) setAutosaveMsg("Rascunho salvo ✓ neste navegador."); }catch(e){}
   }
   function scheduleSave(){
     if(!autosaveReady || restoring) return;
@@ -582,7 +588,7 @@
 
   // Restaura rascunho salvo neste navegador, se houver e for válido.
   try{
-    const draft = hasDraftApi() ? ChecklistDraft.loadDraft() : null;
+    const draft = hasDraftApi() ? Draft.loadDraft() : null;
     if(draft){
       restoring=true;
       applyDraft(draft);
@@ -604,7 +610,7 @@
         ? window.confirm("Limpar o rascunho salvo neste navegador? O formulário será reiniciado.")
         : true;
       if(!ok) return;
-      try{ if(hasDraftApi()) ChecklistDraft.clearDraft(); }catch(e){}
+      try{ if(hasDraftApi()) Draft.clearDraft(); }catch(e){}
       if(typeof window!=="undefined" && window.location && typeof window.location.reload==="function") window.location.reload();
     });
   }
@@ -727,4 +733,4 @@
   }
   function brDate(v){ if(!v||!/^\d{4}-\d{2}-\d{2}$/.test(v)) return esc(v); const p=v.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
   function esc(t){return (t||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
-})();
+}

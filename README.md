@@ -17,16 +17,16 @@ Ao final, gera um resumo imprimível (Imprimir / Salvar PDF).
 
 ## Stack atual
 
-- **Front-end:** HTML + CSS + JavaScript puro (vanilla), sem framework.
-- **Arquitetura:** `index.html` (marcação) referencia `src/styles.css` (estilos) e
-  `src/app.js` (lógica, uma IIFE). O JS é carregado como script clássico com
-  `defer`, então o `index.html` também funciona aberto direto via `file://`.
-- **Dependências em runtime:** nenhuma.
-- **Persistência:** nenhuma (o estado vive apenas em memória; recarregar a página
-  perde o preenchimento).
-- **Ferramentas (dev):** Node ≥ 20, [Vitest](https://vitest.dev) (testes) e
-  [html-validate](https://html-validate.org) (lint). O servidor de desenvolvimento
-  e o build são scripts Node sem dependências (`scripts/`).
+- **Front-end:** HTML + CSS + TypeScript, sem framework de UI (ainda). O
+  `index.html` carrega `src/main.ts` (Vite), que importa os estilos
+  (`src/styles.css`) e inicializa a lógica (`src/app.ts`, com o rascunho em
+  `src/draft.ts`).
+- **Build/dev:** [Vite](https://vitejs.dev) + [TypeScript](https://www.typescriptlang.org).
+- **Dependências em runtime:** nenhuma (o bundle final é estático).
+- **Persistência:** rascunho local em `localStorage` (autosave); nada é enviado a
+  servidor.
+- **Ferramentas (dev):** Node ≥ 20, [Vitest](https://vitest.dev) (testes, incl.
+  comportamento em jsdom) e [html-validate](https://html-validate.org) (lint).
 
 Uma auditoria detalhada está em [`docs/DIAGNOSTICO.md`](docs/DIAGNOSTICO.md) e o
 plano de evolução em [`docs/ROADMAP.md`](docs/ROADMAP.md).
@@ -35,33 +35,34 @@ plano de evolução em [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Como rodar localmente
 
-Não é obrigatório instalar nada para usar o app — basta abrir `index.html` no
-navegador. Para o fluxo de desenvolvimento (servidor local, lint, testes, build):
-
 ```bash
-# 1. Instalar as ferramentas de desenvolvimento
+# 1. Instalar as dependências
 npm install
 
-# 2. Servidor local (http://localhost:5173)
+# 2. Servidor de desenvolvimento Vite (http://localhost:5173)
 npm run dev
 
 # 3. Validações
+npm run typecheck   # checagem de tipos (tsc --noEmit)
 npm run lint        # valida a estrutura do HTML
 npm test            # roda os testes (Vitest)
 npm run build       # gera a pasta dist/ pronta para deploy
-npm run validate    # lint + test + build em sequência
+npm run preview     # serve o dist/ para conferência
+npm run validate    # typecheck + lint + test + build em sequência
 ```
 
 ## Scripts disponíveis
 
-| Script            | O que faz                                                        |
-| ----------------- | ---------------------------------------------------------------- |
-| `npm run dev`     | Servidor estático local (porta 5173; use `PORT=8080` para trocar) |
-| `npm run build`   | Copia os artefatos publicáveis para `dist/`                      |
-| `npm run lint`    | Valida `index.html` com html-validate                            |
-| `npm test`        | Roda os testes com Vitest                                        |
-| `npm run test:watch` | Testes em modo watch                                          |
-| `npm run validate`| `lint` + `test` + `build`                                        |
+| Script               | O que faz                                              |
+| -------------------- | ------------------------------------------------------ |
+| `npm run dev`        | Servidor de desenvolvimento Vite (porta 5173)          |
+| `npm run build`      | Gera o bundle estático em `dist/` (Vite)               |
+| `npm run preview`    | Serve o `dist/` para conferência                       |
+| `npm run typecheck`  | Checagem de tipos com `tsc --noEmit`                   |
+| `npm run lint`       | Valida `index.html` com html-validate                  |
+| `npm test`           | Roda os testes com Vitest                              |
+| `npm run test:watch` | Testes em modo watch                                   |
+| `npm run validate`   | `typecheck` + `lint` + `test` + `build`                |
 
 ---
 
@@ -69,21 +70,24 @@ npm run validate    # lint + test + build em sequência
 
 ```
 .
-├── index.html            # App vigente (marcação). É o que roda e o que é publicado.
+├── index.html            # Entrada (carrega src/main.ts via Vite). É o que é publicado.
 ├── src/
-│   ├── styles.css        # Estilos extraídos do index.html (Sprint 0.2.0)
-│   ├── app.js            # Lógica do checklist extraída do index.html (Sprint 0.2.0)
-│   └── draft.js          # Autosave local: serialização do rascunho (Sprint 0.2.1)
+│   ├── main.ts           # Ponto de entrada: importa estilos e chama initApp()
+│   ├── app.ts            # Lógica do checklist (initApp)
+│   ├── draft.ts          # Autosave local: serialização do rascunho
+│   ├── styles.css        # Estilos do app
+│   └── vite-env.d.ts     # Tipos do Vite (ex.: import de .css)
 ├── archive/              # Snapshots históricos (v1 a v4.1). Não são publicados.
 │   └── README.md
 ├── docs/
-│   ├── DIAGNOSTICO.md    # Auditoria técnica do estado atual
+│   ├── DIAGNOSTICO.md    # Auditoria técnica do estado inicial
 │   └── ROADMAP.md        # Evolução planejada por releases
-├── scripts/
-│   ├── dev-server.mjs    # Servidor estático de desenvolvimento (sem deps)
-│   └── build.mjs         # Gera dist/ (sem deps)
 ├── tests/
-│   └── index.test.js     # Smoke tests da estrutura do app
+│   ├── index.test.js     # Smoke tests da estrutura
+│   ├── draft.test.js     # Testes da serialização do rascunho
+│   └── autosave.dom.test.js  # Testes de comportamento (jsdom): autosave, restauração, conclusão
+├── tsconfig.json         # Configuração do TypeScript
+├── vite.config.ts        # Configuração do Vite (build → dist/)
 ├── .htmlvalidate.json    # Configuração do lint
 ├── package.json
 ├── CHANGELOG.md
