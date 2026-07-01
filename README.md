@@ -17,11 +17,12 @@ Ao final, gera um resumo imprimível (Imprimir / Salvar PDF).
 
 ## Stack atual
 
-- **Front-end:** HTML + CSS + TypeScript, sem framework de UI (ainda). O
-  `index.html` carrega `src/main.ts` (Vite), que importa os estilos
-  (`src/styles.css`) e inicializa a lógica (`src/app.ts`, com o rascunho em
-  `src/draft.ts`).
-- **Build/dev:** [Vite](https://vitejs.dev) + [TypeScript](https://www.typescriptlang.org).
+- **Front-end:** React + TypeScript. O `index.html` tem só `<div id="root">` e
+  carrega `src/main.tsx` (Vite), que monta o `<App/>` (shell em
+  `src/components/`). As regras de negócio puras estão em `src/domain.ts`, o
+  rascunho em `src/draft.ts` e a lógica imperativa (itens dinâmicos, autosave,
+  resumo) em `src/app.ts` — acionada pelo `App` no `useEffect` de montagem.
+- **Build/dev:** [Vite](https://vitejs.dev) + [TypeScript](https://www.typescriptlang.org) + [React](https://react.dev).
 - **Dependências em runtime:** nenhuma (o bundle final é estático).
 - **Persistência:** rascunho local em `localStorage` (autosave); nada é enviado a
   servidor.
@@ -70,10 +71,12 @@ npm run validate    # typecheck + lint + test + build em sequência
 
 ```
 .
-├── index.html            # Entrada (carrega src/main.ts via Vite). É o que é publicado.
+├── index.html            # Entrada (#root + carrega src/main.tsx via Vite). Publicado.
 ├── src/
-│   ├── main.ts           # Ponto de entrada: importa estilos e chama initApp()
-│   ├── app.ts            # Lógica do checklist (initApp)
+│   ├── main.tsx          # Ponto de entrada: importa estilos e monta <App/>
+│   ├── components/       # Shell React (App, Header, ProgressBar, Identificação, Seções…)
+│   ├── app.ts            # Lógica imperativa (estado, itens dinâmicos, autosave, resumo)
+│   ├── domain.ts         # Regras de negócio puras + tipos (fonte única)
 │   ├── draft.ts          # Autosave local: serialização do rascunho
 │   ├── styles.css        # Estilos do app
 │   └── vite-env.d.ts     # Tipos do Vite (ex.: import de .css)

@@ -8,9 +8,9 @@ conforme o handoff pack. Atualizado a cada sprint.
 - Ciclo: Refatoração progressiva + Cloudflare Pages
 - Repositório: `gpgamoeda/CHECKLIST-DE-MEDICAO`
 - Branch base: `main`
-- Último PR mergeado: #4 (Sprint 0.3.0 — Vite + TypeScript)
-- Última versão: `0.3.1` (em PR)
-- Próxima sprint: `0.4.0` — React shell e componentização inicial
+- Último PR mergeado: #5 (Sprint 0.3.1 — tipagem do domínio)
+- Última versão: `0.4.0` (em PR)
+- Próxima sprint: `0.4.1` — Componentização das seções e resumo imprimível
 - Modo de execução: loop autônomo, um branch/PR por sprint, merge quando os
   gates aplicáveis estão verdes.
 
@@ -22,8 +22,8 @@ conforme o handoff pack. Atualizado a cada sprint.
 | 0.2.0 | `claude/release-020-modularizacao-monolito` | #2 | Mergeada | lint+test+build | Extração CSS/JS byte-a-byte fiel |
 | 0.2.1 | `claude/release-021-autosave-localstorage` | #3 | Mergeada | lint+25 testes+build | Autosave local; testes jsdom de comportamento |
 | 0.3.0 | `claude/release-030-vite-typescript-base` | #4 | Mergeada | typecheck+lint+25 testes+build | Vite+TS |
-| 0.3.1 | `claude/release-031-domain-logic-tests` | — | Em PR | typecheck+lint+44 testes+build | domain.ts tipado; @ts-nocheck removido |
-| 0.4.0 | `claude/release-040-react-shell` | | Pendente | | |
+| 0.3.1 | `claude/release-031-domain-logic-tests` | #5 | Mergeada | typecheck+lint+44 testes+build | domain.ts tipado; @ts-nocheck removido |
+| 0.4.0 | `claude/release-040-react-shell` | — | Em PR | typecheck+lint+41 testes+build | React shell; initApp com teardown |
 | 0.4.1 | `claude/release-041-componentizar-secoes-resumo` | | Pendente | | |
 | 0.4.2 | `claude/release-042-qa-ux-a11y-print` | | Pendente | | |
 | 0.5.0 | `claude/release-050-cloudflare-pages` | | Pendente | | Publicação exige credenciais humanas |

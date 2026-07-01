@@ -16,11 +16,16 @@ anteriores estão em `archive/` apenas como histórico.
 
 ## Stack e restrições
 
-- **Vite + TypeScript**, sem framework de UI ainda (React vem no Bloco C). O
-  `index.html` carrega `src/main.ts` (módulo), que importa `src/styles.css` e chama
-  `initApp()` de `src/app.ts` (rascunho em `src/draft.ts`). Sem dependências em
-  runtime — o bundle final é estático. Como agora é bundling ES, **abrir o
-  `index.html` cru via `file://` deixou de ser o fluxo** (use `npm run dev`).
+- **React + TypeScript + Vite.** O `index.html` tem só `<div id="root">` e carrega
+  `src/main.tsx`, que monta o `<App/>` (shell em `src/components/`: Header,
+  ProgressBar, IdentificationCard, ChecklistSections, Termo, Actions, Footer). O
+  `App` chama `initApp()` (de `src/app.ts`) no `useEffect`, que gerencia estado,
+  itens dinâmicos, autosave e resumo imperativamente sobre o DOM; `initApp()`
+  retorna um teardown (removido no unmount). **Abrir o `index.html` cru via
+  `file://` não é o fluxo** (use `npm run dev`).
+- Componentização incremental: em 0.4.0 o shell é React, mas o **conteúdo dinâmico
+  das seções ainda é montado por `initApp()`**. Ao migrar uma parte para React,
+  não duplique estado e mantenha os testes de comportamento verdes.
 - As **regras de negócio puras e os tipos** vivem em `src/domain.ts` (fonte única);
   `src/app.ts` é a camada de DOM que importa o domínio. Ao mudar regra, altere o
   `domain.ts` e o teste correspondente (`tests/domain.test.js`).
