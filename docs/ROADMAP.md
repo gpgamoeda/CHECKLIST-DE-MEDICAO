@@ -17,44 +17,66 @@ comportamento a cada passo.** Nada de reescrever tudo de uma vez.
 - Toolchain mínima: `dev`, `build`, `lint`, `test`, `validate`.
 - Sem mudança de comportamento do app.
 
-## 0.2.0 — Modularização e autosave (sem framework)
+Este ciclo segue o handoff pack "Cloudflare" (sprints pequenas até publicar no
+Cloudflare Pages). Bloco A reduz risco sem framework; B moderniza build/tipos; C
+introduz React incremental; D publica.
 
-- Extrair o `<style>` para `src/styles.css` e o `<script>` para módulos JS em
-  `src/` (ex.: `state.js`, `validation.js`, `format.js`, `summary.js`).
-- Cobrir as funções puras com testes unitários de verdade (máscara de telefone,
-  formatação de data, escape, regras de `rowResolved`).
-- **Autosave em `localStorage`** com opção de limpar o rascunho — resolve o maior
-  risco de UX (perda de preenchimento).
-- Critério de pronto: comportamento idêntico ao atual + testes cobrindo a lógica
-  extraída.
+### Bloco A — reduzir risco sem framework
 
-## 0.3.0 — Vite + TypeScript
+## ✅ 0.2.0 — Modularização segura do monólito (concluída)
 
-- Introduzir Vite como servidor de dev e build (mantendo o mesmo contrato
-  `build` → `dist/` já usado pelo Cloudflare Pages).
-- Migrar os módulos de `src/` para TypeScript, adicionando `typecheck` ao
-  `validate`.
-- Sem componentização ainda; foco em tipar e ter build/dev modernos.
+- CSS extraído para `src/styles.css` e JS para `src/app.js`, referenciados pelo
+  `index.html`. Extração byte-a-byte fiel — comportamento idêntico.
+- Build passa a copiar `src/` para `dist/`; smoke tests atualizados.
 
-## 0.4.0 — React + componentização de UI
+## 0.2.1 — Autosave local em `localStorage`
 
-- Componentizar as seções em React + TypeScript (uma seção por vez).
-- Adotar **CSS Modules** (mais simples e alinhado ao escopo) — reavaliar Tailwind
-  se a quantidade de estilos justificar.
-- Testes de componente com Vitest + Testing Library.
-- Um teste de fluxo crítico com **Playwright**: preencher o mínimo → liberar o
-  botão → gerar resumo → imprimir.
+- Salvar/restaurar rascunho automaticamente; ação de limpar rascunho.
+- Sem envio ao servidor; sem mudar a regra de conclusão.
+- Testes de serialização/restauração/limpeza.
 
-## 0.5.0+ — Persistência e integração (se houver necessidade real)
+### Bloco B — base moderna de build e tipos
 
-- Avaliar persistência além do `localStorage`. Só introduzir back-end se houver
-  necessidade concreta de histórico/multiusuário:
-  - **localStorage** — rascunho por navegador (já em 0.2.0).
-  - **Cloudflare KV** — se bastar guardar solicitações simples por chave.
-  - **Cloudflare D1** — se for preciso consultar/relacionar solicitações.
-  - Camada de API via **Cloudflare Pages Functions / Workers**, apenas se necessário.
-- Exportação estruturada da solicitação (JSON/PDF) para integrar com outros
-  sistemas da FABRILIS.
+## 0.3.0 — Vite + TypeScript base
+
+- Vite como dev server/build (mantendo `build` → `dist/`); TypeScript configurado
+  com `npm run typecheck`. Sem React ainda.
+
+## 0.3.1 — Tipagem de regras de negócio e testes reais
+
+- Tipos para identificação, seções, itens, pendências, eletros, bancadas e resumo.
+- Testes reais das funções puras (máscara, datas, escape, progresso, validação,
+  resumo, rascunho).
+
+### Bloco C — React incremental
+
+## 0.4.0 — React shell e componentização inicial
+
+- React + ReactDOM + plugin Vite React; shell/layout/cabeçalho/progresso/ações.
+- Estado e regras preservados.
+
+## 0.4.1 — Componentização das seções e resumo imprimível
+
+- Seções e resumo em componentes; campos condicionais e listas dinâmicas.
+- "Voltar e editar" e autosave preservados.
+
+## 0.4.2 — QA de UX, a11y, responsividade e impressão/PDF
+
+- Labels/foco/teclado, responsividade mínima, impressão/PDF; **Playwright** para o
+  fluxo crítico. Sem redesign.
+
+### Bloco D — Cloudflare Pages
+
+## 0.5.0 — Preparação e publicação via Cloudflare Pages
+
+- `docs/DEPLOY_CLOUDFLARE.md`, `_headers`/`_redirects` se necessário, config de
+  Pages (`build` → `dist`, Node 20). Publicação só com credenciais/autorização
+  humana — caso contrário, parar com instruções manuais.
+
+## 0.5.1 — Retrospectiva e roadmap seguinte
+
+- Retrospectiva do ciclo, lista de PRs/versões, riscos e próximos passos
+  (envio da solicitação, histórico/exportação, backend leve, etc.).
 
 ---
 
