@@ -1,6 +1,6 @@
 {
   "name": "checklist-de-medicao",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Checklist de Envio para Medição — FABRILIS. Ferramenta interna single-page para consultores prepararem a solicitação de medição de um projeto de marcenaria.",
   "type": "module",

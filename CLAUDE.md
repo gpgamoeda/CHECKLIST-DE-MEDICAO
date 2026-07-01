@@ -16,8 +16,10 @@ anteriores estão em `archive/` apenas como histórico.
 
 ## Stack e restrições
 
-- HTML + CSS + JS puro, **arquivo único** (`index.html`), sem framework e sem
-  dependências em runtime.
+- HTML + CSS + JS puro, sem framework e sem dependências em runtime. Desde a
+  Sprint 0.2.0 **não é mais arquivo único**: `index.html` referencia
+  `src/styles.css` e `src/app.js` (JS é script clássico com `defer`, então abrir
+  o `index.html` via `file://` continua funcionando).
 - Ferramentas de dev: Node ≥ 20, Vitest (testes), html-validate (lint). Servidor
   de dev e build são scripts Node sem dependências, em `scripts/`.
 - Alvo de deploy: **Cloudflare Pages** (`build` → `dist/`).

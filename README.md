@@ -18,8 +18,9 @@ Ao final, gera um resumo imprimível (Imprimir / Salvar PDF).
 ## Stack atual
 
 - **Front-end:** HTML + CSS + JavaScript puro (vanilla), sem framework.
-- **Arquitetura:** arquivo único autocontido (`index.html`) — HTML, CSS (`<style>`)
-  e lógica (`<script>` em IIFE) no mesmo arquivo.
+- **Arquitetura:** `index.html` (marcação) referencia `src/styles.css` (estilos) e
+  `src/app.js` (lógica, uma IIFE). O JS é carregado como script clássico com
+  `defer`, então o `index.html` também funciona aberto direto via `file://`.
 - **Dependências em runtime:** nenhuma.
 - **Persistência:** nenhuma (o estado vive apenas em memória; recarregar a página
   perde o preenchimento).
@@ -68,7 +69,10 @@ npm run validate    # lint + test + build em sequência
 
 ```
 .
-├── index.html            # App vigente (versão v5). É o que roda e o que é publicado.
+├── index.html            # App vigente (marcação). É o que roda e o que é publicado.
+├── src/
+│   ├── styles.css        # Estilos extraídos do index.html (Sprint 0.2.0)
+│   └── app.js            # Lógica do checklist extraída do index.html (Sprint 0.2.0)
 ├── archive/              # Snapshots históricos (v1 a v4.1). Não são publicados.
 │   └── README.md
 ├── docs/

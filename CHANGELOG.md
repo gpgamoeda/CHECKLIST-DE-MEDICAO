@@ -8,9 +8,29 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 ## [Não lançado]
 
 ### A fazer (próximas sprints)
-- Extrair CSS e JS do `index.html` para módulos separados.
 - Adicionar autosave em `localStorage` (evitar perda de preenchimento).
 - Migrar a base para Vite + TypeScript e, em seguida, componentizar em React.
+
+## [0.2.0] — 2026-07-01
+
+Sprint 0.2.0 — Modularização segura do monólito. **Sem alterar o comportamento
+do app.**
+
+### Alterado
+- **O app deixou de ser single-file.** O CSS e o JavaScript, antes embutidos no
+  `index.html`, foram extraídos para `src/styles.css` e `src/app.js`. O
+  `index.html` passa a referenciá-los via `<link>` e `<script src>`. A extração é
+  byte-a-byte fiel ao conteúdo original (verificado no PR), então o comportamento
+  é idêntico.
+- O `<script>` externo é um script clássico com `defer` (não `type="module"`),
+  o que preserva a possibilidade de abrir o `index.html` diretamente via `file://`.
+- `scripts/build.mjs` agora copia também a pasta `src/` para `dist/`.
+
+### Testes
+- Os smoke tests foram atualizados para a estrutura modular: verificam as
+  referências externas de CSS/JS, a ausência de código inline, a presença dos
+  arquivos em `src/` e que o build copia HTML+CSS+JS para `dist/` sem incluir
+  `archive/`.
 
 ## [0.1.0] — 2026-07-01
 

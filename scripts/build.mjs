@@ -9,7 +9,8 @@ const ROOT = resolve(import.meta.dirname, '..');
 const DIST = join(ROOT, 'dist');
 
 // Arquivos/pastas da raiz que devem ir para o deploy.
-const STATIC_ENTRIES = ['index.html'];
+// `src/` contém o CSS e o JS extraídos do monólito na Sprint 0.2.0.
+const STATIC_ENTRIES = ['index.html', 'src'];
 // Pasta opcional de assets públicos (criada em sprints futuras, se necessário).
 const PUBLIC_DIR = 'public';
 
