@@ -7,8 +7,40 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
 ## [Não lançado]
 
-_Sem itens pendentes deste ciclo. Próximo roadmap sugerido em
+_Sem itens pendentes. Próximo roadmap sugerido em
 `docs/release-0.5/RETROSPECTIVE.md`._
+
+## [0.6.0] — 2026-07-01
+
+Release 0.6.0 — **Repaginação visual com o tema FRS** (Fabrilis Relationship
+Studio). Mudança **somente visual**: comportamento, regras, validações, autosave,
+fluxo do resumo e deploy inalterados.
+
+### Alterado
+- **Fonte Manrope** (Google Fonts) carregada no `<head>` do `index.html` e aplicada
+  globalmente.
+- **`src/styles.css` repaginado para o tema FRS:**
+  - paleta: fundo bege quente `--paper #E9E7E2`, texto `--ink #15140F`, muted
+    `#807B72`, bordas `#D3CFC7` + `--border-hi #9A958B`, vermelho terracota
+    `#B43C1E`, verde dessaturado `#0F783C`, âmbar `#9A6E0E`;
+  - cards em branco quente (`#FBFAF7`) com sombra sutil; subcards `#F4F2ED`;
+  - **badges de estado** (concluído/pendente/N.A., guia, herança) com fundos
+    tonais translúcidos;
+  - **inputs** com foco em borda escura + `box-shadow` sutil e hover de borda;
+  - **hovers** em botões ghost / adicionar / autosave / segmentos;
+  - **primário** com `:active { translateY(1px) }`;
+  - **termo** com borda esquerda terracota.
+- `@media print` reforçado: o **resumo imprimível continua com fundo branco**.
+
+### Não alterado
+- Componentes React, store, `domain`/`model`, regras de negócio, validações,
+  autosave, geração do resumo e deploy Cloudflare.
+
+### QA
+- `npm run validate` verde (43 testes), `npm run test:e2e` verde (fluxo crítico em
+  navegador real) e `npm run build` OK. Smoke visual por screenshots (desktop,
+  resumo e mobile): Manrope carregada, fundo bege, cards/badges/inputs no tema FRS,
+  foco visível, mobile sem quebra e resumo branco em impressão.
 
 ## [0.5.1] — 2026-07-01
 

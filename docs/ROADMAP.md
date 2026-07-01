@@ -9,6 +9,13 @@ comportamento a cada passo.** Nada de reescrever tudo de uma vez.
 
 ---
 
+## ✅ 0.6.0 — Repaginação visual com tema FRS (concluída)
+
+- Tema FRS aplicado em `src/styles.css` + fonte Manrope no `index.html`. Somente
+  visual — comportamento, regras e deploy inalterados. `validate` + `test:e2e` verdes.
+
+---
+
 ## ✅ 0.1.0 — Sprint 0: auditoria e base (concluída)
 
 - Diagnóstico técnico do estado atual.
