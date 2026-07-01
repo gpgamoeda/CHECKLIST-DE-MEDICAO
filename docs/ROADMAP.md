@@ -52,10 +52,12 @@ introduz React incremental; D publica.
 
 ### Bloco C — React incremental
 
-## 0.4.0 — React shell e componentização inicial
+## ✅ 0.4.0 — React shell e componentização inicial (concluída)
 
-- React + ReactDOM + plugin Vite React; shell/layout/cabeçalho/progresso/ações.
-- Estado e regras preservados.
+- React + ReactDOM + plugin Vite React; shell em componentes (Header, ProgressBar,
+  Identificação, Seções-esqueleto, Termo, Ações, Footer).
+- `initApp()` retorna teardown, chamado no `useEffect` do `App`; sem duplicar
+  estado. Testes de comportamento renderizam o app React.
 
 ## 0.4.1 — Componentização das seções e resumo imprimível
 

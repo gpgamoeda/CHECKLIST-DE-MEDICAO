@@ -8,7 +8,37 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 ## [Não lançado]
 
 ### A fazer (próximas sprints)
-- Componentizar em React de forma incremental (0.4.x).
+- Componentizar o conteúdo dinâmico das seções e o resumo em React (0.4.1).
+- QA de UX/acessibilidade/impressão + Playwright no fluxo crítico (0.4.2).
+
+## [0.4.0] — 2026-07-01
+
+Sprint 0.4.0 — Introdução do **React** (shell/casca), de forma incremental.
+Comportamento preservado (testes de comportamento agora renderizam o app React).
+
+### Adicionado
+- **React + ReactDOM + `@vitejs/plugin-react`.** O `index.html` agora tem só
+  `<div id="root">` e carrega `src/main.tsx`, que monta o `<App/>`.
+- **Componentes do shell** em `src/components/`: `App`, `Header`, `ProgressBar`,
+  `IdentificationCard`, `ChecklistSections`, `Termo`, `Actions`, `Footer`. São o
+  esqueleto (estático) — preservam todos os `id`/`class`/`data-*`.
+- Testes de comportamento reescritos com `@testing-library/react`
+  (`tests/behavior.dom.test.tsx`): renderizam `<App/>` e exercitam a estrutura,
+  restauração de rascunho, autosave e o **fluxo de conclusão** (gera o resumo).
+
+### Alterado
+- `initApp()` passou a **retornar um teardown** (remove os listeners de documento
+  e cancela o autosave pendente); o `App` o chama no `useEffect` de montagem/
+  desmontagem. Isso evita acúmulo de listeners e dá ciclo de vida correto.
+- Sem duplicação de estado: o React renderiza o esqueleto uma vez; `initApp()`
+  continua dono do estado, dos itens dinâmicos, do autosave e do resumo (a
+  migração desse conteúdo para React é a 0.4.1).
+
+### Notas
+- Dependências novas previstas pela sprint: `react`, `react-dom`,
+  `@vitejs/plugin-react` (runtime) e `@testing-library/react` +
+  `@testing-library/dom` (teste). Bundle e `dist/` OK; `archive/` fora do build.
+  41 testes verdes.
 
 ## [0.3.1] — 2026-07-01
 

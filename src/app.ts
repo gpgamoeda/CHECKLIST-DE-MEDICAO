@@ -22,12 +22,17 @@ import {
   isIdentificationComplete,
 } from './domain';
 
-export function initApp(){
+export function initApp(): () => void {
   // Helpers de DOM (retornam `any` para manter o glue leve; a lógica de negócio
   // tipada está em domain.ts).
   const byId = (id: string): any => document.getElementById(id);
   const qs = (sel: string, root: any = document): any => root.querySelector(sel);
   const qsa = (sel: string, root: any = document): any[] => Array.from(root.querySelectorAll(sel));
+
+  // Listeners de nível de documento, rastreados para remoção no teardown (React
+  // chama o teardown ao desmontar, evitando acúmulo de handlers).
+  const docListeners: Array<[string, any]> = [];
+  const on = (type: string, handler: any) => { (document as any).addEventListener(type, handler); docListeners.push([type, handler]); };
 
   const state: Record<string, any> = {}; // id -> {status, fields:{}}
   let secq: Record<string, any> = {ban:null, 5:null, 6:null};
@@ -344,7 +349,7 @@ export function initApp(){
   }
 
   // ---------- EVENTS ----------
-  document.addEventListener("click",function(e: any){
+  on("click",function(e: any){
     if(e.target.id==="fotosNA"){
       photosNA=!photosNA;
       const inp=byId("link_fotos");
@@ -406,13 +411,13 @@ export function initApp(){
     }
   });
 
-  document.addEventListener("input",function(e: any){
+  on("input",function(e: any){
     if(e.target.dataset.id==="telefone_responsavel"){ e.target.value=maskPhone(e.target.value); }
     const fid=e.target.dataset.fid, fk=e.target.dataset.fk;
     if(fid && fk){ state[fid].fields[fk]=e.target.value; if(state[fid].status) paintState(fid); update(); }
     if(e.target.dataset.id!==undefined && e.target.closest("#idgrid")) update();
   });
-  document.addEventListener("change",function(e: any){
+  on("change",function(e: any){
     // selects de campo (alimentação / respiro dos eletros)
     if(e.target.dataset.fid && e.target.dataset.fk && e.target.dataset.cuba===undefined){
       const id=e.target.dataset.fid, fk=e.target.dataset.fk;
@@ -561,8 +566,8 @@ export function initApp(){
   autosaveReady=true;
 
   // Autosave para digitação em campos de texto (inclui observações gerais).
-  document.addEventListener("input", autosaveFieldListener);
-  document.addEventListener("change", autosaveFieldListener);
+  on("input", autosaveFieldListener);
+  on("change", autosaveFieldListener);
 
   // Limpar rascunho.
   const clearBtn=byId("clearDraft");
@@ -683,4 +688,10 @@ export function initApp(){
     else{ dynRows[sec].forEach(id=>{const s=state[id]; if(s){ const f=s.fields; h+='<div class="sum-line"><b>'+esc(f.ambiente||'')+'</b> — '+esc(f.desc||'')+(f.dim?' ('+esc(f.dim)+')':'')+'</div>';}});}
     return h+'</div>';
   }
+
+  // Teardown: remove os listeners de documento e cancela o autosave pendente.
+  return function teardown(){
+    docListeners.forEach(([type, handler]) => (document as any).removeEventListener(type, handler));
+    if(saveTimer) clearTimeout(saveTimer);
+  };
 }
