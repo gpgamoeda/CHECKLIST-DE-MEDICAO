@@ -9,7 +9,7 @@ export function Section1() {
     <div className="card" id="card-1">
       <div className="sec-h"><span className="sec-n">1</span><span className="sec-t">Obra Civil Finalizada</span>
         <span className="badge guide">GUIA DE AVALIAÇÃO DAS FOTOS</span></div>
-      <div className="sec-d">Base para a avaliação prévia da obra (Jamile). Marque cada item como concluído ou pendente. Itens pendentes embasam o Termo de Responsabilidade.</div>
+      <div className="sec-d">Base para a avaliação prévia da obra. Marque cada item como concluído ou pendente. Itens pendentes embasam o Termo de Responsabilidade.</div>
       <div id="sec1">
         {SEC1_ITEMS.map((name, i) => {
           const id = 's1_' + i;

@@ -18,8 +18,8 @@ Abra `http://localhost:5173`.
    número, responsável + telefone, tipo de medição, tipo de obra, ambientes,
    datas, link das fotos ou "não se aplica").
 2. Confirme que o **telefone** recebe a máscara `(00) 0 0000-0000`.
-3. Selecione **Tipo de obra = Herança / acervo** e confirme o aviso de atenção
-   redobrada; volte para outro tipo.
+3. Confirme que **Tipo de obra** oferece apenas "Obra nova" e "Reforma" (a opção
+   "Herança / acervo" foi removida na 0.6.1).
 4. **Seção 1:** marque itens como Concluído/Pendente (pendência pede ambiente +
    motivo).
 5. **Seção 2:** marque eletros como Definido (com campos) ou "não se aplica";

@@ -50,7 +50,7 @@ export const SEC1_ITEMS: string[] = [
 
 export const SEC2_ITEMS: string[] = [
   'Refrigerador', 'Freezer', 'Cooktop / Fogão', 'Forno', 'Micro-ondas',
-  'Coifa / Depurador', 'Ar condicionado', 'Lava-louças', 'Máquina de lavar', 'Secadora', 'Adega', 'Cervejeira',
+  'Coifa / Depurador', 'Ar condicionado (Painel/nicho/prateleira)', 'Lava-louças', 'Máquina de lavar', 'Secadora', 'Adega', 'Cervejeira',
   'Icemaker', 'Purificador de água', 'Triturador de resíduos', 'Gaveta aquecida', 'Gaveta refrigerada',
   'Cafeteira embutida', 'Frigobar',
 ];
@@ -65,13 +65,14 @@ export const F2: FieldDef[] = [
 ];
 
 // Campos extras por eletrodoméstico.
+// 0.6.1: "Alimentação" só em Cooktop/Fogão e Forno (removida de Micro-ondas,
+// Refrigerador e Freezer); Ar condicionado ficou sem campos extras.
 export const ELETRO_EXTRAS: Record<string, EletroExtra> = {
   'Cooktop / Fogão': { alimentacao: true, respiro: false },
   'Forno': { alimentacao: true, respiro: true },
-  'Micro-ondas': { alimentacao: true, respiro: true },
-  'Refrigerador': { alimentacao: true, respiro: true },
-  'Freezer': { alimentacao: true, respiro: true },
-  'Ar condicionado': { obs: true },
+  'Micro-ondas': { respiro: true },
+  'Refrigerador': { respiro: true },
+  'Freezer': { respiro: true },
 };
 
 export const CUBA_LABEL: Record<string, string> = {

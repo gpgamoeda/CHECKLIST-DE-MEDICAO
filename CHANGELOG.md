@@ -10,6 +10,37 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 _Sem itens pendentes. Próximo roadmap sugerido em
 `docs/release-0.5/RETROSPECTIVE.md`._
 
+## [0.6.1] — 2026-07-01
+
+Release 0.6.1 — Ajustes de conteúdo do formulário solicitados pelo produto.
+**Inclui mudanças de regra de obrigatoriedade — registradas abaixo.**
+
+### Alterado (Seção 2 — Eletrodomésticos)
+- Item "Ar condicionado" renomeado para **"Ar condicionado (Painel/nicho/prateleira)"**.
+- Removido o campo **"Observação"** do Ar condicionado (item ficou sem campos extras).
+- Removido o drop **"Alimentação"** de **Micro-ondas**, **Freezer** e **Refrigerador** —
+  a alimentação **deixa de ser obrigatória** nesses itens (o respiro continua).
+  "Alimentação" permanece apenas em Cooktop/Fogão e Forno.
+
+### Alterado (Identificação)
+- Removida a opção **"Herança / acervo"** do drop "Tipo de obra" (restam
+  "Obra nova" e "Reforma"). O aviso de atenção redobrada correspondente só pode
+  aparecer para rascunhos antigos que ainda tenham esse valor salvo.
+
+### Alterado (Seção 1 — Obra Civil)
+- Texto de orientação sem a menção "(Jamile)": "Base para a avaliação prévia da
+  obra. Marque cada item como concluído ou pendente. …".
+
+### Compatibilidade
+- Rascunhos salvos continuam válidos (as chaves internas dos itens não mudaram).
+  Valores antigos de "alimentação"/"observação" preservados no rascunho passam a
+  ser ignorados pela validação.
+
+### Testes
+- Testes de domínio atualizados/adicionados: Refrigerador/Freezer/Micro-ondas
+  exigem respiro mas não alimentação; Ar condicionado renomeado e sem extras.
+  Total: 45 testes + e2e verdes.
+
 ## [0.6.0] — 2026-07-01
 
 Release 0.6.0 — **Repaginação visual com o tema FRS** (Fabrilis Relationship

@@ -8,8 +8,8 @@ conforme o handoff pack. Atualizado a cada sprint.
 - Ciclo: Refatoração progressiva + Cloudflare Pages (concluído) → repaginação visual
 - Repositório: `gpgamoeda/CHECKLIST-DE-MEDICAO`
 - Branch base: `main`
-- Último PR mergeado: #10 (Sprint 0.5.1 — retrospectiva)
-- Última versão: `0.6.0` (em PR — repaginação visual FRS)
+- Último PR mergeado: #11 (Release 0.6.0 — tema FRS; publicado em produção)
+- Última versão: `0.6.1` (em PR — ajustes de conteúdo do formulário)
 - Próxima sprint: — (próximo roadmap em `docs/release-0.5/RETROSPECTIVE.md`)
 - Produção: https://checklist-de-medicao.pages.dev (publicado)
 - Modo de execução: loop autônomo, um branch/PR por sprint, merge quando os
@@ -29,7 +29,8 @@ conforme o handoff pack. Atualizado a cada sprint.
 | 0.4.2 | `claude/release-042-qa-ux-a11y-print` | #8 | Mergeada | typecheck+lint+43 testes+build+e2e | Playwright fluxo crítico (real) verde; a11y básica |
 | 0.5.0 | `claude/release-050-cloudflare-pages` | #9 | Mergeada | validate+deploy+smoke | Publicado em checklist-de-medicao.pages.dev |
 | 0.5.1 | `claude/release-051-retrospective-roadmap` | #10 | Mergeada | validate | Retrospectiva; ciclo concluído |
-| 0.6.0 | `release/0.6.0-frs-visual-theme` | — | Em PR | validate+e2e+build+smoke visual | Tema FRS (só visual); Manrope + styles.css |
+| 0.6.0 | `release/0.6.0-frs-visual-theme` | #11 | Mergeada + publicada | validate+e2e+build+smoke visual | Tema FRS (só visual); Manrope + styles.css |
+| 0.6.1 | `release/0.6.1-ajustes-formulario` | — | Em PR | validate (45 testes)+e2e | Ajustes eletros/identificação/obra civil; regras registradas |
 
 ## Decisões tomadas
 

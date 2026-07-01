@@ -3,7 +3,7 @@
 // bancada/cuba, datas pt-BR e escape).
 import { describe, it, expect } from 'vitest';
 import {
-  maskPhone, brDate, esc,
+  maskPhone, brDate, esc, SEC2_ITEMS,
   isSection1Resolved, isEletroResolved, isDynEletroResolved,
   isBancadaResolved, isDynResolved, isIdentificationComplete,
 } from '../src/domain.ts';
@@ -85,6 +85,19 @@ describe('seção 2 — eletrodomésticos', () => {
     // respiro "Sim" exige especificação
     expect(isEletroResolved({ status: 'def', fields: { ...full, alimentacao: 'Elétrico', respiro: 'Sim' } }, 'Forno')).toBe(false);
     expect(isEletroResolved({ status: 'def', fields: { ...full, alimentacao: 'Elétrico', respiro: 'Sim', respiro_espec: '50mm' } }, 'Forno')).toBe(true);
+  });
+
+  it('Refrigerador/Freezer/Micro-ondas exigem respiro, mas não alimentação (0.6.1)', () => {
+    for (const item of ['Refrigerador', 'Freezer', 'Micro-ondas']) {
+      expect(isEletroResolved({ status: 'def', fields: full }, item)).toBe(false); // falta respiro
+      expect(isEletroResolved({ status: 'def', fields: { ...full, respiro: 'Não' } }, item)).toBe(true); // sem alimentação
+    }
+  });
+
+  it('Ar condicionado renomeado e sem campos extras (0.6.1)', () => {
+    expect(SEC2_ITEMS).toContain('Ar condicionado (Painel/nicho/prateleira)');
+    expect(SEC2_ITEMS).not.toContain('Ar condicionado');
+    expect(isEletroResolved({ status: 'def', fields: full }, 'Ar condicionado (Painel/nicho/prateleira)')).toBe(true);
   });
 });
 

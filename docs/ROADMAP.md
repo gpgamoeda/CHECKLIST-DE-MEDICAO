@@ -9,6 +9,12 @@ comportamento a cada passo.** Nada de reescrever tudo de uma vez.
 
 ---
 
+## ✅ 0.6.1 — Ajustes de conteúdo do formulário (concluída)
+
+- Seção 2: Ar condicionado renomeado (Painel/nicho/prateleira) e sem extras;
+  "Alimentação" removida de Micro-ondas/Freezer/Refrigerador. Identificação sem a
+  opção "Herança / acervo". Seção 1 sem "(Jamile)". Regras registradas no changelog.
+
 ## ✅ 0.6.0 — Repaginação visual com tema FRS (concluída)
 
 - Tema FRS aplicado em `src/styles.css` + fonte Manrope no `index.html`. Somente
