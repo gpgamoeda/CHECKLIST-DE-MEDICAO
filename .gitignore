@@ -1,0 +1,18 @@
+# Dependências
+node_modules/
+
+# Build / deploy
+dist/
+
+# Testes / cobertura
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operacional / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
