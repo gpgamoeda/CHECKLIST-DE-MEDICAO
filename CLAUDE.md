@@ -50,8 +50,13 @@ npm run lint        # html-validate no index.html
 npm test            # Vitest
 npm run build       # Vite build → dist/
 npm run preview     # serve o dist/ para conferência
+npm run test:e2e    # Playwright (fluxo crítico, navegador real) — gate separado
 npm run validate    # typecheck + lint + test + build
 ```
+
+O `validate` não inclui o e2e (exige navegador/servidor). O e2e usa o Chromium
+pré-instalado (`/opt/pw-browsers/chromium`); não rode `playwright install`.
+Roteiro de smoke manual: `docs/QA_SMOKE.md`.
 
 ## Forma de trabalho (obrigatória)
 

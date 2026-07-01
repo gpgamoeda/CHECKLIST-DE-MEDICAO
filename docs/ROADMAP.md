@@ -66,10 +66,11 @@ introduz React incremental; D publica.
 - Campos condicionais (cuba) e listas dinâmicas em React; "voltar e editar" e
   autosave preservados.
 
-## 0.4.2 — QA de UX, a11y, responsividade e impressão/PDF
+## ✅ 0.4.2 — QA de UX, a11y, responsividade e impressão/PDF (concluída)
 
-- Labels/foco/teclado, responsividade mínima, impressão/PDF; **Playwright** para o
-  fluxo crítico. Sem redesign.
+- **Playwright** cobrindo o fluxo crítico em navegador real (`test:e2e`); smoke
+  manual em `docs/QA_SMOKE.md`. A11y básica: `aria-live`/`role=progressbar`,
+  botões com `type`. Sem redesign.
 
 ### Bloco D — Cloudflare Pages
 

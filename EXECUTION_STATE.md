@@ -8,9 +8,9 @@ conforme o handoff pack. Atualizado a cada sprint.
 - Ciclo: Refatoração progressiva + Cloudflare Pages
 - Repositório: `gpgamoeda/CHECKLIST-DE-MEDICAO`
 - Branch base: `main`
-- Último PR mergeado: #6 (Sprint 0.4.0 — React shell)
-- Última versão: `0.4.1` (em PR)
-- Próxima sprint: `0.4.2` — QA de UX/a11y/impressão + Playwright
+- Último PR mergeado: #7 (Sprint 0.4.1 — componentização)
+- Última versão: `0.4.2` (em PR)
+- Próxima sprint: `0.5.0` — Preparação e publicação via Cloudflare Pages
 - Modo de execução: loop autônomo, um branch/PR por sprint, merge quando os
   gates aplicáveis estão verdes.
 
@@ -24,8 +24,8 @@ conforme o handoff pack. Atualizado a cada sprint.
 | 0.3.0 | `claude/release-030-vite-typescript-base` | #4 | Mergeada | typecheck+lint+25 testes+build | Vite+TS |
 | 0.3.1 | `claude/release-031-domain-logic-tests` | #5 | Mergeada | typecheck+lint+44 testes+build | domain.ts tipado; @ts-nocheck removido |
 | 0.4.0 | `claude/release-040-react-shell` | #6 | Mergeada | typecheck+lint+41 testes+build | React shell; initApp com teardown |
-| 0.4.1 | `claude/release-041-componentizar-secoes-resumo` | — | Em PR | typecheck+lint+43 testes+build | Componentização completa; app.ts removido; estado no React |
-| 0.4.2 | `claude/release-042-qa-ux-a11y-print` | | Pendente | | |
+| 0.4.1 | `claude/release-041-componentizar-secoes-resumo` | #7 | Mergeada | typecheck+lint+43 testes+build | Componentização completa; app.ts removido; estado no React |
+| 0.4.2 | `claude/release-042-qa-ux-a11y-print` | — | Em PR | typecheck+lint+43 testes+build+e2e | Playwright fluxo crítico (real) verde; a11y básica |
 | 0.5.0 | `claude/release-050-cloudflare-pages` | | Pendente | | Publicação exige credenciais humanas |
 | 0.5.1 | `claude/release-051-retrospective-roadmap` | | Pendente | | |
 

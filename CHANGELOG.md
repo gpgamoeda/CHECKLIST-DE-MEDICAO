@@ -8,8 +8,30 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 ## [Não lançado]
 
 ### A fazer (próximas sprints)
-- QA de UX/acessibilidade/impressão + Playwright no fluxo crítico (0.4.2).
 - Preparar e publicar no Cloudflare Pages (0.5.0).
+
+## [0.4.2] — 2026-07-01
+
+Sprint 0.4.2 — QA de UX/acessibilidade + **Playwright** no fluxo crítico. Sem
+mudança de regra de negócio.
+
+### Adicionado
+- **Playwright** (`@playwright/test`) com um teste e2e do fluxo crítico em navegador
+  real (`e2e/critical-flow.spec.ts`): preencher identificação → resolver itens →
+  liberar e gerar a solicitação → conferir o resumo → voltar e editar (estado
+  preservado) → recarregar e confirmar o autosave. Script `npm run test:e2e`.
+- `playwright.config.ts` usa o Chromium pré-instalado do ambiente e sobe o app via
+  Vite; documentação de smoke manual em `docs/QA_SMOKE.md`.
+
+### Melhorado (acessibilidade básica)
+- Barra de progresso com `role="progressbar"` + `aria-valuenow`; contagem de itens
+  e mensagem de autosave com `aria-live="polite"` (anúncio para leitores de tela).
+- Todos os botões já usam `type="button"` (evita submit acidental).
+
+### Notas
+- `npm run validate` segue como `typecheck + lint + test + build`; o e2e é um gate
+  **separado** (`test:e2e`), pois exige navegador/servidor. Nova dependência apenas
+  de teste: `@playwright/test`. 43 testes unitários + 1 e2e.
 
 ## [0.4.1] — 2026-07-01
 

@@ -7,6 +7,12 @@ dist/
 # Testes / cobertura
 coverage/
 
+# Playwright (e2e)
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
 # Logs
 *.log
 npm-debug.log*
