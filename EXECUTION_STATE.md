@@ -8,8 +8,8 @@ conforme o handoff pack. Atualizado a cada sprint.
 - Ciclo: Refatoração progressiva + Cloudflare Pages (concluído) → repaginação visual
 - Repositório: `gpgamoeda/CHECKLIST-DE-MEDICAO`
 - Branch base: `main`
-- Último PR mergeado: #12 (Release 0.6.1 — ajustes de conteúdo)
-- Última versão: `0.6.2` (em PR — contraste na impressão)
+- Último PR mergeado: #13 (Release 0.6.2 — contraste na impressão)
+- Última versão: `0.6.3` (em PR — impressão à prova de dispositivo + HTML no-cache)
 - Deploy: **automático** (integração Git do Cloudflare Pages ativa; merge na `main` publica)
 - Próxima sprint: — (próximo roadmap em `docs/release-0.5/RETROSPECTIVE.md`)
 - Produção: https://checklist-de-medicao.pages.dev (publicado)
@@ -32,7 +32,8 @@ conforme o handoff pack. Atualizado a cada sprint.
 | 0.5.1 | `claude/release-051-retrospective-roadmap` | #10 | Mergeada | validate | Retrospectiva; ciclo concluído |
 | 0.6.0 | `release/0.6.0-frs-visual-theme` | #11 | Mergeada + publicada | validate+e2e+build+smoke visual | Tema FRS (só visual); Manrope + styles.css |
 | 0.6.1 | `release/0.6.1-ajustes-formulario` | #12 | Mergeada | validate (45 testes)+e2e | Ajustes eletros/identificação/obra civil; regras registradas |
-| 0.6.2 | `release/0.6.2-contraste-impressao` | — | Em PR | validate+e2e+PDF antes/depois | Alto contraste no print; .rule vira borda |
+| 0.6.2 | `release/0.6.2-contraste-impressao` | #13 | Mergeada | validate+e2e+PDF antes/depois | Alto contraste no print; .rule vira borda |
+| 0.6.3 | `release/0.6.3-impressao-robusta` | — | Em PR | validate+e2e+PDF | Preto puro/peso 500 no print (iOS); HTML no-cache |
 
 ## Decisões tomadas
 

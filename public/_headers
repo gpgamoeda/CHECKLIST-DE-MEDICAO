@@ -6,6 +6,15 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=()
 
+# HTML sempre revalidado: garante que, após cada deploy, o navegador pegue o
+# index.html novo (e, com ele, o CSS/JS com hash atualizado). Evita imprimir
+# com estilos velhos em cache (visto na 0.6.2 → 0.6.3).
+/
+  Cache-Control: no-cache, must-revalidate
+
+/index.html
+  Cache-Control: no-cache, must-revalidate
+
 # Assets com hash no nome → cache longo e imutável.
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
