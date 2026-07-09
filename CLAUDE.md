@@ -86,10 +86,13 @@ Este projeto segue um padrão de releases pequenas:
 - **Nomes de ambientes (desde 0.6.4):** a "Quantidade de ambientes" gera N campos
   `Ambiente 1`…`Ambiente N`; todos exigem nome não vazio para liberar a geração
   (campo em branco/só espaços bloqueia). Aumentar N preserva os nomes e adiciona ao
-  final; diminuir remove os excedentes mantendo os primeiros. Essa lista é a
-  **fonte principal de ambientes** do checklist (reaproveitada como sugestão em
-  Obra Civil). Guardada em `model.ambientes`; rascunhos antigos inicializam a lista
-  a partir de `qtd_ambientes`.
+  final; **diminuir a quantidade oculta os campos excedentes, mantendo os nomes na
+  sessão/rascunho para evitar perda acidental** — o resumo, a validação e as
+  sugestões consideram apenas os primeiros N ambientes ativos, e os nomes ocultos
+  reaparecem se a quantidade voltar a aumentar. Essa lista é a **fonte principal de
+  ambientes** do checklist (reaproveitada como sugestão em Obra Civil). Guardada em
+  `model.ambientes` (só cresce, via `growAmbientes`); rascunhos antigos inicializam
+  a lista a partir de `qtd_ambientes`.
 - Telefone usa máscara `(00) 0 0000-0000`; datas são exibidas no resumo em pt-BR.
 - **Tipo de obra:** opções "Obra nova" e "Reforma". A opção "Herança / acervo" foi
   removida na 0.6.1 (o aviso de atenção redobrada só aparece para rascunhos

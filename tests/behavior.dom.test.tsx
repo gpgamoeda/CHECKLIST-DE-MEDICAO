@@ -140,7 +140,8 @@ describe('ambientes nomeados (0.6.4)', () => {
     expect(inputs()[1].value).toBe('Lavanderia');
     expect(inputs()[3].value).toBe('');
 
-    // Diminuir mostra só os primeiros; remove os campos excedentes.
+    // Diminuir oculta os campos excedentes (os nomes seguem no modelo); só os
+    // primeiros N ativos ficam visíveis.
     change('#idgrid [data-id="qtd_ambientes"]', '2');
     expect(inputs().length).toBe(2);
     expect(inputs()[0].value).toBe('Cozinha');

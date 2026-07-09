@@ -67,6 +67,11 @@ conforme o handoff pack. Atualizado a cada sprint.
   Identificação + Obra Civil + resumo/validação (Issue #15); demais seções
   intocadas. Branch executada: `claude/handoff-kit-execution-k7azlx` (o handoff
   sugeria `sprint/0.6.4-ambientes-obra-civil`).
+- **0.6.4 — redução de ambientes (decisão de produto, Opção A):** ao diminuir/limpar
+  `qtd_ambientes`, o app **oculta** os campos excedentes e **mantém** os nomes no
+  modelo/rascunho (para evitar perda acidental). Resumo, validação e sugestões
+  consideram apenas os **primeiros N ativos**; os nomes ocultos reaparecem se a
+  quantidade voltar a aumentar. `model.ambientes` só cresce (`growAmbientes`).
 
 ## Riscos encontrados
 

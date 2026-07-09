@@ -220,8 +220,9 @@ export function parseAmbienteCount(qtd: string | null | undefined): number {
   return Math.min(n, MAX_AMBIENTES);
 }
 
-// Ajusta a lista de nomes ao tamanho alvo: preserva os primeiros nomes e
-// acrescenta/remove do final. Usada na desserialização; a UI usa growAmbientes.
+// Helper de baixo nível: ajusta a lista ao tamanho exato (pad no fim / trunca o
+// excedente). Usado por growAmbientes (caso de padding); o fluxo do app nunca
+// trunca — reduzir a quantidade só oculta os campos, sem apagar nomes.
 export function resizeAmbientes(ambientes: string[], count: number): string[] {
   const next = ambientes.slice(0, count);
   while (next.length < count) next.push('');

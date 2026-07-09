@@ -24,7 +24,9 @@ Abra `http://localhost:5173`.
     confirme que aparecem `Ambiente 1`, `Ambiente 2`, `Ambiente 3`. Preencha dois e
     deixe um vazio — a geração fica **bloqueada** (campo vazio destacado + aviso).
     Aumente para 4 e confirme que os nomes já digitados são preservados; volte a 2
-    e confirme que restam os dois primeiros. Preencha todos.
+    e confirme que ficam ativos só os dois primeiros. Confirme que **diminuir apenas
+    oculta** os excedentes: volte a 3/4 e veja o nome do 3º reaparecer (nada foi
+    apagado). Preencha todos.
 4. **Seção 1:** marque itens como Concluído / Pendente / **N/A** (pendência pede
    ambiente + motivo; N/A libera o item sem virar pendência). Use
    **"+ Adicionar ambiente"** para criar uma linha extra, nomeie-a e escolha um

@@ -18,11 +18,12 @@ linhas extras** (Issue #15). **Inclui mudanças de regra — registradas abaixo.
 ### Adicionado
 - **Identificação — nomes de ambientes:** a "Quantidade de ambientes a serem
   medidos" passa a gerar **N campos** (`Ambiente 1`…`Ambiente N`) logo abaixo,
-  para nomear cada ambiente. Aumentar a quantidade acrescenta campos; **reduzir ou
-  limpar** a quantidade apenas oculta os excedentes — os nomes ficam retidos na
-  sessão e reaparecem ao aumentar de novo (evita perda acidental ao editar o
-  número). A quantidade é limitada a `MAX_AMBIENTES` (60), inclusive no texto do
-  campo, para o resumo não divergir da lista.
+  para nomear cada ambiente. Aumentar a quantidade acrescenta campos; **diminuir a
+  quantidade oculta os campos excedentes, mantendo os nomes na sessão/rascunho
+  para evitar perda acidental; o resumo, a validação e as sugestões consideram
+  apenas os primeiros N ambientes ativos** (os nomes ocultos reaparecem ao
+  aumentar de novo). A quantidade é limitada a `MAX_AMBIENTES` (60), inclusive no
+  texto do campo, para o resumo não divergir da lista.
 - **Obra Civil Finalizada — estado N/A:** cada item passa a aceitar
   **Concluído / Pendente / N/A** (antes só Concluído/Pendente).
 - **Obra Civil Finalizada — linhas extras:** botão **"+ Adicionar ambiente"** para
