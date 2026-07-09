@@ -6,7 +6,8 @@ import {
   maskPhone, brDate, esc, SEC2_ITEMS, MAX_AMBIENTES,
   isSection1Resolved, isSec1ExtraResolved, isEletroResolved, isDynEletroResolved,
   isBancadaResolved, isDynResolved, isIdentificationComplete,
-  parseAmbienteCount, resizeAmbientes, missingAmbientes, filledAmbientes,
+  parseAmbienteCount, resizeAmbientes, growAmbientes, clampAmbienteQtd,
+  missingAmbientes, filledAmbientes,
 } from '../src/domain.ts';
 
 describe('formatação', () => {
@@ -85,6 +86,21 @@ describe('ambientes nomeados (0.6.4)', () => {
   it('missingAmbientes e filledAmbientes apontam vazios e preenchidos', () => {
     expect(missingAmbientes(['Cozinha', '', '  ', 'Banho'])).toEqual([1, 2]);
     expect(filledAmbientes(['Cozinha', '', '  Lavanderia  '])).toEqual(['Cozinha', 'Lavanderia']);
+  });
+
+  it('growAmbientes cresce mas NUNCA trunca (protege contra perda ao reduzir)', () => {
+    expect(growAmbientes([], 3)).toEqual(['', '', '']);
+    expect(growAmbientes(['Cozinha'], 3)).toEqual(['Cozinha', '', '']);
+    // count menor que o tamanho atual: mantém tudo (os excedentes só ficam ocultos).
+    expect(growAmbientes(['Cozinha', 'Lavanderia', 'Dormitório'], 1)).toEqual(['Cozinha', 'Lavanderia', 'Dormitório']);
+    expect(growAmbientes(['Cozinha', 'Lavanderia'], 0)).toEqual(['Cozinha', 'Lavanderia']);
+  });
+
+  it('clampAmbienteQtd limita inteiros acima do teto e ignora o resto', () => {
+    expect(clampAmbienteQtd(String(MAX_AMBIENTES + 5))).toBe(String(MAX_AMBIENTES));
+    expect(clampAmbienteQtd('10')).toBe('10');
+    expect(clampAmbienteQtd('')).toBe('');
+    expect(clampAmbienteQtd('abc')).toBe('abc');
   });
 });
 

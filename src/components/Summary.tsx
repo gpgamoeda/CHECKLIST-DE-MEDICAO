@@ -2,7 +2,7 @@
 // O React já escapa o texto, então não é preciso esc() manual.
 import type { ReactNode } from 'react';
 import { useChecklist } from './store';
-import { SEC1_ITEMS, SEC2_ITEMS, F2, CUBA_LABEL, MOD_LABEL, MET_LABEL, brDate } from '../domain';
+import { SEC1_ITEMS, SEC2_ITEMS, F2, CUBA_LABEL, MOD_LABEL, MET_LABEL, brDate, parseAmbienteCount } from '../domain';
 
 function Parts({ items }: { items: Array<[string, string]> }) {
   const filtered = items.filter(([, v]) => v);
@@ -46,8 +46,8 @@ export function Summary({ onEdit }: { onEdit: () => void }) {
         <div className="sum-line"><b>Responsável pela obra:</b> {id.responsavel_obra || ''} &nbsp;·&nbsp; <b>Telefone:</b> {id.telefone_responsavel || ''}</div>
         <div className="sum-line"><b>Tipo de medição:</b> {id.tipo_medicao || ''} &nbsp;·&nbsp; <b>Tipo de obra:</b> {id.tipo || ''}</div>
         <div className="sum-line"><b>Quantidade de ambientes:</b> {id.qtd_ambientes || ''}</div>
-        {model.ambientes.length > 0 && (
-          <div className="sum-line"><b>Ambientes:</b> {model.ambientes.map((a, i) => a.trim() || `Ambiente ${i + 1}`).join(' · ')}</div>
+        {parseAmbienteCount(id.qtd_ambientes) > 0 && (
+          <div className="sum-line"><b>Ambientes:</b> {Array.from({ length: parseAmbienteCount(id.qtd_ambientes) }, (_, i) => (model.ambientes[i] || '').trim() || `Ambiente ${i + 1}`).join(' · ')}</div>
         )}
         <div className="sum-line"><b>Fotos (SharePoint):</b> {model.photosNA ? <span className="sum-na">Não se aplica</span> : (id.link_fotos || '—')}</div>
         <div className="sum-line"><b>Data do preenchimento:</b> {brDate(id.data_checklist)} &nbsp;·&nbsp; <b>Data da solicitação da medição:</b> {brDate(id.data_solicitacao_medicao)}</div>

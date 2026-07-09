@@ -5,7 +5,7 @@ import {
   SEC1_ITEMS, SEC2_ITEMS,
   isSection1Resolved, isSec1ExtraResolved, isEletroResolved, isDynEletroResolved,
   isBancadaResolved, isDynResolved, isIdentificationComplete,
-  resizeAmbientes, parseAmbienteCount,
+  growAmbientes, parseAmbienteCount,
 } from './domain';
 import type { Sec1Extra } from './domain';
 
@@ -54,7 +54,7 @@ export function modelFromDraft(draft: any): Model {
   // Ambientes: aceita rascunhos antigos sem a lista (inicializa a partir de
   // qtd_ambientes) e reconcilia o tamanho com a quantidade informada.
   const ambDraft = Array.isArray(draft.ambientes) ? draft.ambientes.map((x: any) => String(x ?? '')) : [];
-  m.ambientes = resizeAmbientes(ambDraft, parseAmbienteCount(m.id.qtd_ambientes));
+  m.ambientes = growAmbientes(ambDraft, parseAmbienteCount(m.id.qtd_ambientes));
   if (typeof draft.observacoes === 'string') m.observacoes = draft.observacoes;
   m.photosNA = !!draft.photosNA;
   if (draft.secq && typeof draft.secq === 'object') {

@@ -221,11 +221,28 @@ export function parseAmbienteCount(qtd: string | null | undefined): number {
 }
 
 // Ajusta a lista de nomes ao tamanho alvo: preserva os primeiros nomes e
-// acrescenta/remove do final (nunca apaga o que permanece).
+// acrescenta/remove do final. Usada na desserialização; a UI usa growAmbientes.
 export function resizeAmbientes(ambientes: string[], count: number): string[] {
   const next = ambientes.slice(0, count);
   while (next.length < count) next.push('');
   return next;
+}
+
+// Garante ao menos `count` posições SEM truncar: preserva todos os nomes já
+// digitados. Reduzir/limpar a quantidade apenas oculta os excedentes (a UI
+// renderiza `count`), então aumentar de novo restaura os nomes na mesma sessão —
+// evita perda acidental ao editar a quantidade (risco R2 do handoff).
+export function growAmbientes(ambientes: string[], count: number): string[] {
+  return ambientes.length >= count ? ambientes : resizeAmbientes(ambientes, count);
+}
+
+// Limita o texto da "Quantidade de ambientes" ao teto (MAX_AMBIENTES) para o
+// resumo não divergir da lista renderizada/validada. Só toca em inteiros puros
+// acima do teto; deixa vazio/parcial/inválido como o usuário digitou.
+export function clampAmbienteQtd(value: string): string {
+  const t = (value || '').trim();
+  if (/^\d+$/.test(t) && Number(t) > MAX_AMBIENTES) return String(MAX_AMBIENTES);
+  return value;
 }
 
 // Índices (0-based) dos ambientes ainda sem nome — para apontar o que falta.

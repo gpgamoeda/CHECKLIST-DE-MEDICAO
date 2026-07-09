@@ -1,12 +1,16 @@
 // Cartão de Identificação (controlado por React). Telefone com máscara e aviso
 // de herança/acervo derivados do modelo.
 import { useChecklist } from './store';
-import { maskPhone } from '../domain';
+import { maskPhone, parseAmbienteCount } from '../domain';
 
 export function IdentificationCard() {
   const { model, actions } = useChecklist();
   const v = (k: string) => model.id[k] || '';
   const set = (k: string) => (e: { target: { value: string } }) => actions.setId(k, e.target.value);
+  // A quantidade define quantos nomes renderizar/validar; o modelo pode reter
+  // mais nomes (ocultos) para não perdê-los ao reduzir a quantidade (0.6.4).
+  const ambCount = parseAmbienteCount(v('qtd_ambientes'));
+  const ambNames = Array.from({ length: ambCount }, (_, i) => model.ambientes[i] || '');
 
   return (
     <div className="card">
@@ -47,11 +51,11 @@ export function IdentificationCard() {
 
         <div><label>Quantidade de ambientes a serem medidos</label><input data-id="qtd_ambientes" type="number" min="1" step="1" value={v('qtd_ambientes')} onChange={set('qtd_ambientes')} required /></div>
 
-        {model.ambientes.length > 0 && (
+        {ambCount > 0 && (
           <div className="full amb-block" id="ambientes-block">
             <label>Nomes dos ambientes</label>
             <div className="amb-grid" id="ambientesGrid">
-              {model.ambientes.map((name, i) => {
+              {ambNames.map((name, i) => {
                 const missing = !name.trim();
                 return (
                   <div className="f" key={i}>
@@ -69,7 +73,7 @@ export function IdentificationCard() {
                 );
               })}
             </div>
-            {model.ambientes.some((a) => !a.trim()) && (
+            {ambNames.some((a) => !a.trim()) && (
               <div className="hint-sm" id="ambientesHint">Informe o nome de todos os ambientes para liberar a solicitação.</div>
             )}
           </div>

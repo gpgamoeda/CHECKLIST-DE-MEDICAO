@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import type { ReactNode } from 'react';
 import * as Draft from '../draft';
 import { Model, emptyModel, modelFromDraft, nextId } from '../model';
-import { resizeAmbientes, parseAmbienteCount } from '../domain';
+import { growAmbientes, parseAmbienteCount, clampAmbienteQtd } from '../domain';
 
 interface ChecklistStore {
   model: Model;
@@ -76,13 +76,16 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
 
     return {
       setId: (key, value) => setModel((m) => {
-        const id = { ...m.id, [key]: value };
-        // Ao mudar a quantidade, reajusta os campos de nome de ambiente
-        // preservando os já preenchidos (0.6.4).
+        // Ao mudar a quantidade, garante os campos de nome de ambiente SEM apagar
+        // os já preenchidos: a lista só cresce; reduzir/limpar apenas oculta os
+        // excedentes (a UI renderiza `count`). Evita perda ao editar (R2). O texto
+        // é limitado ao teto para o resumo não divergir da lista (0.6.4).
         if (key === 'qtd_ambientes') {
-          return { ...m, id, ambientes: resizeAmbientes(m.ambientes, parseAmbienteCount(value)) };
+          const clamped = clampAmbienteQtd(value);
+          const count = parseAmbienteCount(clamped);
+          return { ...m, id: { ...m.id, qtd_ambientes: clamped }, ambientes: growAmbientes(m.ambientes, count) };
         }
-        return { ...m, id };
+        return { ...m, id: { ...m.id, [key]: value } };
       }),
       setAmbiente: (index, value) => setModel((m) => {
         const ambientes = m.ambientes.slice();

@@ -3,7 +3,7 @@
 // extras. Reaproveita a lista de ambientes da Identificação como fonte de
 // sugestões (fonte principal). Controlado por React.
 import { useChecklist } from './store';
-import { SEC1_ITEMS, filledAmbientes } from '../domain';
+import { SEC1_ITEMS, filledAmbientes, parseAmbienteCount } from '../domain';
 
 // Trio de estados Concluído / Pendente / N/A reutilizado por itens fixos e extras.
 function StateSeg({ status, onSet, dataAttr }: { status: string | null; onSet: (s: string) => void; dataAttr: Record<string, string> }) {
@@ -23,7 +23,9 @@ function StateSeg({ status, onSet, dataAttr }: { status: string | null; onSet: (
 
 export function Section1() {
   const { model, actions } = useChecklist();
-  const ambList = filledAmbientes(model.ambientes);
+  // Sugestões = ambientes ativos (primeiros `count`) já nomeados, sem duplicatas.
+  const ambCount = parseAmbienteCount(model.id.qtd_ambientes);
+  const ambList = Array.from(new Set(filledAmbientes(model.ambientes.slice(0, ambCount))));
   return (
     <div className="card" id="card-1">
       <div className="sec-h"><span className="sec-n">1</span><span className="sec-t">Obra Civil Finalizada</span>

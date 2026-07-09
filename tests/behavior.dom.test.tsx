@@ -140,11 +140,27 @@ describe('ambientes nomeados (0.6.4)', () => {
     expect(inputs()[1].value).toBe('Lavanderia');
     expect(inputs()[3].value).toBe('');
 
-    // Diminuir mantém os primeiros e remove excedentes.
+    // Diminuir mostra só os primeiros; remove os campos excedentes.
     change('#idgrid [data-id="qtd_ambientes"]', '2');
     expect(inputs().length).toBe(2);
     expect(inputs()[0].value).toBe('Cozinha');
     expect(inputs()[1].value).toBe('Lavanderia');
+  });
+
+  it('reduzir/limpar a quantidade não perde os nomes ao aumentar de novo (R2)', () => {
+    render(<App />);
+    const inputs = () => Array.from(document.querySelectorAll('#ambientesGrid [data-amb]')) as HTMLInputElement[];
+    change('#idgrid [data-id="qtd_ambientes"]', '3');
+    change('#idgrid [data-amb="0"]', 'Cozinha');
+    change('#idgrid [data-amb="1"]', 'Lavanderia');
+    change('#idgrid [data-amb="2"]', 'Dormitório');
+
+    // Limpar a quantidade (estado transitório de edição) oculta os campos...
+    change('#idgrid [data-id="qtd_ambientes"]', '');
+    expect(inputs().length).toBe(0);
+    // ...mas voltar para 3 restaura os nomes preenchidos (nada foi apagado).
+    change('#idgrid [data-id="qtd_ambientes"]', '3');
+    expect(inputs().map((n) => n.value)).toEqual(['Cozinha', 'Lavanderia', 'Dormitório']);
   });
 
   it('ambiente sem nome bloqueia a geração da solicitação', () => {
