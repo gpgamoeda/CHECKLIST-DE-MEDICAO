@@ -1,12 +1,16 @@
 // Cartão de Identificação (controlado por React). Telefone com máscara e aviso
 // de herança/acervo derivados do modelo.
 import { useChecklist } from './store';
-import { maskPhone } from '../domain';
+import { maskPhone, parseAmbienteCount } from '../domain';
 
 export function IdentificationCard() {
   const { model, actions } = useChecklist();
   const v = (k: string) => model.id[k] || '';
   const set = (k: string) => (e: { target: { value: string } }) => actions.setId(k, e.target.value);
+  // A quantidade define quantos nomes renderizar/validar; o modelo pode reter
+  // mais nomes (ocultos) para não perdê-los ao reduzir a quantidade (0.6.4).
+  const ambCount = parseAmbienteCount(v('qtd_ambientes'));
+  const ambNames = Array.from({ length: ambCount }, (_, i) => model.ambientes[i] || '');
 
   return (
     <div className="card">
@@ -46,6 +50,35 @@ export function IdentificationCard() {
           </select></div>
 
         <div><label>Quantidade de ambientes a serem medidos</label><input data-id="qtd_ambientes" type="number" min="1" step="1" value={v('qtd_ambientes')} onChange={set('qtd_ambientes')} required /></div>
+
+        {ambCount > 0 && (
+          <div className="full amb-block" id="ambientes-block">
+            <label>Nomes dos ambientes</label>
+            <div className="amb-grid" id="ambientesGrid">
+              {ambNames.map((name, i) => {
+                const missing = !name.trim();
+                return (
+                  <div className="f" key={i}>
+                    <label htmlFor={'amb_' + i}>Ambiente {i + 1}</label>
+                    <input
+                      id={'amb_' + i}
+                      data-amb={i}
+                      className={missing ? 'req-empty' : ''}
+                      aria-invalid={missing}
+                      placeholder="Nome do ambiente"
+                      value={name}
+                      onChange={(e) => actions.setAmbiente(i, e.target.value)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            {ambNames.some((a) => !a.trim()) && (
+              <div className="hint-sm" id="ambientesHint">Informe o nome de todos os ambientes para liberar a solicitação.</div>
+            )}
+          </div>
+        )}
+
         <div><label>Data do preenchimento do checklist</label><input data-id="data_checklist" type="date" value={v('data_checklist')} onChange={set('data_checklist')} required /></div>
         <div><label>Data da solicitação da medição</label><input data-id="data_solicitacao_medicao" type="date" value={v('data_solicitacao_medicao')} onChange={set('data_solicitacao_medicao')} required /></div>
 

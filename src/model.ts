@@ -3,9 +3,11 @@
 // direto e compatível com rascunhos anteriores.
 import {
   SEC1_ITEMS, SEC2_ITEMS,
-  isSection1Resolved, isEletroResolved, isDynEletroResolved,
+  isSection1Resolved, isSec1ExtraResolved, isEletroResolved, isDynEletroResolved,
   isBancadaResolved, isDynResolved, isIdentificationComplete,
+  growAmbientes, parseAmbienteCount,
 } from './domain';
+import type { Sec1Extra } from './domain';
 
 export interface FixedItem { status: string | null; fields: Record<string, string>; }
 export interface DynEletro { id: string; fields: Record<string, string>; }
@@ -21,10 +23,12 @@ export type Gate = 'sim' | 'nao' | null;
 
 export interface Model {
   id: Record<string, string>;
+  ambientes: string[]; // nomes dos ambientes (derivados de qtd_ambientes) — 0.6.4
   observacoes: string;
   photosNA: boolean;
   secq: { ban: Gate; 5: Gate; 6: Gate };
   fixed: Record<string, FixedItem>; // chaves s1_0.. e s2_0..
+  sec1Extras: Sec1Extra[]; // linhas extras de Obra Civil — 0.6.4
   bancadas: Bancada[];
   dynEletros: DynEletro[];
   dyn5: DynItem[];
@@ -36,9 +40,9 @@ export function emptyModel(): Model {
   SEC1_ITEMS.forEach((_, i) => { fixed['s1_' + i] = { status: null, fields: {} }; });
   SEC2_ITEMS.forEach((_, i) => { fixed['s2_' + i] = { status: null, fields: {} }; });
   return {
-    id: {}, observacoes: '', photosNA: false,
+    id: {}, ambientes: [], observacoes: '', photosNA: false,
     secq: { ban: null, 5: null, 6: null },
-    fixed, bancadas: [], dynEletros: [], dyn5: [], dyn6: [],
+    fixed, sec1Extras: [], bancadas: [], dynEletros: [], dyn5: [], dyn6: [],
   };
 }
 
@@ -47,6 +51,10 @@ export function modelFromDraft(draft: any): Model {
   const m = emptyModel();
   if (!draft || typeof draft !== 'object') return m;
   if (draft.id && typeof draft.id === 'object') m.id = { ...draft.id };
+  // Ambientes: aceita rascunhos antigos sem a lista (inicializa a partir de
+  // qtd_ambientes) e reconcilia o tamanho com a quantidade informada.
+  const ambDraft = Array.isArray(draft.ambientes) ? draft.ambientes.map((x: any) => String(x ?? '')) : [];
+  m.ambientes = growAmbientes(ambDraft, parseAmbienteCount(m.id.qtd_ambientes));
   if (typeof draft.observacoes === 'string') m.observacoes = draft.observacoes;
   m.photosNA = !!draft.photosNA;
   if (draft.secq && typeof draft.secq === 'object') {
@@ -59,6 +67,10 @@ export function modelFromDraft(draft: any): Model {
     }
   }
   const arr = (x: any): any[] => (Array.isArray(x) ? x : []);
+  m.sec1Extras = arr(draft.sec1Extras).map((e) => ({
+    id: String(e.id), nome: typeof e.nome === 'string' ? e.nome : '',
+    status: e.status ?? null, fields: { ...(e.fields || {}) },
+  }));
   m.bancadas = arr(draft.bancadas).map((b) => ({
     id: String(b.id), fields: { ...(b.fields || {}) },
     cuba: b.cuba ?? null, modeloCuba: b.modeloCuba ?? null, metalInstal: b.metalInstal ?? null,
@@ -76,6 +88,7 @@ export function computeProgress(m: Model): { resolved: number; total: number } {
   let resolved = 0;
   let total = 0;
   SEC1_ITEMS.forEach((_, i) => { total++; if (isSection1Resolved(m.fixed['s1_' + i])) resolved++; });
+  m.sec1Extras.forEach((ex) => { total++; if (isSec1ExtraResolved(ex)) resolved++; });
   SEC2_ITEMS.forEach((name, i) => { total++; if (isEletroResolved(m.fixed['s2_' + i], name)) resolved++; });
   m.dynEletros.forEach((e) => { total++; if (isDynEletroResolved(e)) resolved++; });
 
@@ -91,8 +104,8 @@ export function computeProgress(m: Model): { resolved: number; total: number } {
   if (m.secq[6] === 'nao') resolved++;
   else if (m.secq[6] === 'sim' && m.dyn6.length > 0 && m.dyn6.every(isDynResolved)) resolved++;
 
-  total++; // identificação
-  if (isIdentificationComplete(m.id, m.photosNA)) resolved++;
+  total++; // identificação (inclui os nomes de ambientes desde a 0.6.4)
+  if (isIdentificationComplete(m.id, m.photosNA, m.ambientes)) resolved++;
 
   return { resolved, total };
 }

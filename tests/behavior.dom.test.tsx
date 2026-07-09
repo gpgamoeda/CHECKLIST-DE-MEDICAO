@@ -30,6 +30,9 @@ function completeForm() {
   change('#idgrid [data-id="telefone_responsavel"]', '11999998888');
   change('#idgrid [data-id="tipo"]', 'Obra nova');
   change('#idgrid [data-id="qtd_ambientes"]', '3');
+  change('#idgrid [data-amb="0"]', 'Cozinha');
+  change('#idgrid [data-amb="1"]', 'Lavanderia');
+  change('#idgrid [data-amb="2"]', 'Dormitório');
   change('#idgrid [data-id="data_checklist"]', '2026-07-01');
   change('#idgrid [data-id="data_solicitacao_medicao"]', '2026-07-02');
   change('#idgrid [data-id="link_fotos"]', 'https://sharepoint/fotos');
@@ -117,6 +120,92 @@ describe('campos condicionais — bancada/cuba', () => {
     fireEvent.change(cubaSel, { target: { value: 'inox' } });
     expect(document.querySelector(`#modblk_${fid}`)).toBeNull(); // some
     expect(document.querySelector(`#metblk_${fid}`)).not.toBeNull(); // metal aparece
+  });
+});
+
+describe('ambientes nomeados (0.6.4)', () => {
+  it('a quantidade gera N campos e ajusta ao crescer/encolher preservando nomes', () => {
+    render(<App />);
+    change('#idgrid [data-id="qtd_ambientes"]', '3');
+    expect(document.querySelectorAll('#ambientesGrid [data-amb]').length).toBe(3);
+
+    change('#idgrid [data-amb="0"]', 'Cozinha');
+    change('#idgrid [data-amb="1"]', 'Lavanderia');
+
+    // Aumentar preserva os já preenchidos.
+    change('#idgrid [data-id="qtd_ambientes"]', '4');
+    const inputs = () => Array.from(document.querySelectorAll('#ambientesGrid [data-amb]')) as HTMLInputElement[];
+    expect(inputs().length).toBe(4);
+    expect(inputs()[0].value).toBe('Cozinha');
+    expect(inputs()[1].value).toBe('Lavanderia');
+    expect(inputs()[3].value).toBe('');
+
+    // Diminuir oculta os campos excedentes (os nomes seguem no modelo); só os
+    // primeiros N ativos ficam visíveis.
+    change('#idgrid [data-id="qtd_ambientes"]', '2');
+    expect(inputs().length).toBe(2);
+    expect(inputs()[0].value).toBe('Cozinha');
+    expect(inputs()[1].value).toBe('Lavanderia');
+  });
+
+  it('reduzir/limpar a quantidade não perde os nomes ao aumentar de novo (R2)', () => {
+    render(<App />);
+    const inputs = () => Array.from(document.querySelectorAll('#ambientesGrid [data-amb]')) as HTMLInputElement[];
+    change('#idgrid [data-id="qtd_ambientes"]', '3');
+    change('#idgrid [data-amb="0"]', 'Cozinha');
+    change('#idgrid [data-amb="1"]', 'Lavanderia');
+    change('#idgrid [data-amb="2"]', 'Dormitório');
+
+    // Limpar a quantidade (estado transitório de edição) oculta os campos...
+    change('#idgrid [data-id="qtd_ambientes"]', '');
+    expect(inputs().length).toBe(0);
+    // ...mas voltar para 3 restaura os nomes preenchidos (nada foi apagado).
+    change('#idgrid [data-id="qtd_ambientes"]', '3');
+    expect(inputs().map((n) => n.value)).toEqual(['Cozinha', 'Lavanderia', 'Dormitório']);
+  });
+
+  it('ambiente sem nome bloqueia a geração da solicitação', () => {
+    render(<App />);
+    completeForm();
+    expect((document.getElementById('finish') as HTMLButtonElement).disabled).toBe(false);
+    // Esvaziar um nome de ambiente volta a travar o botão.
+    change('#idgrid [data-amb="2"]', '   ');
+    expect((document.getElementById('finish') as HTMLButtonElement).disabled).toBe(true);
+    expect(document.getElementById('ambientesHint')).not.toBeNull();
+  });
+});
+
+describe('obra civil — N/A e ambientes extras (0.6.4)', () => {
+  it('N/A resolve o item e não aparece como pendência no resumo', () => {
+    render(<App />);
+    completeForm();
+    // Muda o primeiro item de Concluído para N/A — segue liberado.
+    click('.seg[data-id="s1_0"] [data-s="na"]');
+    const finish = document.getElementById('finish') as HTMLButtonElement;
+    expect(finish.disabled).toBe(false);
+    fireEvent.click(finish);
+    const summary = document.getElementById('summary')!;
+    expect(summary.innerHTML).toContain('não se aplica');
+    expect(summary.querySelectorAll('.sum-pend').length).toBe(0);
+  });
+
+  it('linha extra participa da validação e do resumo', () => {
+    render(<App />);
+    completeForm();
+    const finish = () => document.getElementById('finish') as HTMLButtonElement;
+
+    // Adicionar um ambiente extra ainda sem nome/estado trava a geração.
+    click('[data-add="s1x"]');
+    expect(document.querySelectorAll('#sec1-extras .subcard').length).toBe(1);
+    expect(finish().disabled).toBe(true);
+
+    // Preencher nome e marcar N/A resolve o extra.
+    change('#sec1-extras [data-xk="nome"]', 'Varanda gourmet');
+    click('#sec1-extras .seg[data-xid] [data-s="na"]');
+    expect(finish().disabled).toBe(false);
+
+    fireEvent.click(finish());
+    expect(document.getElementById('summary')!.innerHTML).toContain('Varanda gourmet');
   });
 });
 
