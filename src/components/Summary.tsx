@@ -46,6 +46,9 @@ export function Summary({ onEdit }: { onEdit: () => void }) {
         <div className="sum-line"><b>Responsável pela obra:</b> {id.responsavel_obra || ''} &nbsp;·&nbsp; <b>Telefone:</b> {id.telefone_responsavel || ''}</div>
         <div className="sum-line"><b>Tipo de medição:</b> {id.tipo_medicao || ''} &nbsp;·&nbsp; <b>Tipo de obra:</b> {id.tipo || ''}</div>
         <div className="sum-line"><b>Quantidade de ambientes:</b> {id.qtd_ambientes || ''}</div>
+        {model.ambientes.length > 0 && (
+          <div className="sum-line"><b>Ambientes:</b> {model.ambientes.map((a, i) => a.trim() || `Ambiente ${i + 1}`).join(' · ')}</div>
+        )}
         <div className="sum-line"><b>Fotos (SharePoint):</b> {model.photosNA ? <span className="sum-na">Não se aplica</span> : (id.link_fotos || '—')}</div>
         <div className="sum-line"><b>Data do preenchimento:</b> {brDate(id.data_checklist)} &nbsp;·&nbsp; <b>Data da solicitação da medição:</b> {brDate(id.data_solicitacao_medicao)}</div>
       </div>
@@ -55,7 +58,15 @@ export function Summary({ onEdit }: { onEdit: () => void }) {
         {SEC1_ITEMS.map((n, i) => {
           const s = model.fixed['s1_' + i];
           if (s.status === 'ok') return <div className="sum-line" key={i}>✔ {n}</div>;
+          if (s.status === 'na') return <div className="sum-line sum-na" key={i}>— {n} (não se aplica)</div>;
           return <div className="sum-line sum-pend" key={i}>✖ {n} — pendente{s.fields.amb_pend ? ` (${s.fields.amb_pend})` : ''}: {s.fields.obs || ''}</div>;
+        })}
+        {model.sec1Extras.map((ex) => {
+          const nome = ex.nome.trim() || 'Ambiente extra';
+          if (ex.status === 'ok') return <div className="sum-line" key={ex.id}>✔ {nome}</div>;
+          if (ex.status === 'na') return <div className="sum-line sum-na" key={ex.id}>— {nome} (não se aplica)</div>;
+          if (ex.status === 'pend') return <div className="sum-line sum-pend" key={ex.id}>✖ {nome} — pendente{ex.fields.amb_pend ? ` (${ex.fields.amb_pend})` : ''}: {ex.fields.obs || ''}</div>;
+          return <div className="sum-line" key={ex.id}>{nome}</div>;
         })}
       </div>
 

@@ -10,6 +10,51 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 _Sem itens pendentes. Próximo roadmap sugerido em
 `docs/release-0.5/RETROSPECTIVE.md`._
 
+## [0.6.4] — 2026-07-09
+
+Release 0.6.4 — **Ambientes nomeados na Identificação, estado N/A em Obra Civil e
+linhas extras** (Issue #15). **Inclui mudanças de regra — registradas abaixo.**
+
+### Adicionado
+- **Identificação — nomes de ambientes:** a "Quantidade de ambientes a serem
+  medidos" passa a gerar **N campos** (`Ambiente 1`…`Ambiente N`) logo abaixo,
+  para nomear cada ambiente. Aumentar a quantidade acrescenta campos preservando
+  os nomes já digitados; diminuir remove os excedentes mantendo os primeiros. A
+  lista fica limitada a `MAX_AMBIENTES` (60) por segurança.
+- **Obra Civil Finalizada — estado N/A:** cada item passa a aceitar
+  **Concluído / Pendente / N/A** (antes só Concluído/Pendente).
+- **Obra Civil Finalizada — linhas extras:** botão **"+ Adicionar ambiente"** para
+  registrar ambientes/itens não previstos, com nome livre e o mesmo trio de
+  estados. Os nomes de ambiente da Identificação são reaproveitados como
+  **sugestões** (datalist) nos campos de ambiente — a lista da Identificação é a
+  fonte principal, sem cadastro paralelo.
+- **Resumo:** passa a listar os **nomes dos ambientes**; itens/extras `N/A`
+  aparecem como "não se aplica" (não como pendência).
+
+### Alterado (regras de negócio)
+- **Liberação da solicitação** agora também exige que **todos os nomes de
+  ambiente** estejam preenchidos (campo em branco ou só com espaços bloqueia,
+  com indicação visual do que falta).
+- **`N/A` conta como resolvido** em Obra Civil (não trava a geração e não vira
+  pendência). `Pendente` continua exigindo ambiente + motivo e continua embasando
+  o Termo de Responsabilidade.
+- Linha extra só conta como resolvida com **nome preenchido + estado resolvido**.
+
+### Compatibilidade
+- Rascunhos antigos **sem** a lista de ambientes abrem sem erro: a lista é
+  inicializada a partir de `qtd_ambientes` (campos vazios para completar). O modelo
+  usa o mesmo formato do rascunho — **sem bump da chave** `checklist-medicao:draft:v1`.
+
+### Testes
+- `domain.test.js`: N/A resolve; extras (nome + estado); `parseAmbienteCount`,
+  `resizeAmbientes`, `missingAmbientes`, `filledAmbientes`; identificação com
+  nomes de ambiente.
+- `behavior.dom.test.tsx`: geração de N campos e ajuste ao crescer/encolher;
+  ambiente vazio bloqueia; N/A resolve e não vira pendência; linha extra participa
+  da validação e do resumo.
+- `critical-flow.spec.ts` (Playwright): nomes de ambiente, N/A, pendência real e
+  linha extra refletidos no resumo. Timeout do e2e elevado para 60s (fluxo maior).
+
 ## [0.6.3] — 2026-07-01
 
 Release 0.6.3 — **Impressão à prova de dispositivo + HTML sem cache.** Follow-up

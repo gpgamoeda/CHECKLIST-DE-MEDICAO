@@ -44,6 +44,7 @@
   .state{font-size:9px;font-weight:800;letter-spacing:.6px;border-radius:20px;padding:3px 9px;text-transform:uppercase;}
   .state.pend{background:rgba(180,60,30,.12);color:var(--red);}
   .state.ok{background:rgba(15,120,60,.12);color:var(--green);}
+  .state.na{background:rgba(128,123,114,.16);color:var(--muted);}
   .seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
   .seg.multi{flex-wrap:wrap;}
   .seg button{appearance:none;border:none;background:#fff;color:var(--muted);
@@ -53,6 +54,7 @@
   .seg button:not(.on-y):not(.on-n):hover{background:#F1EFE9;color:var(--ink);}
   .seg button.on-y{background:var(--green);color:#fff;}
   .seg button.on-n{background:var(--ink);color:#fff;}
+  .seg button.on-na{background:var(--muted);color:#fff;}
   .seg-na{appearance:none;border:1px solid var(--border);background:#fff;color:var(--muted);
     font-size:11.5px;font-weight:700;padding:9px 12px;border-radius:8px;cursor:pointer;white-space:nowrap;
     transition:background .15s ease,border-color .15s ease,color .15s ease;}
@@ -77,6 +79,9 @@
   .idgrid .full{grid-column:1/-1;}
   .idgrid .span2{grid-column:span 2;}
   .idgrid label{display:block;font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--muted);margin:0 0 3px;text-transform:uppercase;}
+  /* Nomes dos ambientes (Identificação, 0.6.4) */
+  .amb-block{margin-top:2px;}
+  .amb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;}
   .heritage{display:none;margin:10px 0 2px;font-size:12px;color:var(--amber);
     background:rgba(154,110,14,.10);border:1px solid rgba(154,110,14,.35);border-radius:8px;padding:9px 11px;}
   .heritage.show{display:block;}
@@ -133,7 +138,7 @@
   .sign{display:flex;gap:40px;margin:34px 0 0;}
   .sign div{flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:11px;color:var(--muted);letter-spacing:.5px;}
   @media (max-width:620px){
-    .idgrid,.fields,.fields.two{grid-template-columns:1fr 1fr;}
+    .idgrid,.fields,.fields.two,.amb-grid{grid-template-columns:1fr 1fr;}
     .fields.one{grid-template-columns:1fr;}
     .idgrid .span2{grid-column:1/-1;}
     .fixture-row{grid-template-columns:1fr;}

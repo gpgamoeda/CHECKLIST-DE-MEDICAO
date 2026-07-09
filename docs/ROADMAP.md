@@ -9,6 +9,14 @@ comportamento a cada passo.** Nada de reescrever tudo de uma vez.
 
 ---
 
+## ✅ 0.6.4 — Ambientes nomeados, N/A em Obra Civil e linhas extras (concluída)
+
+- Identificação gera N campos de nome de ambiente a partir da quantidade
+  (preserva nomes ao crescer/encolher; bloqueia com campo vazio). Obra Civil
+  ganha o estado **N/A** (conta como resolvido) e **"+ Adicionar ambiente"**
+  (linhas extras). Resumo lista os ambientes; N/A não vira pendência.
+  Compatível com rascunhos antigos. Issue #15. `validate` + `test:e2e` verdes.
+
 ## ✅ 0.6.3 — Impressão à prova de dispositivo + HTML sem cache (concluída)
 
 - Print em preto puro/peso 500 (iOS Quartz clareia tons médios) + `print-color-adjust`.

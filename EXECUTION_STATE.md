@@ -8,8 +8,8 @@ conforme o handoff pack. Atualizado a cada sprint.
 - Ciclo: Refatoração progressiva + Cloudflare Pages (concluído) → repaginação visual
 - Repositório: `gpgamoeda/CHECKLIST-DE-MEDICAO`
 - Branch base: `main`
-- Último PR mergeado: #13 (Release 0.6.2 — contraste na impressão)
-- Última versão: `0.6.3` (em PR — impressão à prova de dispositivo + HTML no-cache)
+- Último PR mergeado: #14 (Release 0.6.3 — impressão à prova de dispositivo + HTML no-cache)
+- Última versão: `0.6.4` (em PR — ambientes nomeados, N/A em Obra Civil e linhas extras; Issue #15)
 - Deploy: **automático** (integração Git do Cloudflare Pages ativa; merge na `main` publica)
 - Próxima sprint: — (próximo roadmap em `docs/release-0.5/RETROSPECTIVE.md`)
 - Produção: https://checklist-de-medicao.pages.dev (publicado)
@@ -33,7 +33,8 @@ conforme o handoff pack. Atualizado a cada sprint.
 | 0.6.0 | `release/0.6.0-frs-visual-theme` | #11 | Mergeada + publicada | validate+e2e+build+smoke visual | Tema FRS (só visual); Manrope + styles.css |
 | 0.6.1 | `release/0.6.1-ajustes-formulario` | #12 | Mergeada | validate (45 testes)+e2e | Ajustes eletros/identificação/obra civil; regras registradas |
 | 0.6.2 | `release/0.6.2-contraste-impressao` | #13 | Mergeada | validate+e2e+PDF antes/depois | Alto contraste no print; .rule vira borda |
-| 0.6.3 | `release/0.6.3-impressao-robusta` | — | Em PR | validate+e2e+PDF | Preto puro/peso 500 no print (iOS); HTML no-cache |
+| 0.6.3 | `release/0.6.3-impressao-robusta` | #14 | Mergeada | validate+e2e+PDF | Preto puro/peso 500 no print (iOS); HTML no-cache |
+| 0.6.4 | `claude/handoff-kit-execution-k7azlx` | — | Em PR | validate (57 testes)+e2e | Ambientes nomeados + N/A + linhas extras em Obra Civil (Issue #15) |
 
 ## Decisões tomadas
 
@@ -58,6 +59,14 @@ conforme o handoff pack. Atualizado a cada sprint.
   autosave/restauração continuam compatíveis (sem bump de versão da chave). Estado
   centralizado no `ChecklistProvider`; "voltar e editar" só alterna a exibição.
   `app.ts` imperativo removido; testes migrados para `fireEvent` (React).
+- **0.6.4:** `Model` ganhou `ambientes: string[]` e `sec1Extras[]`, mantendo o mesmo
+  formato de rascunho — **sem bump da chave**. Rascunhos antigos inicializam
+  `ambientes` a partir de `qtd_ambientes` em `modelFromDraft` (defaults seguros). A
+  lista da Identificação é a **fonte principal**: Obra Civil só a reaproveita como
+  sugestão (datalist), sem criar cadastro paralelo. Escopo restrito a
+  Identificação + Obra Civil + resumo/validação (Issue #15); demais seções
+  intocadas. Branch executada: `claude/handoff-kit-execution-k7azlx` (o handoff
+  sugeria `sprint/0.6.4-ambientes-obra-civil`).
 
 ## Riscos encontrados
 

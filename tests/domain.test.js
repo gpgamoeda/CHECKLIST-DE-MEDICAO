@@ -3,9 +3,10 @@
 // bancada/cuba, datas pt-BR e escape).
 import { describe, it, expect } from 'vitest';
 import {
-  maskPhone, brDate, esc, SEC2_ITEMS,
-  isSection1Resolved, isEletroResolved, isDynEletroResolved,
+  maskPhone, brDate, esc, SEC2_ITEMS, MAX_AMBIENTES,
+  isSection1Resolved, isSec1ExtraResolved, isEletroResolved, isDynEletroResolved,
   isBancadaResolved, isDynResolved, isIdentificationComplete,
+  parseAmbienteCount, resizeAmbientes, missingAmbientes, filledAmbientes,
 } from '../src/domain.ts';
 
 describe('formatação', () => {
@@ -52,6 +53,39 @@ describe('identificação', () => {
     expect(isIdentificationComplete({ ...base, link_fotos: '' }, false)).toBe(false);
     expect(isIdentificationComplete({ ...base, link_fotos: '' }, true)).toBe(true);
   });
+
+  it('exige um nome para cada ambiente da quantidade (0.6.4)', () => {
+    // qtd 3 exige 3 nomes não vazios.
+    expect(isIdentificationComplete(base, false, ['Cozinha', 'Lavanderia', ''])).toBe(false);
+    expect(isIdentificationComplete(base, false, ['Cozinha', 'Lavanderia', '  '])).toBe(false); // só espaços
+    expect(isIdentificationComplete(base, false, ['Cozinha', 'Lavanderia', 'Dormitório'])).toBe(true);
+    // sem passar ambientes, a checagem de nomes é ignorada (retrocompat).
+    expect(isIdentificationComplete(base, false)).toBe(true);
+  });
+});
+
+describe('ambientes nomeados (0.6.4)', () => {
+  it('parseAmbienteCount normaliza o texto da quantidade', () => {
+    expect(parseAmbienteCount('3')).toBe(3);
+    expect(parseAmbienteCount('')).toBe(0);
+    expect(parseAmbienteCount('0')).toBe(0);
+    expect(parseAmbienteCount('-2')).toBe(0);
+    expect(parseAmbienteCount('abc')).toBe(0);
+    expect(parseAmbienteCount('2.9')).toBe(2); // trunca
+    expect(parseAmbienteCount(String(MAX_AMBIENTES + 10))).toBe(MAX_AMBIENTES); // limita
+  });
+
+  it('resizeAmbientes preserva nomes ao crescer e ao encolher', () => {
+    expect(resizeAmbientes([], 3)).toEqual(['', '', '']);
+    expect(resizeAmbientes(['Cozinha', 'Lavanderia'], 4)).toEqual(['Cozinha', 'Lavanderia', '', '']);
+    expect(resizeAmbientes(['Cozinha', 'Lavanderia', 'Dormitório', 'Banho'], 2)).toEqual(['Cozinha', 'Lavanderia']);
+    expect(resizeAmbientes(['Cozinha'], 0)).toEqual([]);
+  });
+
+  it('missingAmbientes e filledAmbientes apontam vazios e preenchidos', () => {
+    expect(missingAmbientes(['Cozinha', '', '  ', 'Banho'])).toEqual([1, 2]);
+    expect(filledAmbientes(['Cozinha', '', '  Lavanderia  '])).toEqual(['Cozinha', 'Lavanderia']);
+  });
 });
 
 describe('seção 1 — obra civil', () => {
@@ -65,6 +99,25 @@ describe('seção 1 — obra civil', () => {
   });
   it('sem status não resolve', () => {
     expect(isSection1Resolved({ status: null, fields: {} })).toBe(false);
+  });
+  it('N/A resolve sem exigir ambiente/motivo (0.6.4)', () => {
+    expect(isSection1Resolved({ status: 'na', fields: {} })).toBe(true);
+  });
+});
+
+describe('seção 1 — linhas extras (0.6.4)', () => {
+  it('exige nome/descrição além do estado resolvido', () => {
+    expect(isSec1ExtraResolved({ id: 'x', nome: '', status: 'ok', fields: {} })).toBe(false);
+    expect(isSec1ExtraResolved({ id: 'x', nome: '   ', status: 'na', fields: {} })).toBe(false);
+    expect(isSec1ExtraResolved({ id: 'x', nome: 'Varanda', status: 'ok', fields: {} })).toBe(true);
+    expect(isSec1ExtraResolved({ id: 'x', nome: 'Varanda', status: 'na', fields: {} })).toBe(true);
+  });
+  it('extra pendente segue a regra de ambiente + motivo', () => {
+    expect(isSec1ExtraResolved({ id: 'x', nome: 'Varanda', status: 'pend', fields: {} })).toBe(false);
+    expect(isSec1ExtraResolved({ id: 'x', nome: 'Varanda', status: 'pend', fields: { amb_pend: 'Varanda', obs: 'Falta piso' } })).toBe(true);
+  });
+  it('extra sem estado não resolve', () => {
+    expect(isSec1ExtraResolved({ id: 'x', nome: 'Varanda', status: null, fields: {} })).toBe(false);
   });
 });
 

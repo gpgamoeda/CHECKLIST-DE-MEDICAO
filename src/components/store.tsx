@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import type { ReactNode } from 'react';
 import * as Draft from '../draft';
 import { Model, emptyModel, modelFromDraft, nextId } from '../model';
+import { resizeAmbientes, parseAmbienteCount } from '../domain';
 
 interface ChecklistStore {
   model: Model;
@@ -14,10 +15,16 @@ interface ChecklistStore {
 
 interface Actions {
   setId: (key: string, value: string) => void;
+  setAmbiente: (index: number, value: string) => void;
   setPhotosNA: (on: boolean) => void;
   setObservacoes: (value: string) => void;
   setFixedStatus: (id: string, status: string) => void;
   setFixedField: (id: string, key: string, value: string) => void;
+  addSec1Extra: () => void;
+  removeSec1Extra: (id: string) => void;
+  setSec1ExtraNome: (id: string, value: string) => void;
+  setSec1ExtraStatus: (id: string, status: string) => void;
+  setSec1ExtraField: (id: string, key: string, value: string) => void;
   addEletro: () => void;
   removeEletro: (id: string) => void;
   setEletroField: (id: string, key: string, value: string) => void;
@@ -68,7 +75,20 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
       list.map((x) => (x.id === id ? patch(x) : x));
 
     return {
-      setId: (key, value) => setModel((m) => ({ ...m, id: { ...m.id, [key]: value } })),
+      setId: (key, value) => setModel((m) => {
+        const id = { ...m.id, [key]: value };
+        // Ao mudar a quantidade, reajusta os campos de nome de ambiente
+        // preservando os já preenchidos (0.6.4).
+        if (key === 'qtd_ambientes') {
+          return { ...m, id, ambientes: resizeAmbientes(m.ambientes, parseAmbienteCount(value)) };
+        }
+        return { ...m, id };
+      }),
+      setAmbiente: (index, value) => setModel((m) => {
+        const ambientes = m.ambientes.slice();
+        ambientes[index] = value;
+        return { ...m, ambientes };
+      }),
       setPhotosNA: (on) => setModel((m) => ({
         ...m, photosNA: on, id: on ? { ...m.id, link_fotos: '' } : m.id,
       })),
@@ -79,6 +99,19 @@ export function ChecklistProvider({ children }: { children: ReactNode }) {
         if (key === 'respiro' && value !== 'Sim') fields.respiro_espec = '';
         return { ...f, fields };
       }),
+      addSec1Extra: () => setModel((m) => ({
+        ...m, sec1Extras: [...m.sec1Extras, { id: nextId('s1x'), nome: '', status: null, fields: {} }],
+      })),
+      removeSec1Extra: (id) => setModel((m) => ({ ...m, sec1Extras: m.sec1Extras.filter((e) => e.id !== id) })),
+      setSec1ExtraNome: (id, value) => setModel((m) => ({
+        ...m, sec1Extras: mapList(m.sec1Extras, id, (e) => ({ ...e, nome: value })),
+      })),
+      setSec1ExtraStatus: (id, status) => setModel((m) => ({
+        ...m, sec1Extras: mapList(m.sec1Extras, id, (e) => ({ ...e, status })),
+      })),
+      setSec1ExtraField: (id, key, value) => setModel((m) => ({
+        ...m, sec1Extras: mapList(m.sec1Extras, id, (e) => ({ ...e, fields: { ...e.fields, [key]: value } })),
+      })),
       addEletro: () => setModel((m) => ({ ...m, dynEletros: [...m.dynEletros, { id: nextId('de'), fields: {} }] })),
       removeEletro: (id) => setModel((m) => ({ ...m, dynEletros: m.dynEletros.filter((e) => e.id !== id) })),
       setEletroField: (id, key, value) => setModel((m) => ({

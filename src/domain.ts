@@ -4,7 +4,7 @@
 // do produto (registrar no PR e no changelog).
 
 // ---------- Tipos ----------
-export type Section1Status = 'ok' | 'pend' | null;
+export type Section1Status = 'ok' | 'pend' | 'na' | null;
 export type DefStatus = 'def' | 'na' | null;
 export type CubaType = 'inox' | 'louca' | 'esculpida' | 'na' | null;
 export type MetalInstal = 'parede' | 'bancada' | null;
@@ -30,6 +30,15 @@ export interface EletroExtra {
   alimentacao?: boolean;
   respiro?: boolean;
   obs?: boolean;
+}
+
+// Linha extra de Obra Civil (0.6.4): um ambiente/item não previsto na lista
+// padrão, com nome/descrição livre e o mesmo modelo de estado dos itens fixos.
+export interface Sec1Extra {
+  id: string;
+  nome: string;
+  status: string | null;
+  fields: Fields;
 }
 
 // ---------- Dados ----------
@@ -120,11 +129,19 @@ function filled(v: string | undefined): boolean {
   return !!(v && v.trim());
 }
 
-// Seção 1 (obra civil): concluído, ou pendente com ambiente + motivo.
+// Seção 1 (obra civil): concluído ou "não se aplica" (N/A) resolvem; pendente
+// exige ambiente + motivo. (0.6.4: N/A passa a contar como resolvido.)
 export function isSection1Resolved(s: ItemState): boolean {
-  if (s.status === 'ok') return true;
+  if (s.status === 'ok' || s.status === 'na') return true;
   if (s.status === 'pend') return !!(s.fields.amb_pend && s.fields.obs);
   return false;
+}
+
+// Linha extra de Obra Civil (0.6.4): além do estado resolvido, exige um
+// nome/descrição não vazio para não gerar linha inconsistente no resumo.
+export function isSec1ExtraResolved(s: Sec1Extra): boolean {
+  if (!filled(s.nome)) return false;
+  return isSection1Resolved({ status: s.status, fields: s.fields });
 }
 
 // Seção 2 (eletrodoméstico fixo): "não se aplica", ou "definido" com os campos
@@ -168,12 +185,58 @@ export function isDynResolved(s: ItemState): boolean {
 }
 
 // Identificação: todos os campos não-opcionais preenchidos; link de fotos exigido
-// a menos que esteja marcado "não se aplica".
-export function isIdentificationComplete(values: Record<string, string>, photosNA: boolean): boolean {
+// a menos que esteja marcado "não se aplica". (0.6.4) Se `ambientes` for passado,
+// todos os nomes derivados da "Quantidade de ambientes" precisam estar preenchidos.
+export function isIdentificationComplete(
+  values: Record<string, string>,
+  photosNA: boolean,
+  ambientes?: string[],
+): boolean {
   for (const key of Object.keys(values)) {
     if (OPTIONAL_ID_FIELDS[key]) continue;
     if (!filled(values[key])) return false;
   }
   if (!photosNA && !filled(values.link_fotos)) return false;
+  if (ambientes) {
+    const count = parseAmbienteCount(values.qtd_ambientes);
+    for (let i = 0; i < count; i++) {
+      if (!filled(ambientes[i])) return false;
+    }
+  }
   return true;
+}
+
+// ---------- Ambientes nomeados (Identificação, 0.6.4) ----------
+
+// Limite defensivo para não renderizar uma quantidade absurda de campos caso o
+// usuário digite um número enorme na "Quantidade de ambientes".
+export const MAX_AMBIENTES = 60;
+
+// Converte o texto da "Quantidade de ambientes" em um inteiro entre 0 e
+// MAX_AMBIENTES. Valores vazios/inválidos/≤0 viram 0.
+export function parseAmbienteCount(qtd: string | null | undefined): number {
+  const n = Math.floor(Number((qtd || '').trim()));
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return Math.min(n, MAX_AMBIENTES);
+}
+
+// Ajusta a lista de nomes ao tamanho alvo: preserva os primeiros nomes e
+// acrescenta/remove do final (nunca apaga o que permanece).
+export function resizeAmbientes(ambientes: string[], count: number): string[] {
+  const next = ambientes.slice(0, count);
+  while (next.length < count) next.push('');
+  return next;
+}
+
+// Índices (0-based) dos ambientes ainda sem nome — para apontar o que falta.
+export function missingAmbientes(ambientes: string[]): number[] {
+  const out: number[] = [];
+  ambientes.forEach((a, i) => { if (!filled(a)) out.push(i); });
+  return out;
+}
+
+// Nomes de ambientes já preenchidos (fonte principal reutilizável por outras
+// seções, ex.: sugestões de "ambiente pendente" na Obra Civil).
+export function filledAmbientes(ambientes: string[]): string[] {
+  return ambientes.map((a) => a.trim()).filter(Boolean);
 }

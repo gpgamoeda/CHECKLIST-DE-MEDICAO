@@ -20,8 +20,15 @@ Abra `http://localhost:5173`.
 2. Confirme que o **telefone** recebe a máscara `(00) 0 0000-0000`.
 3. Confirme que **Tipo de obra** oferece apenas "Obra nova" e "Reforma" (a opção
    "Herança / acervo" foi removida na 0.6.1).
-4. **Seção 1:** marque itens como Concluído/Pendente (pendência pede ambiente +
-   motivo).
+3a. **Nomes de ambientes (0.6.4):** informe **Quantidade de ambientes = 3** e
+    confirme que aparecem `Ambiente 1`, `Ambiente 2`, `Ambiente 3`. Preencha dois e
+    deixe um vazio — a geração fica **bloqueada** (campo vazio destacado + aviso).
+    Aumente para 4 e confirme que os nomes já digitados são preservados; volte a 2
+    e confirme que restam os dois primeiros. Preencha todos.
+4. **Seção 1:** marque itens como Concluído / Pendente / **N/A** (pendência pede
+   ambiente + motivo; N/A libera o item sem virar pendência). Use
+   **"+ Adicionar ambiente"** para criar uma linha extra, nomeie-a e escolha um
+   estado; remova para conferir.
 5. **Seção 2:** marque eletros como Definido (com campos) ou "não se aplica";
    adicione um eletro extra e remova.
 6. **Seção 3:** responda "Sim"; num ambiente, escolha **Louça** e confirme que
@@ -34,7 +41,9 @@ Abra `http://localhost:5173`.
 
 ## Resumo, impressão e edição
 
-10. Gere a solicitação e confira o **resumo**.
+10. Gere a solicitação e confira o **resumo** — os **nomes dos ambientes** devem
+    aparecer na Identificação; itens/linhas **N/A** aparecem como "não se aplica"
+    (nunca como pendência); pendências reais continuam destacadas.
 11. **Imprimir / Salvar PDF:** confira que só o resumo aparece (sem a barra, sem
     botões) e que o layout está legível.
 12. **Voltar e editar:** confirme que o preenchimento continua lá.

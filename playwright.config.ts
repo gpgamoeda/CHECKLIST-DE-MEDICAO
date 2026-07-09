@@ -4,7 +4,9 @@ import { defineConfig, devices } from '@playwright/test';
 // ambiente (não baixa navegador) e sobe o app via Vite dev server.
 export default defineConfig({
   testDir: './e2e',
-  timeout: 30_000,
+  // O fluxo crítico cresceu (ambientes nomeados + N/A + linha extra na 0.6.4) e o
+  // navegador real deste ambiente é lento (~1s por ação); 60s dá folga ao teste.
+  timeout: 60_000,
   fullyParallel: true,
   reporter: 'list',
   use: {

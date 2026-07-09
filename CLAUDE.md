@@ -83,12 +83,22 @@ Este projeto segue um padrão de releases pequenas:
   número, responsável + telefone, tipo de medição, tipo de obra, quantidade de
   ambientes, datas e link das fotos (ou "não se aplica"). Opcionais: arquiteto,
   complemento, ponto de referência, observações gerais.
+- **Nomes de ambientes (desde 0.6.4):** a "Quantidade de ambientes" gera N campos
+  `Ambiente 1`…`Ambiente N`; todos exigem nome não vazio para liberar a geração
+  (campo em branco/só espaços bloqueia). Aumentar N preserva os nomes e adiciona ao
+  final; diminuir remove os excedentes mantendo os primeiros. Essa lista é a
+  **fonte principal de ambientes** do checklist (reaproveitada como sugestão em
+  Obra Civil). Guardada em `model.ambientes`; rascunhos antigos inicializam a lista
+  a partir de `qtd_ambientes`.
 - Telefone usa máscara `(00) 0 0000-0000`; datas são exibidas no resumo em pt-BR.
 - **Tipo de obra:** opções "Obra nova" e "Reforma". A opção "Herança / acervo" foi
   removida na 0.6.1 (o aviso de atenção redobrada só aparece para rascunhos
   antigos que ainda tenham esse valor).
-- **Seção 1 (Obra Civil):** cada item é "Concluído" ou "Pendente" (pendência exige
-  ambiente + motivo). Pendências embasam o Termo de Responsabilidade.
+- **Seção 1 (Obra Civil):** cada item é "Concluído", "Pendente" ou "N/A" (desde
+  0.6.4). "Pendente" exige ambiente + motivo e embasa o Termo de Responsabilidade;
+  "N/A" conta como resolvido e não vira pendência. É possível **adicionar
+  ambientes/linhas extras** ("+ Adicionar ambiente"): nome livre + o mesmo trio de
+  estados; extra só resolve com nome preenchido. Guardados em `model.sec1Extras`.
 - **Seção 2 (Eletrodomésticos):** "Definido" (com campos) ou "não se aplica".
   Campos extras (desde 0.6.1): **alimentação** só em Cooktop/Fogão e Forno;
   **respiro** em Forno, Micro-ondas, Refrigerador e Freezer (se "Sim", exige
