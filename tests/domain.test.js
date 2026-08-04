@@ -168,6 +168,17 @@ describe('seção 2 — eletrodomésticos', () => {
     expect(SEC2_ITEMS).not.toContain('Ar condicionado');
     expect(isEletroResolved({ status: 'def', fields: full }, 'Ar condicionado (Painel/nicho/prateleira)')).toBe(true);
   });
+
+  it('Aquecedor a gás está na lista, no fim, e exige respiro (0.6.5)', () => {
+    expect(SEC2_ITEMS).toContain('Aquecedor a gás');
+    // Índices são chaves de rascunho (s2_<i>): o item novo tem que ser o último.
+    expect(SEC2_ITEMS[SEC2_ITEMS.length - 1]).toBe('Aquecedor a gás');
+    expect(isEletroResolved({ status: 'na', fields: {} }, 'Aquecedor a gás')).toBe(true);
+    expect(isEletroResolved({ status: 'def', fields: full }, 'Aquecedor a gás')).toBe(false); // falta respiro
+    expect(isEletroResolved({ status: 'def', fields: { ...full, respiro: 'Não' } }, 'Aquecedor a gás')).toBe(true);
+    expect(isEletroResolved({ status: 'def', fields: { ...full, respiro: 'Sim' } }, 'Aquecedor a gás')).toBe(false);
+    expect(isEletroResolved({ status: 'def', fields: { ...full, respiro: 'Sim', respiro_espec: '100mm' } }, 'Aquecedor a gás')).toBe(true);
+  });
 });
 
 describe('seção 3 — bancada / cuba / metal', () => {

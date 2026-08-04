@@ -62,6 +62,10 @@ export const SEC2_ITEMS: string[] = [
   'Coifa / Depurador', 'Ar condicionado (Painel/nicho/prateleira)', 'Lava-louças', 'Máquina de lavar', 'Secadora', 'Adega', 'Cervejeira',
   'Icemaker', 'Purificador de água', 'Triturador de resíduos', 'Gaveta aquecida', 'Gaveta refrigerada',
   'Cafeteira embutida', 'Frigobar',
+  // 0.6.5: itens novos entram no FIM da lista — as chaves do rascunho são
+  // posicionais (`s2_<índice>`), então inserir no meio remapearia rascunhos
+  // antigos para o eletrodoméstico errado.
+  'Aquecedor a gás',
 ];
 
 // Campos exigidos de cada eletrodoméstico "Definido".
@@ -82,6 +86,9 @@ export const ELETRO_EXTRAS: Record<string, EletroExtra> = {
   'Micro-ondas': { respiro: true },
   'Refrigerador': { respiro: true },
   'Freezer': { respiro: true },
+  // 0.6.5: aparelho a gás — a alimentação já está no nome, mas a exaustão/respiro
+  // precisa ser informada como nos demais embutidos.
+  'Aquecedor a gás': { respiro: true },
 };
 
 export const CUBA_LABEL: Record<string, string> = {

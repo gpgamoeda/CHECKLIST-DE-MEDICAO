@@ -54,7 +54,7 @@ describe('estrutura', () => {
       expect(document.querySelector(`#idgrid [data-id="${campo}"]`)).not.toBeNull();
     }
     expect(document.querySelectorAll('#sec1 .item').length).toBe(12);
-    expect(document.querySelectorAll('#sec2 .item').length).toBe(19);
+    expect(document.querySelectorAll('#sec2 .item').length).toBe(20); // +Aquecedor a gás (0.6.5)
     expect((document.getElementById('finish') as HTMLButtonElement).disabled).toBe(true);
   });
 });
