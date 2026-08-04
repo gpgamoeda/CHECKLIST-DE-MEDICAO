@@ -10,6 +10,24 @@ e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 _Sem itens pendentes. Próximo roadmap sugerido em
 `docs/release-0.5/RETROSPECTIVE.md`._
 
+## [0.6.5] — 2026-08-04
+
+Release 0.6.5 — **"Aquecedor a gás" no Quadro 2 (Eletrodomésticos)** (Issue #17).
+
+### Adicionado
+- **Seção 2 (Eletrodomésticos):** novo item fixo **"Aquecedor a gás"**, com o
+  mesmo comportamento dos demais (botões *Definido* / *Não se aplica*, campos
+  base obrigatórios Ambiente, Marca, Modelo, Referência/Código e Dimensões) e
+  **campo condicional de respiro** — como Forno, Micro-ondas, Refrigerador e
+  Freezer: se "Sim", exige a especificação. Sem campo de alimentação (o item já
+  é a gás por definição). O item aparece também no resumo, como os outros.
+
+### Notas técnicas
+- O item foi acrescentado **no fim de `SEC2_ITEMS`**: as chaves do rascunho são
+  posicionais (`s2_<índice>`), então inserir no meio da lista remaparia
+  rascunhos salvos para o eletrodoméstico errado. Rascunhos antigos continuam
+  válidos e ganham o item novo em branco (pendente).
+
 ## [0.6.4] — 2026-07-09
 
 Release 0.6.4 — **Ambientes nomeados na Identificação, estado N/A em Obra Civil e

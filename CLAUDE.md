@@ -104,8 +104,11 @@ Este projeto segue um padrão de releases pequenas:
   estados; extra só resolve com nome preenchido. Guardados em `model.sec1Extras`.
 - **Seção 2 (Eletrodomésticos):** "Definido" (com campos) ou "não se aplica".
   Campos extras (desde 0.6.1): **alimentação** só em Cooktop/Fogão e Forno;
-  **respiro** em Forno, Micro-ondas, Refrigerador e Freezer (se "Sim", exige
-  especificação). É possível adicionar eletrodomésticos fora da lista.
+  **respiro** em Forno, Micro-ondas, Refrigerador, Freezer e Aquecedor a gás
+  (se "Sim", exige especificação). É possível adicionar eletrodomésticos fora da
+  lista. **Itens novos entram sempre no fim de `SEC2_ITEMS`** — as chaves do
+  rascunho são posicionais (`s2_<índice>`) e inserir no meio remaparia rascunhos
+  antigos para o eletrodoméstico errado.
 - **Seção 3 (Bancadas, Cubas e Metais):** por ambiente. O **tipo de cuba**
   (Inox / Louça / Esculpida / Não se aplica) define os campos seguintes; "Louça"
   ainda pede o modelo (apoio/sobrepor/embutir/semi-encaixe). Depois vêm os campos
